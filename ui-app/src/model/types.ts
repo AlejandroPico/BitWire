@@ -82,6 +82,8 @@ export interface ModuleArea {
   /** Collapsed modules behave as a single reusable chip on the parent canvas. */
   collapsed: boolean;
   pins: ModulePin[];
+  /** Parent encapsulation. Undefined places the module on the project canvas. */
+  parentModuleId?: string;
   description?: string;
 }
 
@@ -97,6 +99,8 @@ export interface SavedModule {
   pins: ModulePin[];
   components: ComponentInstance[];
   wires: Wire[];
+  /** Nested encapsulations stored relative to the reusable module root. */
+  modules?: ModuleArea[];
   savedAt: string;
 }
 

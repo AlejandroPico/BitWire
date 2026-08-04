@@ -55,11 +55,14 @@ export function createDemoProject(): BitWireProject {
     wire('w_load', 'resistor_main', 'b', 'lamp_main', 'a'),
     wire('w_return', 'lamp_main', 'b', 'ground_main', 'gnd'),
     wire('w_ground', 'source_main', 'neg', 'ground_main', 'gnd'),
-    wire('w_a', 'logic_a', 'out', 'gate_main', 'a'),
-    wire('w_b', 'logic_b', 'out', 'gate_main', 'b'),
-    wire('w_gate_out', 'gate_main', 'out', 'led_logic', 'a'),
+    wire('w_a', 'logic_a', 'out', 'module_gate_core', 'a'),
+    wire('w_a_internal', 'module_gate_core', 'a', 'gate_main', 'a'),
+    wire('w_b', 'logic_b', 'out', 'module_gate_core', 'b'),
+    wire('w_b_internal', 'module_gate_core', 'b', 'gate_main', 'b'),
+    wire('w_gate_internal', 'gate_main', 'out', 'module_gate_core', 'q'),
+    wire('w_gate_out', 'module_gate_core', 'q', 'led_logic', 'a'),
     wire('w_led_return', 'led_logic', 'b', 'ground_main', 'gnd'),
-    wire('w_scope', 'gate_main', 'out', 'scope_main', 'ch1'),
+    wire('w_scope', 'module_gate_core', 'q', 'scope_main', 'ch1'),
   ];
   const modules: ModuleArea[] = [
     { id: 'module_power', name: 'Etapa eléctrica de 5 V', x: -610, y: -170, width: 900, height: 210, color: '#f5b942', memberIds: ['source_main','switch_main','resistor_main','lamp_main'], enabled: true, collapsed: false, pins: [
@@ -69,6 +72,11 @@ export function createDemoProject(): BitWireProject {
     ] },
     { id: 'module_logic', name: 'Demostrador AND', x: -580, y: 250, width: 920, height: 320, color: '#2be4c4', memberIds: ['logic_a','logic_b','gate_main','led_logic'], enabled: true, collapsed: false, pins: [
       { id: 'a', name: 'A', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: .35 },
+      { id: 'b', name: 'B', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: .68 },
+      { id: 'q', name: 'Q', kind: 'OUTPUT', domain: 'DIGITAL', side: 'right', position: .5 },
+    ] },
+    { id: 'module_gate_core', name: 'Núcleo lógico AND', x: -260, y: 300, width: 320, height: 180, color: '#7b8cff', memberIds: ['gate_main'], enabled: true, collapsed: true, parentModuleId: 'module_logic', pins: [
+      { id: 'a', name: 'A', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: .34 },
       { id: 'b', name: 'B', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: .68 },
       { id: 'q', name: 'Q', kind: 'OUTPUT', domain: 'DIGITAL', side: 'right', position: .5 },
     ] },

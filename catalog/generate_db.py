@@ -48,6 +48,14 @@ def pins_for(profile: str) -> list[dict]:
         return [pin("a","A","INPUT","DIGITAL",0,.25),pin("b","B","INPUT","DIGITAL",0,.55),pin("sel","S","INPUT","DIGITAL",0,.82),pin("out","Q","OUTPUT","DIGITAL",1,.5)]
     if profile == "display7":
         return [pin(name,name.upper(),"INPUT","DIGITAL",0,(i+1)/9) for i,name in enumerate("abcdefg")]
+    if profile == "display4":
+        return [pin(name,name.upper(),"INPUT","DIGITAL",0,(i+1)/9) for i,name in enumerate("abcdefg")] + [pin(f"digit{i+1}",f"D{i+1}","INPUT","DIGITAL",1,(i+1)/5) for i in range(4)]
+    if profile == "lcd16x2":
+        return [pin(f"d{i}",f"D{i}","INPUT","DIGITAL",0,(i+1)/10) for i in range(8)] + [pin("rs","RS","INPUT","DIGITAL",1,.25),pin("enable","E","INPUT","DIGITAL",1,.45),pin("vcc","VCC","VCC","POWER",1,.65),pin("gnd","GND","GND","POWER",1,.82)]
+    if profile == "matrix8":
+        return [pin(f"row{i}",f"R{i}","INPUT","DIGITAL",0,(i+1)/9) for i in range(8)] + [pin(f"col{i}",f"C{i}","INPUT","DIGITAL",1,(i+1)/9) for i in range(8)]
+    if profile == "bargraph10":
+        return [pin(f"s{i+1}",str(i+1),"INPUT","DIGITAL",0,(i+1)/11) for i in range(10)]
     if profile == "analyzer":
         return [pin(f"ch{i}",f"D{i}","INPUT","DIGITAL",0,(i+1)/9) for i in range(8)]
     return profiles["analog2"]

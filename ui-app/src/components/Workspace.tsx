@@ -1,4 +1,4 @@
-import { ChevronLeft, Crosshair, Maximize, Minus, Plus, Route, Scan, Trash2, X } from 'lucide-react';
+import { Crosshair, Maximize, Minus, Plus, Route, Scan, Trash2, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CATALOG_BY_ID } from '../catalog/catalog';
 import { fitBounds, screenToWorld, zoomAt } from '../canvas/ViewportMatrix';
@@ -27,6 +27,7 @@ interface Props {
   onViewport(viewport: ViewportState): void;
   activeModuleId?: string;
   onActiveModule(id?: string): void;
+  onOpenInspector(): void;
 }
 
 type Interaction =
@@ -39,26 +40,36 @@ type Interaction =
   | { type: 'marquee' | 'module'; start: Point; current: Point }
   | null;
 
-export function Workspace({ project, update, selected, onSelected, selectedModuleId, onSelectedModule, tool, onTool, snapshot, running, onViewport, activeModuleId, onActiveModule }: Props) {
+export function Workspace({ project, update, selected, onSelected, selectedModuleId, onSelectedModule, tool, onTool, snapshot, running, onViewport, activeModuleId, onActiveModule, onOpenInspector }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [viewport, setViewportState] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
   const [interaction, setInteraction] = useState<Interaction>(null);
   const interactionRef = useRef<Interaction>(null);
   const [pendingPin, setPendingPin] = useState<PinRef>();
-  const [openInspectors, setOpenInspectors] = useState<Set<string>>(() => new Set());
   const [selectedWireId, setSelectedWireId] = useState<string>();
   const [pointerWorld, setPointerWorld] = useState<Point>({ x: 0, y: 0 });
   const [spaceHeld, setSpaceHeld] = useState(false);
   const lod = lodForScale(viewport.scale);
   const selectedModule = project.modules.find(module => module.id === selectedModuleId);
   const activeModule = project.modules.find(module => module.id === activeModuleId);
-  const hiddenMemberIds = useMemo(() => new Set(project.modules.filter(module => module.collapsed && module.id !== activeModuleId).flatMap(module => module.memberIds)), [project.modules, activeModuleId]);
+  const childModules = useMemo(() => project.modules.filter(module => module.parentModuleId === activeModuleId), [project.modules, activeModuleId]);
+  const ancestors = useMemo(() => {
+    const path: ModuleArea[] = [];
+    let cursor = activeModule;
+    const visited = new Set<string>();
+    while (cursor && !visited.has(cursor.id)) { visited.add(cursor.id); path.unshift(cursor); cursor = project.modules.find(module => module.id === cursor?.parentModuleId); }
+    return path;
+  }, [activeModule, project.modules]);
+  const hiddenMemberIds = useMemo(() => new Set(project.modules.filter(module => module.collapsed && module.id !== activeModuleId && (!activeModuleId || module.parentModuleId === activeModuleId)).flatMap(module => module.memberIds)), [project.modules, activeModuleId]);
   const activeMemberIds = useMemo(() => activeModule ? new Set(activeModule.memberIds) : undefined, [activeModule]);
-  const visibleComponents = useMemo(() => project.components.filter(component => activeMemberIds ? activeMemberIds.has(component.id) : !hiddenMemberIds.has(component.id)), [project.components, activeMemberIds, hiddenMemberIds]);
+  const visibleComponents = useMemo(() => project.components.filter(component => activeMemberIds ? activeMemberIds.has(component.id) && !hiddenMemberIds.has(component.id) : !hiddenMemberIds.has(component.id)), [project.components, activeMemberIds, hiddenMemberIds]);
   const visibleWires = useMemo(() => project.wires.filter(wire => {
-    if (activeMemberIds && activeModule) return [wire.from.componentId, wire.to.componentId].every(id => activeMemberIds.has(id) || id === activeModule.id);
+    if (activeMemberIds && activeModule) {
+      const visibleEndpoints = new Set([activeModule.id, ...activeMemberIds, ...childModules.map(module => module.id)]);
+      return [wire.from.componentId, wire.to.componentId].every(id => visibleEndpoints.has(id));
+    }
     return !project.modules.some(module => module.collapsed && [wire.from.componentId, wire.to.componentId].every(id => module.memberIds.includes(id) || id === module.id));
-  }), [project.wires, project.modules, activeMemberIds, activeModule]);
+  }), [project.wires, project.modules, activeMemberIds, activeModule, childModules]);
 
   const setCurrentInteraction = useCallback((value: Interaction) => {
     interactionRef.current = value;
@@ -92,6 +103,11 @@ export function Workspace({ project, update, selected, onSelected, selectedModul
     if (!component || !definition || !pin) {
       const module = project.modules.find(item => item.id === ref.componentId);
       const modulePin = module?.pins.find(item => item.id === ref.pinId);
+      if (module && modulePin && module.id === activeModuleId && svgRef.current) {
+        const width=svgRef.current.clientWidth, height=svgRef.current.clientHeight;
+        const screenPoint = modulePin.side==='left' ? {x:1,y:modulePin.position*height} : modulePin.side==='right' ? {x:width-1,y:modulePin.position*height} : modulePin.side==='top' ? {x:modulePin.position*width,y:1} : {x:modulePin.position*width,y:height-1};
+        return screenToWorld(screenPoint,viewport);
+      }
       return module && modulePin ? modulePinWorld(module, modulePin) : undefined;
     }
     const base = { x: pin.x * definition.width, y: pin.y * definition.height };
@@ -102,7 +118,7 @@ export function Workspace({ project, update, selected, onSelected, selectedModul
       x: component.x + (cx + (base.x - cx) * Math.cos(angle) - (base.y - cy) * Math.sin(angle)) * scale,
       y: component.y + (cy + (base.x - cx) * Math.sin(angle) + (base.y - cy) * Math.cos(angle)) * scale,
     };
-  }, [project.components, project.modules]);
+  }, [project.components, project.modules, activeModuleId, viewport]);
 
   const onWheel = (event: React.WheelEvent<SVGSVGElement>) => {
     event.preventDefault();
@@ -157,6 +173,9 @@ export function Workspace({ project, update, selected, onSelected, selectedModul
         const moveX = currentInteraction.origin.x + dx - module.x;
         const moveY = currentInteraction.origin.y + dy - module.y;
         module.x += moveX; module.y += moveY;
+        const descendantIds = new Set([module.id]);
+        let changed=true;
+        while(changed){changed=false;for(const child of draft.modules)if(child.parentModuleId&&descendantIds.has(child.parentModuleId)&&!descendantIds.has(child.id)){descendantIds.add(child.id);child.x+=moveX;child.y+=moveY;changed=true;}}
         for (const id of module.memberIds) { const component = draft.components.find(item => item.id === id); if (component) { component.x += moveX; component.y += moveY; } }
         for (const wire of draft.wires) if ([wire.from.componentId,wire.to.componentId].some(id => module.memberIds.includes(id) || id === module.id)) wire.controlPoints = wire.controlPoints?.map(point => ({ x: point.x + moveX, y: point.y + moveY }));
       }, !currentInteraction.recorded);
@@ -201,7 +220,7 @@ export function Workspace({ project, update, selected, onSelected, selectedModul
         }).map(component => component.id);
         if (currentInteraction.type === 'marquee') onSelected(memberIds);
         else {
-          const module: ModuleArea = { id: uid('module'), name: `Encapsulado ${project.modules.length + 1}`, ...rect, color: '#7b8cff', memberIds, enabled: true, collapsed: false, pins: [] };
+          const module: ModuleArea = { id: uid('module'), name: `Encapsulado ${project.modules.length + 1}`, ...rect, color: '#7b8cff', memberIds, enabled: true, collapsed: false, pins: [], parentModuleId: activeModuleId };
           update(draft => { draft.modules.push(module); });
           onSelectedModule(module.id); onTool('select');
         }
@@ -257,14 +276,7 @@ export function Workspace({ project, update, selected, onSelected, selectedModul
     if (definition.model === 'logic_input') item.properties.state = Number(item.properties.state) ? 0 : 1;
   });
 
-  const toggleComponentInspector = (component: ComponentInstance) => {
-    setOpenInspectors(current => {
-      const next = new Set(current);
-      next.has(component.id) ? next.delete(component.id) : next.add(component.id);
-      return next;
-    });
-    onSelected([component.id]);
-  };
+  const openComponentInspector = (component: ComponentInstance) => { onSelected([component.id]); onSelectedModule(undefined); onOpenInspector(); };
 
   const fitProject = () => {
     const rect = svgRef.current!.getBoundingClientRect();
@@ -273,6 +285,14 @@ export function Workspace({ project, update, selected, onSelected, selectedModul
     const minX = Math.min(...boxes.map(b => b.x)), minY = Math.min(...boxes.map(b => b.y));
     const maxX = Math.max(...boxes.map(b => b.x + b.width)), maxY = Math.max(...boxes.map(b => b.y + b.height));
     setViewport(fitBounds({ x: minX, y: minY, width: maxX - minX, height: maxY - minY }, { width: rect.width, height: rect.height }, 110));
+  };
+
+  const navigateToModule = (id?:string) => {
+    onActiveModule(id); onSelected([]); onSelectedModule(id);
+    const rect=svgRef.current?.getBoundingClientRect();
+    const module=id?project.modules.find(item=>item.id===id):undefined;
+    if(rect&&module)setViewport(fitBounds(module,{width:rect.width,height:rect.height},90));
+    else if(rect){const roots=project.modules.filter(item=>!item.parentModuleId);if(roots.length){const minX=Math.min(...roots.map(item=>item.x)),minY=Math.min(...roots.map(item=>item.y)),maxX=Math.max(...roots.map(item=>item.x+item.width)),maxY=Math.max(...roots.map(item=>item.y+item.height));setViewport(fitBounds({x:minX,y:minY,width:maxX-minX,height:maxY-minY},{width:rect.width,height:rect.height},80));}}
   };
 
   const addAt = (definitionId: string, world: Point) => {
@@ -335,7 +355,7 @@ export function Workspace({ project, update, selected, onSelected, selectedModul
   const gridSize = adaptiveGrid(project.settings.gridSize, viewport.scale);
   const renderedWires = useMemo(() => visibleWires.map(wire => ({ wire, from: pinWorld(wire.from), to: pinWorld(wire.to) })), [visibleWires, pinWorld]);
   const selectedWire = project.wires.find(wire => wire.id === selectedWireId);
-  const renderedModules = activeModule ? [activeModule] : project.modules;
+  const renderedModules = activeModule ? childModules : project.modules.filter(module => !module.parentModuleId);
 
   return <main className={`workspace theme-${resolveTheme(project.settings.theme)} tool-${tool} ${spaceHeld ? 'space-pan' : ''} ${activeModule ? 'inside-module' : ''}`}>
     <svg ref={svgRef} className="circuit-canvas" onWheel={onWheel} onPointerDown={onBackgroundDown} onPointerMove={onPointerMove} onPointerUp={finishInteraction} onPointerCancel={finishInteraction}
@@ -348,11 +368,11 @@ export function Workspace({ project, update, selected, onSelected, selectedModul
       </defs>
       <g transform={`translate(${viewport.x} ${viewport.y}) scale(${viewport.scale})`}>
         <rect className="grid-plane" x={-100000} y={-100000} width={200000} height={200000} fill="url(#majorGrid)"/>
-        <g className="module-layer">{renderedModules.map(module => <g key={module.id} className={`module-area ${module.collapsed && !activeModule ? 'chip-mode' : 'area-mode'} ${module.id === selectedModuleId ? 'selected' : ''} ${module.enabled ? '' : 'disabled'}`} onPointerDown={event => onModuleDown(event,module)} onDoubleClick={event => { event.stopPropagation(); const entering=activeModuleId!==module.id; onActiveModule(entering?module.id:undefined); onSelectedModule(module.id); if(entering)setViewport(fitBounds(module,{width:svgRef.current!.clientWidth,height:svgRef.current!.clientHeight},90)); }}>
+        <g className="module-layer">{renderedModules.map(module => <g key={module.id} className={`module-area ${module.collapsed ? 'chip-mode' : 'area-mode'} ${module.id === selectedModuleId ? 'selected' : ''} ${module.enabled ? '' : 'disabled'}`} onPointerDown={event => onModuleDown(event,module)} onDoubleClick={event => { event.stopPropagation(); navigateToModule(module.id); }}>
           <rect x={module.x} y={module.y} width={module.width} height={module.height} style={{ stroke: module.color }}/>
           <path d={`M${module.x} ${module.y + 34}h${module.width}`} style={{ stroke: module.color }}/>
-          {module.collapsed && !activeModule && <>{Array.from({length:Math.max(2,Math.min(12,module.pins.length))},(_,index)=><path key={index} className="chip-decoration" d={`M${module.x+22+index*14} ${module.y+12}v10`} style={{stroke:module.color}}/>)}</>}
-          <text x={module.x + 14} y={module.y + 23} style={{ fill: module.color }}>{module.name.toUpperCase()}</text><text className="module-state" x={module.x + module.width - 14} y={module.y + 23} textAnchor="end">{activeModule ? 'LIENZO INTERNO' : module.collapsed ? `${module.pins.length} PINES` : module.enabled ? 'ACTIVO' : 'AISLADO'}</text>
+          {module.collapsed && <>{Array.from({length:Math.max(2,Math.min(12,module.pins.length))},(_,index)=><path key={index} className="chip-decoration" d={`M${module.x+22+index*14} ${module.y+12}v10`} style={{stroke:module.color}}/>)}</>}
+          <text x={module.x + 14} y={module.y + 23} style={{ fill: module.color }}>{module.name.toUpperCase()}</text><text className="module-state" x={module.x + module.width - 14} y={module.y + 23} textAnchor="end">{module.collapsed ? `${module.pins.length} PINES` : module.enabled ? 'ACTIVO' : 'AISLADO'}</text>
           {module.pins.map(pin => <ModulePinNode key={pin.id} module={module} pin={pin} onPin={event => { event.stopPropagation(); connectPin({ componentId: module.id, pinId: pin.id }); }}/>) }
           {module.id === selectedModuleId && <ResizeHandles module={module} onPointerDown={onModuleResize}/>} 
         </g>)}</g>
@@ -371,12 +391,13 @@ export function Workspace({ project, update, selected, onSelected, selectedModul
           const definition = CATALOG_BY_ID.get(component.definitionId);
           if (!definition) return null;
           const componentLod = lodForScale(viewport.scale * (component.scale || 1));
-          return <CircuitSymbol key={component.id} component={component} definition={definition} selected={selected.includes(component.id)} lod={componentLod.level} signal={snapshot?.componentSignals[component.id]} inspectorOpen={openInspectors.has(component.id)} onPointerDown={onComponentDown} onDoubleClick={toggleComponentInspector} onPin={onPin} onQuickToggle={quickToggle} onProperty={(item,key,value) => update(draft => { const target=draft.components.find(node=>node.id===item.id); if(target) target.properties[key]=value; })}/>;
+          return <CircuitSymbol key={component.id} component={component} definition={definition} selected={selected.includes(component.id)} lod={componentLod.level} signal={snapshot?.componentSignals[component.id]} onPointerDown={onComponentDown} onDoubleClick={openComponentInspector} onPin={onPin} onQuickToggle={quickToggle} onProperty={(item,key,value) => update(draft => { const target=draft.components.find(node=>node.id===item.id); if(target) target.properties[key]=value; })}/>;
         })}</g>
         {marquee && <rect className={interaction?.type === 'module' ? 'module-marquee' : 'selection-marquee'} x={marquee.x} y={marquee.y} width={marquee.width} height={marquee.height}/>} 
       </g>
     </svg>
-    <div className="workspace-breadcrumb">{activeModule && <button onClick={() => onActiveModule(undefined)} title="Volver al proyecto"><ChevronLeft size={14}/></button>}<span>PROYECTO</span><b>/</b><strong>{project.name}</strong>{activeModule ? <><b>/</b><span style={{ color: activeModule.color }}>{activeModule.name} · LIENZO INTERNO</span></> : selectedModule && <><b>/</b><span style={{ color: selectedModule.color }}>{selectedModule.name}</span></>}</div>
+    <nav className="workspace-breadcrumb" aria-label="Ruta del lienzo"><button onClick={() => navigateToModule()}>PROYECTO</button><b>/</b><button onClick={() => navigateToModule()}>{project.name}</button>{ancestors.map((module,index)=><span className="breadcrumb-level" key={module.id}><b>/</b><button className={index===ancestors.length-1?'current':''} style={{color:module.color}} onClick={()=>navigateToModule(module.id)}>{module.name}{index===ancestors.length-1?' · LIENZO INTERNO':''}</button></span>)}{!activeModule && selectedModule && <span className="breadcrumb-level"><b>/</b><span style={{color:selectedModule.color}}>{selectedModule.name}</span></span>}</nav>
+    {activeModule && <ModulePortDocks module={activeModule} onPin={pin=>connectPin({componentId:activeModule.id,pinId:pin.id})}/>} 
     <div className="lod-indicator"><Scan size={15}/><div><span>LOD {lod.level}</span><strong>{lod.name}</strong></div><small>{lod.detail}</small></div>
     {pendingPin && <div className="wire-hint"><WayPointIcon/>Selecciona otro terminal para completar el cable<button onClick={() => setPendingPin(undefined)}><X size={14}/></button></div>}
     {selectedWire && <div className="wire-editor"><Route size={14}/><strong>CONEXIÓN</strong><select value={selectedWire.routing} onChange={event => patchWire(selectedWire.id,{routing:event.target.value as Wire['routing']})}><option value="orthogonal">Ortogonal</option><option value="bezier">Bézier</option><option value="straight">Recta</option></select><span>{selectedWire.controlPoints?.length ?? 0} nodos</span><button onClick={() => patchWire(selectedWire.id,{controlPoints:[]})}>Limpiar nodos</button><button className="danger" onClick={() => deleteWire(selectedWire.id)}><Trash2 size={13}/></button></div>}
@@ -410,6 +431,16 @@ function ModulePinNode({ module, pin, onPin }: { module: ModuleArea; pin: Module
     <circle className="module-pin-hit" cx={point.x} cy={point.y} r="14" onPointerDown={onPin}/>
     <text x={labelX} y={labelY} textAnchor={horizontal ? pin.side === 'left' ? 'start' : 'end' : 'middle'}>{pin.name}{pin.nominalVoltage !== undefined ? ` · ${pin.nominalVoltage}V` : ''}</text>
   </g>;
+}
+
+function ModulePortDocks({ module, onPin }: { module: ModuleArea; onPin(pin:ModulePin):void }) {
+  return <div className="module-port-docks" aria-label={`Terminales de ${module.name}`}>{module.pins.map(pin => {
+    const along = `${Math.max(4,Math.min(96,pin.position*100))}%`;
+    const style = pin.side === 'left' || pin.side === 'right' ? { top: along } : { left: along };
+    return <button key={pin.id} className={`module-port-dock ${pin.side} ${pin.domain.toLowerCase()}`} style={style} onPointerDown={event=>event.stopPropagation()} onClick={()=>onPin(pin)} title={`${pin.kind} · ${pin.domain}${pin.nominalVoltage !== undefined ? ` · ${pin.nominalVoltage} V` : ''}`}>
+      <i/><span><strong>{pin.name}</strong><small>{pin.kind}{pin.nominalVoltage !== undefined ? ` · ${pin.nominalVoltage} V` : ''}</small></span>
+    </button>;
+  })}</div>;
 }
 
 const RESIZE_HANDLES = [

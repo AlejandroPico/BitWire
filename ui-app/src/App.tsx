@@ -102,7 +102,7 @@ export default function App() {
   const insertModule = (saved: SavedModule) => {
     const world = { x:(window.innerWidth*.5-viewport.x)/viewport.scale, y:(window.innerHeight*.45-viewport.y)/viewport.scale };
     let insertedId='';
-    update(draft=>{ const module=insertSavedModule(draft,saved,world.x-saved.width/2,world.y-saved.height/2); insertedId=module.id; });
+    update(draft=>{ const module=insertSavedModule(draft,saved,world.x-saved.width/2,world.y-saved.height/2,activeModuleId); insertedId=module.id; });
     queueMicrotask(()=>{ if(insertedId){ setSelected([]); setSelectedModuleId(insertedId); } });
   };
 
@@ -114,8 +114,17 @@ export default function App() {
 
   const deleteSelection = useCallback(() => {
     if (selectedModuleId) {
-      update(draft => { draft.modules = draft.modules.filter(module => module.id !== selectedModuleId); });
-      if(activeModuleId===selectedModuleId)setActiveModuleId(undefined);
+      const moduleIds = new Set([selectedModuleId]);
+      let changed = true;
+      while (changed) { changed = false; for (const module of project.modules) if (module.parentModuleId && moduleIds.has(module.parentModuleId) && !moduleIds.has(module.id)) { moduleIds.add(module.id); changed = true; } }
+      update(draft => {
+        const componentIds = new Set(draft.modules.filter(module=>moduleIds.has(module.id)).flatMap(module=>module.memberIds));
+        draft.modules = draft.modules.filter(module => !moduleIds.has(module.id));
+        draft.components = draft.components.filter(component=>!componentIds.has(component.id));
+        draft.wires = draft.wires.filter(wire=>!moduleIds.has(wire.from.componentId)&&!moduleIds.has(wire.to.componentId)&&!componentIds.has(wire.from.componentId)&&!componentIds.has(wire.to.componentId));
+        for (const module of draft.modules) module.memberIds = module.memberIds.filter(id=>!componentIds.has(id));
+      });
+      if(activeModuleId && moduleIds.has(activeModuleId))setActiveModuleId(undefined);
       setSelectedModuleId(undefined); return;
     }
     if (!selected.length) return;
@@ -126,7 +135,7 @@ export default function App() {
       for (const module of draft.modules) module.memberIds = module.memberIds.filter(id => !ids.has(id));
     });
     setSelected([]);
-  }, [selected, selectedModuleId, activeModuleId, update]);
+  }, [selected, selectedModuleId, activeModuleId, update, project.modules]);
 
   const duplicateSelection = useCallback(() => {
     if (!selected.length) return;
@@ -174,7 +183,7 @@ export default function App() {
       onNew={newProject} onSave={save} onImport={() => importRef.current?.click()} onExport={() => exportProject(project)} onUndo={undo} onRedo={redo}/>
     <div className={`editor-grid ${catalogCollapsed ? 'left-collapsed' : ''} ${inspectorCollapsed ? 'right-collapsed' : ''} ${instrumentsCollapsed ? 'bottom-collapsed' : ''}`}>
       <CatalogPanel collapsed={catalogCollapsed} database={database} onToggle={() => setCatalogCollapsed(value => !value)} onAdd={addDefinition} modules={moduleLibrary} onInsertModule={insertModule} onImportModule={()=>moduleImportRef.current?.click()} onDeleteModule={id=>setModuleLibrary(deleteSavedModule(id))}/>
-      <Workspace project={project} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} running={running} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}}/>
+      <Workspace project={project} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} running={running} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>setInspectorCollapsed(false)}/>
       <Inspector project={project} selected={selected} collapsed={inspectorCollapsed} onToggle={() => setInspectorCollapsed(value => !value)} selectedModule={selectedModule}
         onProperty={(id, key, value: PropertyValue) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) item.properties[key] = value; })}
         onPatch={(id, patch) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) Object.assign(item, patch); })}
@@ -199,7 +208,7 @@ export default function App() {
       <div className="help-grid">
         <article><PanelLeftClose/><h3>1. Inserta</h3><p>Arrastra símbolos desde el catálogo. Todos son vectoriales y conservan nitidez a cualquier escala.</p></article>
         <article><Cpu/><h3>2. Configura</h3><p>Selecciona un elemento y modifica sus parámetros. Los interruptores y entradas lógicas también se accionan sobre el plano.</p></article>
-        <article><Layers3/><h3>3. Profundiza</h3><p>Amplía para revelar controles y circuitos internos. El doble clic abre o cierra el inspector incrustado sin mover la cámara.</p></article>
+        <article><Layers3/><h3>3. Profundiza</h3><p>Amplía para revelar controles y circuitos internos. El doble clic selecciona el elemento y abre su inspector lateral sin mover la cámara.</p></article>
         <article><BookOpen/><h3>4. Encapsula</h3><p>Dibuja un módulo, redimensiónalo y define sus patillas. Su lienzo interno puede guardarse o exportarse para reutilizarlo.</p></article>
       </div>
       <div className="shortcut-table"><span><kbd>V</kbd> Selección</span><span><kbd>W</kbd> Cable</span><span><kbd>H</kbd> Mano</span><span><kbd>Espacio</kbd> Desplazar</span><span><kbd>Supr</kbd> Eliminar</span><span><kbd>Ctrl S</kbd> Guardar</span></div>

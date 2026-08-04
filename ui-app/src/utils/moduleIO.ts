@@ -12,13 +12,17 @@ export function loadModuleLibrary(): SavedModule[] {
 }
 
 export function buildSavedModule(project: BitWireProject, module: ModuleArea): SavedModule {
-  const members = new Set(module.memberIds);
+  const descendants: ModuleArea[] = [];
+  const collect = (parentId: string) => project.modules.filter(item => item.parentModuleId === parentId).forEach(item => { descendants.push(item); collect(item.id); });
+  collect(module.id);
+  const moduleIds = new Set([module.id, ...descendants.map(item => item.id)]);
+  const members = new Set([module, ...descendants].flatMap(item => item.memberIds));
   const components = project.components.filter(item => members.has(item.id)).map(item => ({
     ...structuredClone(item), x: item.x - module.x, y: item.y - module.y,
   }));
   const wires = project.wires.filter(wire =>
-    (members.has(wire.from.componentId) || wire.from.componentId === module.id)
-    && (members.has(wire.to.componentId) || wire.to.componentId === module.id))
+    (members.has(wire.from.componentId) || moduleIds.has(wire.from.componentId))
+    && (members.has(wire.to.componentId) || moduleIds.has(wire.to.componentId)))
     .map(wire => {
       const copy = structuredClone(wire);
       if (copy.from.componentId === module.id) copy.from.componentId = MODULE_ENDPOINT;
@@ -26,10 +30,14 @@ export function buildSavedModule(project: BitWireProject, module: ModuleArea): S
       copy.controlPoints = copy.controlPoints?.map(point => ({ x: point.x - module.x, y: point.y - module.y }));
       return copy;
     });
+  const modules = descendants.map(item => ({
+    ...structuredClone(item), x: item.x - module.x, y: item.y - module.y,
+    parentModuleId: item.parentModuleId === module.id ? MODULE_ENDPOINT : item.parentModuleId,
+  }));
   return {
     format: 'bitwire-module', version: 1, id: uid('library'), name: module.name,
     description: module.description ?? '', width: module.width, height: module.height,
-    color: module.color, pins: structuredClone(module.pins), components, wires,
+    color: module.color, pins: structuredClone(module.pins), components, wires, modules,
     savedAt: new Date().toISOString(),
   };
 }
@@ -47,28 +55,36 @@ export function deleteSavedModule(id: string): SavedModule[] {
   return library;
 }
 
-export function insertSavedModule(project: BitWireProject, saved: SavedModule, x: number, y: number): ModuleArea {
+export function insertSavedModule(project: BitWireProject, saved: SavedModule, x: number, y: number, parentModuleId?: string): ModuleArea {
   const moduleId = uid('module');
   const idMap = new Map<string, string>();
+  idMap.set(MODULE_ENDPOINT, moduleId);
+  for (const nested of saved.modules ?? []) idMap.set(nested.id, uid('module'));
   const components: ComponentInstance[] = saved.components.map(component => {
     const id = uid('node'); idMap.set(component.id, id);
     return { ...structuredClone(component), id, x: x + component.x, y: y + component.y };
   });
   const wires: Wire[] = saved.wires.map(wire => ({
     ...structuredClone(wire), id: uid('wire'),
-    from: { ...wire.from, componentId: wire.from.componentId === MODULE_ENDPOINT ? moduleId : idMap.get(wire.from.componentId) ?? wire.from.componentId },
-    to: { ...wire.to, componentId: wire.to.componentId === MODULE_ENDPOINT ? moduleId : idMap.get(wire.to.componentId) ?? wire.to.componentId },
+    from: { ...wire.from, componentId: idMap.get(wire.from.componentId) ?? wire.from.componentId },
+    to: { ...wire.to, componentId: idMap.get(wire.to.componentId) ?? wire.to.componentId },
     controlPoints: wire.controlPoints?.map(point => ({ x: point.x + x, y: point.y + y })),
   }));
   const module: ModuleArea = {
     id: moduleId, name: saved.name, description: saved.description,
     x, y, width: saved.width, height: saved.height, color: saved.color,
     memberIds: components.map(item => item.id), enabled: true, collapsed: true,
-    pins: structuredClone(saved.pins),
+    pins: structuredClone(saved.pins), parentModuleId,
   };
+  const nestedModules = (saved.modules ?? []).map(nested => ({
+    ...structuredClone(nested), id: idMap.get(nested.id)!,
+    x: x + nested.x, y: y + nested.y,
+    parentModuleId: nested.parentModuleId === MODULE_ENDPOINT ? moduleId : nested.parentModuleId ? idMap.get(nested.parentModuleId) : moduleId,
+    memberIds: nested.memberIds.map(id => idMap.get(id) ?? id),
+  }));
   project.components.push(...components);
   project.wires.push(...wires);
-  project.modules.push(module);
+  project.modules.push(module, ...nestedModules);
   return module;
 }
 

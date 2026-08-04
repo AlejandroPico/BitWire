@@ -36,6 +36,10 @@ export function pinsFor(profile: string): PinDefinition[] {
   if (profile === 'dff') return [pin('d','D','INPUT','DIGITAL',0,.3),pin('clk','CLK','INPUT','DIGITAL',0,.7),pin('q','Q','OUTPUT','DIGITAL',1,.3),pin('nq','Q̅','OUTPUT','DIGITAL',1,.7)];
   if (profile === 'mux') return [pin('a','A','INPUT','DIGITAL',0,.25),pin('b','B','INPUT','DIGITAL',0,.55),pin('sel','S','INPUT','DIGITAL',0,.82),pin('out','Q','OUTPUT','DIGITAL',1,.5)];
   if (profile === 'display7') return [...'abcdefg'].map((name, i) => pin(name,name.toUpperCase(),'INPUT','DIGITAL',0,(i + 1) / 9));
+  if (profile === 'display4') return [...'abcdefg'].map((name,i)=>pin(name,name.toUpperCase(),'INPUT','DIGITAL',0,(i+1)/9)).concat(Array.from({length:4},(_,i)=>pin(`digit${i+1}`,`D${i+1}`,'INPUT','DIGITAL',1,(i+1)/5)));
+  if (profile === 'lcd16x2') return Array.from({length:8},(_,i)=>pin(`d${i}`,`D${i}`,'INPUT','DIGITAL',0,(i+1)/10)).concat([pin('rs','RS','INPUT','DIGITAL',1,.25),pin('enable','E','INPUT','DIGITAL',1,.45),pin('vcc','VCC','VCC','POWER',1,.65),pin('gnd','GND','GND','POWER',1,.82)]);
+  if (profile === 'matrix8') return Array.from({length:8},(_,i)=>pin(`row${i}`,`R${i}`,'INPUT','DIGITAL',0,(i+1)/9)).concat(Array.from({length:8},(_,i)=>pin(`col${i}`,`C${i}`,'INPUT','DIGITAL',1,(i+1)/9)));
+  if (profile === 'bargraph10') return Array.from({length:10},(_,i)=>pin(`s${i+1}`,String(i+1),'INPUT','DIGITAL',0,(i+1)/11));
   if (profile === 'analyzer') return Array.from({ length: 8 }, (_, i) => pin(`ch${i}`,`D${i}`,'INPUT','DIGITAL',0,(i + 1) / 9));
   return profiles.analog2;
 }
