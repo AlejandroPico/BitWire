@@ -8,17 +8,20 @@ import { Workspace } from './components/Workspace';
 import { EMBEDDED_CATALOG, verifyCatalogDatabase } from './catalog/catalog';
 import type {
   BitWireProject, CatalogDatabaseStatus, ComponentDefinition, ModuleArea,
-  PropertyValue, SimulationSnapshot, Theme, ToolMode, ViewportState,
+  PropertyValue, SavedModule, SimulationSnapshot, Theme, ToolMode, ViewportState,
 } from './model/types';
 import { createBlankProject, createDemoProject, createInstance, uid } from './state/project';
 import { useProjectHistory } from './state/useProjectHistory';
 import { exportProject, importProject, loadLocalProject, saveProjectLocally } from './utils/projectIO';
+import { deleteSavedModule, exportModule, importModule, insertSavedModule, loadModuleLibrary, saveModuleToLibrary } from './utils/moduleIO';
 
 export default function App() {
   const initial = useRef(loadLocalProject() ?? createDemoProject()).current;
   const { project, update, reset, undo, redo, canUndo, canRedo } = useProjectHistory(initial);
   const [selected, setSelected] = useState<string[]>([]);
   const [selectedModuleId, setSelectedModuleId] = useState<string>();
+  const [activeModuleId, setActiveModuleId] = useState<string>();
+  const [moduleLibrary, setModuleLibrary] = useState<SavedModule[]>(loadModuleLibrary);
   const [tool, setTool] = useState<ToolMode>('select');
   const [running, setRunning] = useState(false);
   const [speed, setSpeed] = useState(1);
@@ -34,6 +37,7 @@ export default function App() {
   const [helpOpen, setHelpOpen] = useState(false);
   const workerRef = useRef<Worker | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
+  const moduleImportRef = useRef<HTMLInputElement>(null);
 
   const simulationProject = useCallback((source: BitWireProject) => {
     const next = structuredClone(source);
@@ -71,26 +75,47 @@ export default function App() {
 
   const newProject = useCallback(() => {
     if (project.updatedAt !== savedRevision && !window.confirm('Hay cambios sin guardar. ¿Crear un proyecto nuevo?')) return;
-    reset(createBlankProject()); setSelected([]); setSelectedModuleId(undefined); setRunning(false);
+    reset(createBlankProject()); setSelected([]); setSelectedModuleId(undefined); setActiveModuleId(undefined); setRunning(false);
   }, [project.updatedAt, savedRevision, reset]);
 
   const doImport = async (file?: File) => {
     if (!file) return;
     try {
-      const next = await importProject(file); reset(next); setSelected([]); setSelectedModuleId(undefined); setRunning(false); setToast({ type: 'ok', message: `Proyecto «${next.name}» importado.` });
+      const next = await importProject(file); reset(next); setSelected([]); setSelectedModuleId(undefined); setActiveModuleId(undefined); setRunning(false); setToast({ type: 'ok', message: `Proyecto «${next.name}» importado.` });
     } catch (error) { setToast({ type: 'error', message: error instanceof Error ? error.message : 'No se pudo importar el proyecto.' }); }
   };
 
   const addDefinition = (definition: ComponentDefinition) => {
     const world = { x: (window.innerWidth * .5 - viewport.x) / viewport.scale, y: (window.innerHeight * .45 - viewport.y) / viewport.scale };
-    const component = createInstance(definition.id, world.x - definition.width / 2, world.y - definition.height / 2);
-    update(draft => { draft.components.push(component); });
+    const instanceScale = Math.max(.04,Math.min(20,1/viewport.scale));
+    const component = createInstance(definition.id, world.x - definition.width*instanceScale/2, world.y - definition.height*instanceScale/2, uid('node'), instanceScale);
+    update(draft => { draft.components.push(component); if(activeModuleId) draft.modules.find(module=>module.id===activeModuleId)?.memberIds.push(component.id); });
     setSelected([component.id]); setSelectedModuleId(undefined);
+  };
+
+  const saveSelectedModule = () => {
+    if (!selectedModule) return;
+    setModuleLibrary(saveModuleToLibrary(project,selectedModule));
+    setToast({type:'ok',message:`«${selectedModule.name}» guardado en la biblioteca de encapsulados.`});
+  };
+
+  const insertModule = (saved: SavedModule) => {
+    const world = { x:(window.innerWidth*.5-viewport.x)/viewport.scale, y:(window.innerHeight*.45-viewport.y)/viewport.scale };
+    let insertedId='';
+    update(draft=>{ const module=insertSavedModule(draft,saved,world.x-saved.width/2,world.y-saved.height/2); insertedId=module.id; });
+    queueMicrotask(()=>{ if(insertedId){ setSelected([]); setSelectedModuleId(insertedId); } });
+  };
+
+  const doImportModule = async(file?:File) => {
+    if(!file)return;
+    try{ const saved=await importModule(file); setModuleLibrary(loadModuleLibrary()); setToast({type:'ok',message:`Encapsulado «${saved.name}» importado.`}); }
+    catch(error){setToast({type:'error',message:error instanceof Error?error.message:'No se pudo importar el encapsulado.'});}
   };
 
   const deleteSelection = useCallback(() => {
     if (selectedModuleId) {
       update(draft => { draft.modules = draft.modules.filter(module => module.id !== selectedModuleId); });
+      if(activeModuleId===selectedModuleId)setActiveModuleId(undefined);
       setSelectedModuleId(undefined); return;
     }
     if (!selected.length) return;
@@ -101,7 +126,7 @@ export default function App() {
       for (const module of draft.modules) module.memberIds = module.memberIds.filter(id => !ids.has(id));
     });
     setSelected([]);
-  }, [selected, selectedModuleId, update]);
+  }, [selected, selectedModuleId, activeModuleId, update]);
 
   const duplicateSelection = useCallback(() => {
     if (!selected.length) return;
@@ -134,7 +159,7 @@ export default function App() {
       else if (event.key.toLowerCase() === 'v') setTool('select');
       else if (event.key.toLowerCase() === 'w') setTool('wire');
       else if (event.key.toLowerCase() === 'h') setTool('pan');
-      else if (event.key === 'Escape') { setSelected([]); setSelectedModuleId(undefined); setTool('select'); }
+      else if (event.key === 'Escape') { setSelected([]); setSelectedModuleId(undefined); setActiveModuleId(undefined); setTool('select'); }
     };
     window.addEventListener('keydown', handler); return () => window.removeEventListener('keydown', handler);
   }, [deleteSelection, newProject, redo, save, undo]);
@@ -148,13 +173,13 @@ export default function App() {
       onRouting={routing => update(draft => { draft.settings.wireRouting = routing; })} onSignalView={signalView => update(draft => { draft.settings.signalView = signalView; })}
       onNew={newProject} onSave={save} onImport={() => importRef.current?.click()} onExport={() => exportProject(project)} onUndo={undo} onRedo={redo}/>
     <div className={`editor-grid ${catalogCollapsed ? 'left-collapsed' : ''} ${inspectorCollapsed ? 'right-collapsed' : ''} ${instrumentsCollapsed ? 'bottom-collapsed' : ''}`}>
-      <CatalogPanel collapsed={catalogCollapsed} database={database} onToggle={() => setCatalogCollapsed(value => !value)} onAdd={addDefinition}/>
-      <Workspace project={project} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} running={running} onViewport={setViewport}/>
+      <CatalogPanel collapsed={catalogCollapsed} database={database} onToggle={() => setCatalogCollapsed(value => !value)} onAdd={addDefinition} modules={moduleLibrary} onInsertModule={insertModule} onImportModule={()=>moduleImportRef.current?.click()} onDeleteModule={id=>setModuleLibrary(deleteSavedModule(id))}/>
+      <Workspace project={project} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} running={running} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}}/>
       <Inspector project={project} selected={selected} collapsed={inspectorCollapsed} onToggle={() => setInspectorCollapsed(value => !value)} selectedModule={selectedModule}
         onProperty={(id, key, value: PropertyValue) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) item.properties[key] = value; })}
         onPatch={(id, patch) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) Object.assign(item, patch); })}
         onProject={patch => update(draft => { Object.assign(draft, patch); })} onDelete={deleteSelection} onDuplicate={duplicateSelection}
-        onSelectModule={id => { setSelected([]); setSelectedModuleId(id); }} onModule={patchModule}/>
+        onSelectModule={id => { setSelected([]); setSelectedModuleId(id); }} onModule={patchModule} activeModuleId={activeModuleId} onEnterModule={id=>{setActiveModuleId(id);if(id)setSelectedModuleId(id);}} onSaveModule={saveSelectedModule} onExportModule={()=>selectedModule&&exportModule(project,selectedModule)}/>
       <InstrumentTray collapsed={instrumentsCollapsed} samples={samples} onToggle={() => setInstrumentsCollapsed(value => !value)}/>
       <footer className="statusbar">
         <div><span className={`engine-light ${running ? 'running' : ''}`}/><b>{running ? `SIMULANDO ${speed}×` : 'MOTOR EN PAUSA'}</b><span>{snapshot ? `t = ${snapshot.time.toFixed(3)} s · tick ${snapshot.tick}` : 'Inicializando motor…'}</span></div>
@@ -167,14 +192,15 @@ export default function App() {
       </footer>
     </div>
     <input ref={importRef} type="file" accept=".bitwire,.json,application/json" hidden onChange={event => { void doImport(event.target.files?.[0]); event.currentTarget.value = ''; }}/>
+    <input ref={moduleImportRef} type="file" accept=".bitwire-module,.json,application/json" hidden onChange={event=>{void doImportModule(event.target.files?.[0]);event.currentTarget.value='';}}/>
     {toast && <div className={`toast ${toast.type}`}>{toast.type === 'ok' ? <CheckCircle2 size={18}/> : <CircleAlert size={18}/>}<span>{toast.message}</span><button onClick={() => setToast(undefined)}><X size={15}/></button></div>}
     {helpOpen && <div className="modal-backdrop" onMouseDown={() => setHelpOpen(false)}><section className="help-modal" onMouseDown={event => event.stopPropagation()}>
       <header><div><span className="eyebrow">GUÍA RÁPIDA</span><h2>Trabajar en BitWire</h2></div><button onClick={() => setHelpOpen(false)}><X size={18}/></button></header>
       <div className="help-grid">
         <article><PanelLeftClose/><h3>1. Inserta</h3><p>Arrastra símbolos desde el catálogo. Todos son vectoriales y conservan nitidez a cualquier escala.</p></article>
         <article><Cpu/><h3>2. Configura</h3><p>Selecciona un elemento y modifica sus parámetros. Los interruptores y entradas lógicas también se accionan sobre el plano.</p></article>
-        <article><Layers3/><h3>3. Profundiza</h3><p>Amplía o haz doble clic sobre puertas y chips. Los niveles LOD revelan pines, bloques y redes internas.</p></article>
-        <article><BookOpen/><h3>4. Encapsula</h3><p>Elige la herramienta de módulo y dibuja un área. Podrás aislarla, reutilizarla y exportar todo como .bitwire.</p></article>
+        <article><Layers3/><h3>3. Profundiza</h3><p>Amplía para revelar controles y circuitos internos. El doble clic abre o cierra el inspector incrustado sin mover la cámara.</p></article>
+        <article><BookOpen/><h3>4. Encapsula</h3><p>Dibuja un módulo, redimensiónalo y define sus patillas. Su lienzo interno puede guardarse o exportarse para reutilizarlo.</p></article>
       </div>
       <div className="shortcut-table"><span><kbd>V</kbd> Selección</span><span><kbd>W</kbd> Cable</span><span><kbd>H</kbd> Mano</span><span><kbd>Espacio</kbd> Desplazar</span><span><kbd>Supr</kbd> Eliminar</span><span><kbd>Ctrl S</kbd> Guardar</span></div>
     </section></div>}

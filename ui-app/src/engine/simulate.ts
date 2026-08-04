@@ -86,12 +86,15 @@ function evaluateComponent(
       if (inputs.a) output.b = { ...inputs.a };
       if (inputs.b) output.a = { ...inputs.b };
     }
-  } else if (['resistor','capacitor','inductor','diode','zener','led','lamp','motor','buzzer','fuse','connector'].includes(model)) {
+  } else if (['resistor','capacitor','inductor','fuse','connector'].includes(model)) {
     if (model === 'fuse' && Boolean(props.blown)) return {};
     if (inputs.a) output.b = { ...inputs.a };
     if (inputs.b) output.a = { ...inputs.b };
     if (inputs.p1) output.p2 = { ...inputs.p1 };
     if (inputs.p2) output.p1 = { ...inputs.p2 };
+  } else if (['diode','zener','led','lamp','motor','buzzer'].includes(model)) {
+    // Loads consume a net but must not behave as ideal voltage sources on the return net.
+    // Their visual activity is derived from the input below.
   } else if (model === 'opamp') {
     const supply = Number(props.supply ?? 12);
     const voltage = Math.max(-supply, Math.min(supply,
@@ -113,6 +116,22 @@ export function evaluateCircuit(project: BitWireProject, time = 0, tick = 0): Si
     connectedTo.set(to, [...(connectedTo.get(to) ?? []), from]);
   }
 
+  const signalOnNet = (start: string): WireSignal | undefined => {
+    const queue = [start], visited = new Set<string>();
+    let fallback: WireSignal | undefined;
+    while (queue.length) {
+      const endpoint = queue.shift()!;
+      if (visited.has(endpoint)) continue;
+      visited.add(endpoint);
+      const value = endpointSignals.get(endpoint);
+      if (value?.active && Math.abs(value.voltage) > .001) return value;
+      if (value?.active) fallback = value;
+      else if (value && !fallback) fallback = value;
+      for (const peer of connectedTo.get(endpoint) ?? []) queue.push(peer);
+    }
+    return fallback;
+  };
+
   for (let pass = 0; pass < Math.max(6, project.components.length * 2); pass += 1) {
     let changed = false;
     for (const component of project.components) {
@@ -121,10 +140,8 @@ export function evaluateCircuit(project: BitWireProject, time = 0, tick = 0): Si
       const inputs: Record<string, WireSignal> = {};
       for (const pinDef of definition.pins) {
         const endpoint = keyOf(component.id, pinDef.id);
-        for (const peer of connectedTo.get(endpoint) ?? []) {
-          const signal = endpointSignals.get(peer);
-          if (signal && (signal.active || !inputs[pinDef.id])) inputs[pinDef.id] = signal;
-        }
+        const signal = signalOnNet(endpoint);
+        if (signal) inputs[pinDef.id] = signal;
       }
       const outputs = evaluateComponent(component, inputs, time);
       let active = false;
@@ -137,6 +154,10 @@ export function evaluateCircuit(project: BitWireProject, time = 0, tick = 0): Si
         active ||= signal.active && Math.abs(signal.voltage) > .001;
         power += Math.abs(signal.voltage * signal.current);
       }
+      if (['diode','zener','led','lamp','motor','buzzer'].includes(definition.model)) {
+        const input = Object.values(inputs).find(signal => signal.active && Math.abs(signal.voltage) > .001);
+        if (input) { active = true; power = Math.abs(input.voltage * Math.max(input.current,.002)); }
+      }
       componentSignals[component.id] = { outputs, active, power };
     }
     if (!changed) break;
@@ -145,8 +166,8 @@ export function evaluateCircuit(project: BitWireProject, time = 0, tick = 0): Si
   const wireSignals: Record<string, WireSignal> = {};
   const warnings: string[] = [];
   for (const wire of project.wires) {
-    const left = endpointSignals.get(keyOf(wire.from.componentId, wire.from.pinId));
-    const right = endpointSignals.get(keyOf(wire.to.componentId, wire.to.pinId));
+    const left = signalOnNet(keyOf(wire.from.componentId, wire.from.pinId));
+    const right = signalOnNet(keyOf(wire.to.componentId, wire.to.pinId));
     const signal = left?.active ? left : right?.active ? right : left ?? right ?? cloneSignal();
     const destination = project.components.find(c => c.id === wire.to.componentId);
     const destinationDef = destination && CATALOG_BY_ID.get(destination.definitionId);

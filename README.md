@@ -8,17 +8,22 @@ La primera versión funcional incluye un plano SVG de profundidad semántica, ca
 
 - Plano técnico virtualmente infinito con desplazamiento, zoom de `3,5 %` a `3200 %`, rejilla adaptativa y encaje automático.
 - Cinco niveles de detalle: encapsulado, esquemático, funcional, dispositivo y físico.
+- Escala de inserción dependiente del zoom: una pieza conserva el tamaño visual con el que fue colocada y revela su escala relativa al alejarse.
 - Catálogo inicial de **49 componentes** eléctricos, analógicos, digitales, integrados, de radiofrecuencia e instrumentación.
 - Símbolos SVG nativos: no se utilizan bitmaps para los elementos del circuito.
 - Inserción mediante arrastre o doble clic, movimiento con ajuste a rejilla, selección múltiple, duplicado, giro, bloqueo y borrado seguro de conexiones.
 - Cableado terminal a terminal con rutas ortogonales, Bézier o rectas.
+- Edición manual de cables: arrastre directo, nodos mediante doble clic, asas desplazables y cambio de ruta por conexión.
 - Motor de simulación en `Web Worker` con ejecución, pausa, paso y velocidades de `0,25×` a `10×`.
 - Propagación de fuentes CC/CA, interruptores, cargas, pasivos, entradas digitales, reloj y puertas AND, OR, NOT, NAND, NOR, XOR y XNOR.
 - Visualización sobre el cable de tensión, corriente, potencia o estado lógico.
 - Accionamiento directo de interruptores y entradas binarias desde el plano.
 - Osciloscopio y analizador lógico vectoriales con captura en vivo.
-- Encapsulados funcionales: delimitación de un subsistema, selección, enfoque, aislamiento y control independiente.
+- Encapsulados funcionales redimensionables con lienzo interno propio, modo chip, patillas configurables por lado, tipo, posición y tensión nominal.
+- Biblioteca local de encapsulados, importación y exportación `.bitwire-module` y reutilización entre proyectos.
 - Inspector editable con parámetros eléctricos, posición, rotación, estado y conectividad.
+- Inspector incrustado mediante doble clic y parámetros editables directamente dentro del elemento al alcanzar el LOD físico.
+- Redes internas equivalentes de contactos para AND, OR, NOT, NAND, NOR, XOR y XNOR.
 - Temas plano técnico, noche, día y automático.
 - Deshacer/rehacer, guardado local, importación y exportación `.bitwire`.
 - Proyecto inicial con un circuito eléctrico de 5 V y un demostrador lógico AND.
@@ -72,7 +77,7 @@ npm run build
 | Desplazar | `H`, botón central o `Espacio` + arrastre |
 | Selección múltiple | `Mayús` + clic o recuadro |
 | Encapsular | herramienta de módulo + recuadro |
-| Zoom semántico | rueda del ratón; doble clic para entrar en un componente |
+| Zoom semántico | rueda del ratón; el doble clic abre/cierra el inspector interno |
 | Eliminar | `Supr` |
 | Guardar | `Ctrl+S` |
 | Deshacer / rehacer | `Ctrl+Z` / `Ctrl+Y` |

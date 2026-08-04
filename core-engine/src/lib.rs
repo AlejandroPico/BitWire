@@ -14,6 +14,9 @@ pub enum SignalDomain { Analog, Digital, Mixed, Power }
 pub struct PinRef { pub component_id: String, pub pin_id: String }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Point2D { pub x: f64, pub y: f64 }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Transform2D {
     pub x: f64,
     pub y: f64,
@@ -38,6 +41,30 @@ pub struct Wire {
     pub from: PinRef,
     pub to: PinRef,
     pub label: Option<String>,
+    #[serde(default)]
+    pub control_points: Vec<Point2D>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ModulePin {
+    pub id: String,
+    pub name: String,
+    pub kind: PinKind,
+    pub domain: SignalDomain,
+    pub side: String,
+    pub position: f64,
+    pub nominal_voltage: Option<f64>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct CircuitModule {
+    pub id: String,
+    pub name: String,
+    pub bounds: [f64; 4],
+    pub member_ids: Vec<String>,
+    pub pins: Vec<ModulePin>,
+    pub enabled: bool,
+    pub collapsed: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Default)]
@@ -46,6 +73,8 @@ pub struct CircuitGraph {
     pub name: String,
     pub components: BTreeMap<String, ComponentInstance>,
     pub wires: BTreeMap<String, Wire>,
+    #[serde(default)]
+    pub modules: BTreeMap<String, CircuitModule>,
     pub external_pins: BTreeMap<String, PinRef>,
 }
 

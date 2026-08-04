@@ -1,16 +1,20 @@
-import { ChevronDown, Database, GripVertical, Search, X } from 'lucide-react';
+import { Box, ChevronDown, Database, FolderUp, GripVertical, Search, Trash2, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { EMBEDDED_CATALOG, searchCatalog } from '../catalog/catalog';
-import type { CatalogDatabaseStatus, ComponentDefinition } from '../model/types';
+import type { CatalogDatabaseStatus, ComponentDefinition, SavedModule } from '../model/types';
 
 interface Props {
   collapsed: boolean;
   database: CatalogDatabaseStatus;
   onToggle(): void;
   onAdd(definition: ComponentDefinition): void;
+  modules: SavedModule[];
+  onInsertModule(module: SavedModule): void;
+  onImportModule(): void;
+  onDeleteModule(id: string): void;
 }
 
-export function CatalogPanel({ collapsed, database, onToggle, onAdd }: Props) {
+export function CatalogPanel({ collapsed, database, onToggle, onAdd, modules, onInsertModule, onImportModule, onDeleteModule }: Props) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState<Set<string>>(() => new Set(['Fuentes y tierra', 'Pasivos', 'Lógica digital']));
   const categories = useMemo(() => [...new Set(EMBEDDED_CATALOG.map(item => item.category))], []);
@@ -41,6 +45,10 @@ export function CatalogPanel({ collapsed, database, onToggle, onAdd }: Props) {
       </label>
       <div className="catalog-status"><Database size={13}/><span>{database.count} símbolos · {database.source === 'sqlite' ? 'SQLite verificado' : 'catálogo integrado'}</span></div>
       <div className="catalog-scroll">
+        <section className="saved-module-section">
+          <div className="saved-module-heading"><span><Box size={13}/>MIS ENCAPSULADOS</span><button onClick={onImportModule} title="Importar .bitwire-module"><FolderUp size={14}/>Importar</button></div>
+          {modules.length ? <div className="saved-module-list">{modules.map(module => <div key={module.id}><button className="saved-module-card" onDoubleClick={() => onInsertModule(module)} title="Doble clic para insertar"><span style={{ borderColor: module.color }}><b>{module.pins.length}</b> PIN</span><span><strong>{module.name}</strong><small>{module.components.length} elementos · {module.width} × {module.height}</small></span></button><button className="delete-library-item" onClick={() => onDeleteModule(module.id)} title="Eliminar de la biblioteca"><Trash2 size={12}/></button></div>)}</div> : <p className="empty-library">Guarda aquí los chips que diseñes para reutilizarlos en otros proyectos.</p>}
+        </section>
         {categories.map(category => {
           const categoryItems = items.filter(item => item.category === category);
           if (!categoryItems.length) return null;
@@ -82,4 +90,3 @@ function glyphFor(symbol: string) {
   if (symbol === 'lamp' || symbol === 'led') return '✦';
   return '◇';
 }
-

@@ -13,7 +13,7 @@ export const DEFAULT_SETTINGS: ProjectSettings = {
   showValues: true,
 };
 
-export function createInstance(definitionId: string, x: number, y: number, id = uid('node')): ComponentInstance {
+export function createInstance(definitionId: string, x: number, y: number, id = uid('node'), scale = 1): ComponentInstance {
   const definition = CATALOG_BY_ID.get(definitionId);
   if (!definition) throw new Error(`Componente desconocido: ${definitionId}`);
   return {
@@ -22,6 +22,7 @@ export function createInstance(definitionId: string, x: number, y: number, id = 
     x,
     y,
     rotation: 0,
+    scale,
     properties: { ...definition.defaults },
     enabled: true,
   };
@@ -61,8 +62,16 @@ export function createDemoProject(): BitWireProject {
     wire('w_scope', 'gate_main', 'out', 'scope_main', 'ch1'),
   ];
   const modules: ModuleArea[] = [
-    { id: 'module_power', name: 'Etapa eléctrica de 5 V', x: -610, y: -170, width: 900, height: 210, color: '#f5b942', memberIds: ['source_main','switch_main','resistor_main','lamp_main'], enabled: true },
-    { id: 'module_logic', name: 'Demostrador AND', x: -580, y: 250, width: 920, height: 320, color: '#2be4c4', memberIds: ['logic_a','logic_b','gate_main','led_logic'], enabled: true },
+    { id: 'module_power', name: 'Etapa eléctrica de 5 V', x: -610, y: -170, width: 900, height: 210, color: '#f5b942', memberIds: ['source_main','switch_main','resistor_main','lamp_main'], enabled: true, collapsed: false, pins: [
+      { id: 'vin', name: 'VIN 5V', kind: 'POWER', domain: 'POWER', side: 'left', position: .34, nominalVoltage: 5 },
+      { id: 'gnd', name: 'GND', kind: 'GND', domain: 'POWER', side: 'left', position: .72, nominalVoltage: 0 },
+      { id: 'vout', name: 'VOUT', kind: 'OUTPUT', domain: 'ANALOG', side: 'right', position: .5, nominalVoltage: 5 },
+    ] },
+    { id: 'module_logic', name: 'Demostrador AND', x: -580, y: 250, width: 920, height: 320, color: '#2be4c4', memberIds: ['logic_a','logic_b','gate_main','led_logic'], enabled: true, collapsed: false, pins: [
+      { id: 'a', name: 'A', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: .35 },
+      { id: 'b', name: 'B', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: .68 },
+      { id: 'q', name: 'Q', kind: 'OUTPUT', domain: 'DIGITAL', side: 'right', position: .5 },
+    ] },
   ];
   return {
     format: 'bitwire', version: 1, id: uid('project'), name: 'Laboratorio inicial',
@@ -88,12 +97,20 @@ export function validateProject(input: unknown): BitWireProject {
   const candidate = input as Partial<BitWireProject>;
   if (candidate.format !== 'bitwire' || candidate.version !== 1) throw new Error('Versión de archivo .bitwire incompatible.');
   if (!Array.isArray(candidate.components) || !Array.isArray(candidate.wires)) throw new Error('El grafo del circuito está incompleto.');
-  const ids = new Set(candidate.components.map(item => item.id));
+  candidate.modules ??= [];
+  const ids = new Set([...candidate.components.map(item => item.id), ...candidate.modules.map(item => item.id)]);
   for (const connection of candidate.wires) {
     if (!ids.has(connection.from.componentId) || !ids.has(connection.to.componentId)) {
       throw new Error(`El cable ${connection.id} apunta a un componente inexistente.`);
     }
   }
-  return candidate as BitWireProject;
+  const project = candidate as BitWireProject;
+  // Forward-compatible migration of projects saved by the first public build.
+  for (const component of project.components) component.scale = Number(component.scale) || 1;
+  for (const module of project.modules) {
+    module.collapsed ??= false;
+    module.pins ??= [];
+  }
+  for (const connection of project.wires) connection.controlPoints ??= [];
+  return project;
 }
-

@@ -38,6 +38,8 @@ export interface ComponentInstance {
   x: number;
   y: number;
   rotation: number;
+  /** World-space scale. New parts are sized from the zoom at insertion time. */
+  scale: number;
   properties: Record<string, PropertyValue>;
   enabled: boolean;
   locked?: boolean;
@@ -49,6 +51,22 @@ export interface Wire {
   to: PinRef;
   label?: string;
   routing: 'orthogonal' | 'bezier' | 'straight';
+  /** User-authored bend or Bézier control nodes in world coordinates. */
+  controlPoints?: Point[];
+}
+
+export type ModulePinSide = 'left' | 'right' | 'top' | 'bottom';
+
+export interface ModulePin {
+  id: string;
+  name: string;
+  kind: PinKind;
+  domain: SignalDomain;
+  side: ModulePinSide;
+  /** Position along the selected side, from 0 to 1. */
+  position: number;
+  nominalVoltage?: number;
+  description?: string;
 }
 
 export interface ModuleArea {
@@ -61,7 +79,25 @@ export interface ModuleArea {
   color: string;
   memberIds: string[];
   enabled: boolean;
-  collapsed?: boolean;
+  /** Collapsed modules behave as a single reusable chip on the parent canvas. */
+  collapsed: boolean;
+  pins: ModulePin[];
+  description?: string;
+}
+
+export interface SavedModule {
+  format: 'bitwire-module';
+  version: 1;
+  id: string;
+  name: string;
+  description: string;
+  width: number;
+  height: number;
+  color: string;
+  pins: ModulePin[];
+  components: ComponentInstance[];
+  wires: Wire[];
+  savedAt: string;
 }
 
 export interface ProjectSettings {
@@ -123,4 +159,3 @@ export interface CatalogDatabaseStatus {
 export const EMPTY_SIGNAL: WireSignal = {
   logic: 'Z', voltage: 0, current: 0, active: false, floating: true,
 };
-

@@ -1,5 +1,5 @@
 import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react';
-import type { ComponentDefinition, ComponentInstance, ComponentSignal, PinDefinition } from '../model/types';
+import type { ComponentDefinition, ComponentInstance, ComponentSignal, PinDefinition, PropertyValue } from '../model/types';
 import type { LodLevel } from '../canvas/LODManager';
 
 interface Props {
@@ -8,30 +8,34 @@ interface Props {
   selected: boolean;
   lod: LodLevel;
   signal?: ComponentSignal;
+  inspectorOpen: boolean;
   onPointerDown(event: ReactPointerEvent<SVGGElement>, component: ComponentInstance): void;
   onDoubleClick(component: ComponentInstance): void;
   onPin(event: ReactPointerEvent<SVGCircleElement>, component: ComponentInstance, pin: PinDefinition): void;
   onQuickToggle(component: ComponentInstance): void;
+  onProperty(component: ComponentInstance, key: string, value: PropertyValue): void;
 }
 
-export function CircuitSymbol({ component, definition, selected, lod, signal, onPointerDown, onDoubleClick, onPin, onQuickToggle }: Props) {
+export function CircuitSymbol({ component, definition, selected, lod, signal, inspectorOpen, onPointerDown, onDoubleClick, onPin, onQuickToggle, onProperty }: Props) {
   const w = definition.width;
   const h = definition.height;
   const active = Boolean(signal?.active);
+  const gateInternal = lod >= 3 && ['and','or','not','nand','nor','xor','xnor'].includes(definition.model);
   return <g
     className={`circuit-component ${selected ? 'selected' : ''} ${active ? 'energized' : ''} ${component.enabled ? '' : 'disabled'}`}
-    transform={`translate(${component.x} ${component.y}) rotate(${component.rotation} ${w / 2} ${h / 2})`}
+    transform={`translate(${component.x} ${component.y}) scale(${component.scale || 1}) rotate(${component.rotation} ${w / 2} ${h / 2})`}
     onPointerDown={event => onPointerDown(event, component)}
     onDoubleClick={event => { event.stopPropagation(); onDoubleClick(component); }}
     data-component-id={component.id}
   >
     <rect className="component-hitbox" x="-8" y="-8" width={w + 16} height={h + 16}/>
     {lod === 0 ? <MacroSymbol definition={definition}/> : <>
-      <g className="symbol-artwork">{symbolArtwork(definition, active)}</g>
+      {!gateInternal && <g className="symbol-artwork">{symbolArtwork(definition, active)}</g>}
+      {gateInternal && <GateInternalNetwork definition={definition}/>} 
       <text className="symbol-title" x={w / 2} y={h + 20} textAnchor="middle">{definition.name}</text>
       {lod >= 2 && <text className="symbol-model" x={w / 2} y={h + 34} textAnchor="middle">{definition.family.toUpperCase()}</text>}
-      {lod >= 3 && definition.internal && <InternalNetwork definition={definition}/>} 
-      {lod >= 4 && <PropertyOverlay component={component} definition={definition}/>} 
+      {lod >= 3 && definition.internal && !gateInternal && <InternalNetwork definition={definition}/>} 
+      {lod >= 4 && !gateInternal && <InlinePropertyEditor component={component} definition={definition} onProperty={onProperty}/>} 
     </>}
     {definition.pins.map(pin => {
       const x = pin.x * w;
@@ -45,6 +49,7 @@ export function CircuitSymbol({ component, definition, selected, lod, signal, on
     {(definition.model === 'switch' || definition.model === 'logic_input') && lod >= 1 && <g className="quick-toggle" onPointerDown={event => { event.stopPropagation(); onQuickToggle(component); }} transform={`translate(${w / 2 - 16} ${h - 21})`}>
       <rect width="32" height="14"/><circle cx={Boolean(component.properties.closed ?? component.properties.state) ? 24 : 8} cy="7" r="5"/>
     </g>}
+    {inspectorOpen && <EmbeddedInspector component={component} definition={definition} onProperty={onProperty}/>} 
   </g>;
 }
 
@@ -105,7 +110,71 @@ function InternalNetwork({ definition }: { definition: ComponentDefinition }) {
   </g>;
 }
 
-function PropertyOverlay({ component, definition }: { component: ComponentInstance; definition: ComponentDefinition }) {
+function GateInternalNetwork({ definition }: { definition: ComponentDefinition }) {
+  const model = definition.model;
+  const inverted = model === 'nand' || model === 'nor' || model === 'not';
+  const series = model === 'and' || model === 'nand';
+  return <g className="gate-internal-network">
+    <rect x="9" y="5" width="142" height="70"/>
+    <text x="15" y="14">EQUIVALENTE DE CONMUTACIÓN · {model.toUpperCase()}</text>
+    <path className="rail" d="M18 24h124M18 64h124"/>
+    <text x="15" y="30">VCC</text><text x="15" y="61">GND</text>
+    {model === 'not' ? <>
+      <SwitchGlyph x={62} y={42} label="A" normallyClosed/>
+      <path className="network-wire" d="M18 24h30v18h14m38 0h27V24h15M100 42h27"/>
+      <text x="131" y="45">Q</text>
+    </> : series ? <>
+      <SwitchGlyph x={55} y={42} label="A"/>
+      <SwitchGlyph x={97} y={42} label="B"/>
+      <path className="network-wire" d="M18 24h23v18h14m18 0h24m18 0h15V24h12"/>
+      <text x="132" y="45">Q</text>
+    </> : model === 'or' || model === 'nor' ? <>
+      <SwitchGlyph x={74} y={32} label="A"/>
+      <SwitchGlyph x={74} y={54} label="B"/>
+      <path className="network-wire" d="M18 24h38v8h18m18 0h28v10m-64 12h18m18 0h28V42h22"/>
+      <text x="132" y="45">Q</text>
+    </> : <>
+      <SwitchGlyph x={61} y={32} label="A"/>
+      <SwitchGlyph x={97} y={54} label="B"/>
+      <path className="network-wire" d="M18 24h29v8h14m18 0h28v10m-60 12h50m18 0h12V42h35"/>
+      <text x="132" y="45">Q</text>
+    </>}
+    {inverted && model !== 'not' && <circle className="invert-node" cx="128" cy="42" r="4"/>}
+    <text className="network-note" x="80" y="72" textAnchor="middle">{series ? 'CONTACTOS EN SERIE' : model === 'or' || model === 'nor' ? 'CONTACTOS EN PARALELO' : model === 'not' ? 'CONTACTO INVERSOR' : 'RED CRUZADA DE PARIDAD'}</text>
+  </g>;
+}
+
+function SwitchGlyph({ x, y, label, normallyClosed = false }: { x: number; y: number; label: string; normallyClosed?: boolean }) {
+  return <g className="internal-switch" transform={`translate(${x} ${y})`}>
+    <circle cx="0" cy="0" r="2"/><circle cx="18" cy="0" r="2"/><path d={normallyClosed ? 'M2 0h14' : 'M2 0l14-7'}/><text x="9" y="-10" textAnchor="middle">{label}</text>
+  </g>;
+}
+
+function InlinePropertyEditor({ component, definition, onProperty }: { component: ComponentInstance; definition: ComponentDefinition; onProperty: Props['onProperty'] }) {
   const entries = Object.entries(component.properties).slice(0, 3);
-  return <g className="property-overlay"><rect x="18" y="8" width={definition.width - 36} height={definition.height - 16}/>{entries.map(([key,value],i)=><text key={key} x="26" y={29+i*16}>{key}: <tspan>{String(value)}</tspan></text>)}</g>;
+  return <foreignObject className="inline-editor-object" x="14" y="9" width={definition.width - 28} height={definition.height - 18} onPointerDown={event => event.stopPropagation()} onDoubleClick={event => event.stopPropagation()}>
+    <div className="inline-property-editor">
+      {entries.map(([key,value]) => <label key={key}><span>{humanize(key)}</span>{typeof value === 'boolean' ? <button className={value ? 'mini-toggle on' : 'mini-toggle'} onClick={() => onProperty(component,key,!value)}>{value ? 'ON' : 'OFF'}</button> : <input type={typeof value === 'number' ? 'number' : key.toLowerCase().includes('color') ? 'color' : 'text'} value={String(value)} onChange={event => onProperty(component,key,typeof value === 'number' ? Number(event.target.value) : event.target.value)}/>}</label>)}
+    </div>
+  </foreignObject>;
+}
+
+function EmbeddedInspector({ component, definition, onProperty }: { component: ComponentInstance; definition: ComponentDefinition; onProperty: Props['onProperty'] }) {
+  const height = Math.max(112, 36 + Object.keys(component.properties).length * 29);
+  return <foreignObject className="embedded-inspector-object" x={definition.width + 18} y="-8" width="218" height={height} onPointerDown={event => event.stopPropagation()} onDoubleClick={event => event.stopPropagation()}>
+    <div className="embedded-inspector">
+      <header><b>{definition.name}</b><small>INSPECTOR INTERNO</small></header>
+      <div>{Object.entries(component.properties).map(([key,value]) => <label key={key}><span>{humanize(key)}</span>{typeof value === 'boolean' ? <button className={value ? 'mini-toggle on' : 'mini-toggle'} onClick={() => onProperty(component,key,!value)}>{value ? 'ON' : 'OFF'}</button> : <input type={typeof value === 'number' ? 'number' : key.toLowerCase().includes('color') ? 'color' : 'text'} value={String(value)} onChange={event => onProperty(component,key,typeof value === 'number' ? Number(event.target.value) : event.target.value)}/>}</label>)}</div>
+      {definition.internal && <footer>Red interna: {definition.internal}</footer>}
+    </div>
+  </foreignObject>;
+}
+
+function humanize(value: string) {
+  const labels: Record<string,string> = {
+    frequency:'Frecuencia (Hz)', dutyCycle:'Ciclo útil (%)', propagationDelay:'Retardo (ns)',
+    voltage:'Tensión (V)', currentLimit:'Límite (A)', resistance:'Resistencia (Ω)',
+    capacitance:'Capacidad (F)', inductance:'Inductancia (H)', state:'Estado lógico', closed:'Cerrado',
+  };
+  return labels[value] ?? value.replace(/([A-Z])/g, ' $1').replace(/^./, letter => letter.toUpperCase());
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createDemoProject } from '../state/project';
+import { createBlankProject, createDemoProject, createInstance } from '../state/project';
 import { evaluateCircuit } from './simulate';
 
 describe('BitWire simulation core', () => {
@@ -22,5 +22,27 @@ describe('BitWire simulation core', () => {
     switchNode.properties.closed = false;
     const snapshot = evaluateCircuit(project, 0, 1);
     expect(snapshot.wireSignals.w_load.active).toBe(false);
+  });
+
+  it('passes a signal through an encapsulation boundary pin', () => {
+    const project = createBlankProject('Boundary test');
+    project.components.push(
+      createInstance('dc_source',0,0,'source'),
+      createInstance('resistor',300,0,'inside_resistor'),
+      createInstance('lamp',520,0,'inside_lamp'),
+    );
+    project.modules.push({
+      id:'module',name:'Chip',x:240,y:-80,width:500,height:220,color:'#2be4c4',
+      memberIds:['inside_resistor','inside_lamp'],enabled:true,collapsed:true,
+      pins:[{id:'vin',name:'VIN',kind:'POWER',domain:'POWER',side:'left',position:.5,nominalVoltage:5}],
+    });
+    project.wires.push(
+      {id:'outside',from:{componentId:'source',pinId:'pos'},to:{componentId:'module',pinId:'vin'},routing:'orthogonal'},
+      {id:'boundary',from:{componentId:'module',pinId:'vin'},to:{componentId:'inside_resistor',pinId:'a'},routing:'orthogonal'},
+      {id:'inside',from:{componentId:'inside_resistor',pinId:'b'},to:{componentId:'inside_lamp',pinId:'a'},routing:'orthogonal'},
+    );
+    const snapshot=evaluateCircuit(project,0,1);
+    expect(snapshot.wireSignals.boundary.voltage).toBe(5);
+    expect(snapshot.wireSignals.inside.active).toBe(true);
   });
 });
