@@ -366,6 +366,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
         <pattern id="minorGrid" width={gridSize} height={gridSize} patternUnits="userSpaceOnUse"><path d={`M ${gridSize} 0 L 0 0 0 ${gridSize}`} className="grid-minor"/></pattern>
         <pattern id="majorGrid" width={gridSize * 5} height={gridSize * 5} patternUnits="userSpaceOnUse"><rect width={gridSize * 5} height={gridSize * 5} fill="url(#minorGrid)"/><path d={`M ${gridSize * 5} 0 L 0 0 0 ${gridSize * 5}`} className="grid-major"/></pattern>
         <filter id="signalGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="wireGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.1" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       </defs>
       <g transform={`translate(${viewport.x} ${viewport.y}) scale(${viewport.scale})`}>
         <rect className="grid-plane" x={-100000} y={-100000} width={200000} height={200000} fill="url(#majorGrid)"/>
@@ -382,8 +383,15 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
           const signal = snapshot?.wireSignals[wire.id];
           const value = formatSignal(signal, project.settings.signalView);
           const mid = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
+          const wirePath = routeWire(from, to, wire.routing, wire.controlPoints);
           return <g key={wire.id} className={`wire ${signal?.active ? 'active' : ''} logic-${signal?.logic ?? 'z'} ${running ? 'running' : ''}`}>
-            <path className="wire-hit" d={routeWire(from, to, wire.routing, wire.controlPoints)} onPointerDown={event => onWireDown(event,wire,from,to)} onDoubleClick={event => addWireNode(event,wire,from,to)}/><path className="wire-base" d={routeWire(from, to, wire.routing, wire.controlPoints)}/><path className="wire-signal" d={routeWire(from, to, wire.routing, wire.controlPoints)}>{running && signal?.active && <animate attributeName="stroke-dashoffset" from="0" to="-15" dur="0.55s" repeatCount="indefinite"/>}</path>
+            <path className="wire-hit" d={wirePath} onPointerDown={event => onWireDown(event,wire,from,to)} onDoubleClick={event => addWireNode(event,wire,from,to)}/>
+            <path className="wire-base" d={wirePath}/>
+            <path className="wire-signal" d={wirePath}/>
+            {running && signal?.active && <>
+              <path className="wire-flow" d={wirePath}><animate attributeName="stroke-dashoffset" from="0" to="-34" dur="0.82s" calcMode="linear" repeatCount="indefinite"/></path>
+              <path className="wire-flow-highlight" d={wirePath}><animate attributeName="stroke-dashoffset" from="0" to="-34" dur="0.82s" calcMode="linear" repeatCount="indefinite"/></path>
+            </>}
             {project.settings.showValues && <g className="signal-label" transform={`translate(${mid.x} ${mid.y})`}><rect x="-36" y="-13" width="72" height="22"/><text textAnchor="middle" y="3">{value}</text></g>}
             {wire.id === selectedWireId && wire.controlPoints?.map((point,index)=><rect key={index} className="wire-control-node" x={point.x-6} y={point.y-6} width="12" height="12" onPointerDown={event => onWireNodeDown(event,wire.id,index)} onDoubleClick={event => { event.stopPropagation(); patchWire(wire.id,{ controlPoints:wire.controlPoints?.filter((_,itemIndex)=>itemIndex!==index) }); }}/>) }
           </g>;
