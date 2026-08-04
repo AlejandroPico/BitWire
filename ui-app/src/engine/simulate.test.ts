@@ -45,4 +45,17 @@ describe('BitWire simulation core', () => {
     expect(snapshot.wireSignals.boundary.voltage).toBe(5);
     expect(snapshot.wireSignals.inside.active).toBe(true);
   });
+
+  it('evaluates every input of a three-input gate', () => {
+    const project=createBlankProject('Three input gate');
+    project.components.push(createInstance('logic_input',0,0,'a'),createInstance('logic_input',0,100,'b'),createInstance('logic_input',0,200,'c'),createInstance('gate_and_3',300,100,'gate'));
+    project.wires.push(
+      {id:'a',from:{componentId:'a',pinId:'out'},to:{componentId:'gate',pinId:'a'},routing:'straight'},
+      {id:'b',from:{componentId:'b',pinId:'out'},to:{componentId:'gate',pinId:'b'},routing:'straight'},
+      {id:'c',from:{componentId:'c',pinId:'out'},to:{componentId:'gate',pinId:'c'},routing:'straight'},
+    );
+    expect(evaluateCircuit(project).componentSignals.gate.outputs.out.logic).toBe(1);
+    project.components.find(item=>item.id==='c')!.properties.state=0;
+    expect(evaluateCircuit(project).componentSignals.gate.outputs.out.logic).toBe(0);
+  });
 });

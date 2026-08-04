@@ -58,6 +58,18 @@ def pins_for(profile: str) -> list[dict]:
         return [pin(f"s{i+1}",str(i+1),"INPUT","DIGITAL",0,(i+1)/11) for i in range(10)]
     if profile == "analyzer":
         return [pin(f"ch{i}",f"D{i}","INPUT","DIGITAL",0,(i+1)/9) for i in range(8)]
+    if profile == "rf3":
+        return [pin("rf_in","RF IN","INPUT","ANALOG",0,.35),pin("control","CTRL","INPUT","MIXED",0,.75),pin("rf_out","RF OUT","OUTPUT","ANALOG",1,.5)]
+    if profile == "sensor3":
+        return [pin("vcc","VCC","VCC","POWER",0,.25),pin("gnd","GND","GND","POWER",0,.75),pin("out","OUT","OUTPUT","MIXED",1,.5)]
+    if profile == "switch3":
+        return [pin("com","COM","BIDIRECTIONAL","MIXED",0,.5),pin("a","A","BIDIRECTIONAL","MIXED",1,.3),pin("b","B","BIDIRECTIONAL","MIXED",1,.7)]
+    if profile == "fulladder":
+        return [pin("a","A","INPUT","DIGITAL",0,.25),pin("b","B","INPUT","DIGITAL",0,.5),pin("cin","CIN","INPUT","DIGITAL",0,.75),pin("sum","Σ","OUTPUT","DIGITAL",1,.35),pin("cout","COUT","OUTPUT","DIGITAL",1,.68)]
+    if profile == "gate3":
+        return [pin("a","A","INPUT","DIGITAL",0,.22),pin("b","B","INPUT","DIGITAL",0,.5),pin("c","C","INPUT","DIGITAL",0,.78),pin("out","Q","OUTPUT","DIGITAL",1,.5)]
+    if profile == "bus8":
+        return [pin(f"d{i}",f"D{i}","BIDIRECTIONAL","DIGITAL",0 if i < 4 else 1,((i%4)+1)/5) for i in range(8)]
     return profiles["analog2"]
 
 
@@ -65,6 +77,7 @@ def build(output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     output.unlink(missing_ok=True)
     catalog = json.loads((ROOT / "components.json").read_text(encoding="utf-8"))
+    catalog += json.loads((ROOT / "expanded-components.json").read_text(encoding="utf-8"))
     schema = (ROOT / "schema.sql").read_text(encoding="utf-8")
     db = sqlite3.connect(output)
     db.executescript(schema)

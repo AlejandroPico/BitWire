@@ -1,5 +1,6 @@
 import initSqlJs from 'sql.js';
 import rawCatalog from '../../../catalog/components.json';
+import expandedCatalog from '../../../catalog/expanded-components.json';
 import type { CatalogDatabaseStatus, ComponentDefinition, PinDefinition, PinKind, SignalDomain } from '../model/types';
 
 type RawComponent = {
@@ -41,10 +42,16 @@ export function pinsFor(profile: string): PinDefinition[] {
   if (profile === 'matrix8') return Array.from({length:8},(_,i)=>pin(`row${i}`,`R${i}`,'INPUT','DIGITAL',0,(i+1)/9)).concat(Array.from({length:8},(_,i)=>pin(`col${i}`,`C${i}`,'INPUT','DIGITAL',1,(i+1)/9)));
   if (profile === 'bargraph10') return Array.from({length:10},(_,i)=>pin(`s${i+1}`,String(i+1),'INPUT','DIGITAL',0,(i+1)/11));
   if (profile === 'analyzer') return Array.from({ length: 8 }, (_, i) => pin(`ch${i}`,`D${i}`,'INPUT','DIGITAL',0,(i + 1) / 9));
+  if (profile === 'rf3') return [pin('rf_in','RF IN','INPUT','ANALOG',0,.35),pin('control','CTRL','INPUT','MIXED',0,.75),pin('rf_out','RF OUT','OUTPUT','ANALOG',1,.5)];
+  if (profile === 'sensor3') return [pin('vcc','VCC','VCC','POWER',0,.25),pin('gnd','GND','GND','POWER',0,.75),pin('out','OUT','OUTPUT','MIXED',1,.5)];
+  if (profile === 'switch3') return [pin('com','COM','BIDIRECTIONAL','MIXED',0,.5),pin('a','A','BIDIRECTIONAL','MIXED',1,.3),pin('b','B','BIDIRECTIONAL','MIXED',1,.7)];
+  if (profile === 'fulladder') return [pin('a','A','INPUT','DIGITAL',0,.25),pin('b','B','INPUT','DIGITAL',0,.5),pin('cin','CIN','INPUT','DIGITAL',0,.75),pin('sum','Σ','OUTPUT','DIGITAL',1,.35),pin('cout','COUT','OUTPUT','DIGITAL',1,.68)];
+  if (profile === 'gate3') return [pin('a','A','INPUT','DIGITAL',0,.22),pin('b','B','INPUT','DIGITAL',0,.5),pin('c','C','INPUT','DIGITAL',0,.78),pin('out','Q','OUTPUT','DIGITAL',1,.5)];
+  if (profile === 'bus8') return Array.from({length:8},(_,i)=>pin(`d${i}`,`D${i}`,'BIDIRECTIONAL','DIGITAL',i<4?0:1,((i%4)+1)/5));
   return profiles.analog2;
 }
 
-export const EMBEDDED_CATALOG: ComponentDefinition[] = (rawCatalog as RawComponent[]).map(item => ({
+export const EMBEDDED_CATALOG: ComponentDefinition[] = ([...(rawCatalog as RawComponent[]),...(expandedCatalog as RawComponent[])]).map(item => ({
   id: item.id,
   name: item.name,
   category: item.category,

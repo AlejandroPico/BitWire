@@ -6,10 +6,10 @@ La primera versión funcional incluye un plano SVG de profundidad semántica, ca
 
 ## Lo que ya funciona
 
-- Plano técnico virtualmente infinito con desplazamiento, zoom de `3,5 %` a `3200 %`, rejilla adaptativa y encaje automático.
+- Plano técnico virtualmente infinito con desplazamiento, zoom práctico hasta `1.000.000.000×`, rejilla adaptativa y encaje automático.
 - Cinco niveles de detalle: encapsulado, esquemático, funcional, dispositivo y físico.
 - Escala de inserción dependiente del zoom: una pieza conserva el tamaño visual con el que fue colocada y revela su escala relativa al alejarse.
-- Catálogo inicial de **53 componentes** eléctricos, analógicos, digitales, integrados, de radiofrecuencia, visualización e instrumentación.
+- Catálogo de **216 componentes** repartidos entre electricidad, semiconductores, RF, analógica, potencia, sensores, lógica, memorias, comunicaciones, audio, visualización e instrumentación.
 - Símbolos SVG nativos: no se utilizan bitmaps para los elementos del circuito.
 - Inserción mediante arrastre o doble clic, movimiento con ajuste a rejilla, selección múltiple, duplicado, giro, bloqueo y borrado seguro de conexiones.
 - Cableado terminal a terminal con rutas ortogonales, Bézier o rectas.

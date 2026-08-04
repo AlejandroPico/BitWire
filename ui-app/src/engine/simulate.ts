@@ -68,7 +68,7 @@ function evaluateComponent(
     const duty = Math.max(1, Math.min(99, Number(props.dutyCycle ?? 50))) / 100;
     output.out = logicSignal((time * frequency) % 1 < duty ? 1 : 0, voltageHigh);
   } else if (['and','or','not','nand','nor','xor','xnor'].includes(model)) {
-    const ids = model === 'not' ? ['in'] : ['a', 'b'];
+    const ids = definition.pins.filter(pin => pin.kind === 'INPUT').map(pin => pin.id);
     output.out = logicSignal(gateResult(model, ids.map(id => truth(inputs[id]))), voltageHigh);
   } else if (model === 'mux') {
     const selected = truth(inputs.sel) === 1 ? inputs.b : inputs.a;

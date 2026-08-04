@@ -50,7 +50,7 @@ export function Inspector({ project, selected, collapsed, onToggle, onProperty, 
         <InspectorSection title="Transformación">
           <div className="field-grid"><Field label="X"><NumberInput value={component.x} onChange={x => onPatch(component.id, { x })}/></Field><Field label="Y"><NumberInput value={component.y} onChange={y => onPatch(component.id, { y })}/></Field></div>
           <Field label="Rotación"><NumberInput value={component.rotation} onChange={rotation => onPatch(component.id, { rotation })} suffix="°"/></Field>
-          <Field label="Escala"><NumberInput value={component.scale || 1} onChange={scale => onPatch(component.id, { scale: Math.max(.02, scale) })} suffix="×"/></Field>
+          <Field label="Escala"><NumberInput value={component.scale || 1} onChange={scale => onPatch(component.id, { scale: Math.max(1e-9, scale) })} suffix="×"/></Field>
           <Field label="Bloqueado"><Toggle checked={Boolean(component.locked)} onChange={locked => onPatch(component.id, { locked })}/></Field>
         </InspectorSection>
         <InspectorSection title="Parámetros del modelo">

@@ -1,7 +1,8 @@
 import type { Point, ViewportState } from '../model/types';
 
 export const MIN_ZOOM = 0.035;
-export const MAX_ZOOM = 32;
+/** Practical infinity: beyond this point browser floating-point precision becomes unreliable. */
+export const MAX_ZOOM = 1_000_000_000;
 
 export function screenToWorld(point: Point, viewport: ViewportState): Point {
   return {
@@ -41,4 +42,3 @@ export function fitBounds(
     y: viewportSize.height / 2 - (bounds.y + bounds.height / 2) * scale,
   };
 }
-

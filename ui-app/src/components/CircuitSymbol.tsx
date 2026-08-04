@@ -20,7 +20,7 @@ export function CircuitSymbol({ component, definition, selected, lod, signal, on
   const h = definition.height;
   const active = Boolean(signal?.active);
   const gateInternal = lod >= 3 && ['and','or','not','nand','nor','xor','xnor'].includes(definition.model);
-  const semiconductorInternal = lod >= 3 && ['npn','pnp','nmos','pmos','diode','zener','led'].includes(definition.symbol);
+  const semiconductorInternal = lod >= 3 && ['npn','pnp','nmos','pmos','jfet_n','jfet_p','igbt_n','igbt_p','diode','zener','led'].includes(definition.symbol);
   return <g
     className={`circuit-component ${selected ? 'selected' : ''} ${active ? 'energized' : ''} ${component.enabled ? '' : 'disabled'}`}
     transform={`translate(${component.x} ${component.y}) scale(${component.scale || 1}) rotate(${component.rotation} ${w / 2} ${h / 2})`}
@@ -76,12 +76,14 @@ function symbolArtwork(definition: ComponentDefinition, component: ComponentInst
   }
   if (s === 'lamp') return <><path className="lead" d={`M0 ${h/2}H43 M117 ${h/2}H${w}`}/><circle className={`lamp-bulb ${active ? 'on' : ''}`} cx="80" cy="40" r="35"/><path className="symbol-line" d="M56 16l48 48m0-48L56 64"/></>;
   if (s === 'led' || s === 'diode' || s === 'zener') return <><path className="lead" d={`M0 ${h/2}H50 M110 ${h/2}H${w}`}/><path className="symbol-body" d="M50 16v48l50-24z"/><path className="symbol-line" d={s === 'zener' ? 'M100 16v13m-6 0h12m-6 0v22m-6 0h12m-6 0v13' : 'M100 14v52'}/>{s === 'led' && <><path className="symbol-line accent" d="M105 25l18-14m-8 1 8-1-2 8M111 38l18-14m-8 1 8-1-2 8"/></>}</>;
-  if (['and','nand'].includes(s)) return <><path className="symbol-body" d="M42 8h35c53 0 53 64 0 64H42z"/><path className="lead" d={`M0 26H42 M0 54H42 M118 40H${w}`}/>{s === 'nand' && <circle className="symbol-body" cx="124" cy="40" r="6"/>}</>;
-  if (['or','nor','xor','xnor'].includes(s)) return <><path className="symbol-body" d="M39 8c22 0 63 4 84 32-21 28-62 32-84 32 18-20 18-44 0-64z"/><path className="lead" d={`M0 26H45 M0 54H45 M123 40H${w}`}/>{s.startsWith('x') && <path className="symbol-line" d="M31 8c18 20 18 44 0 64"/>}{(s === 'nor' || s === 'xnor') && <circle className="symbol-body" cx="128" cy="40" r="6"/>}</>;
+  if (['and','nand'].includes(s)) return <><path className="symbol-body" d="M42 8h35c53 0 53 64 0 64H42z"/><path className="lead" d={`${inputLeadPath(definition,42)} M${s==='nand'?130:118} 40H${w}`}/>{s === 'nand' && <circle className="symbol-body" cx="124" cy="40" r="6"/>}</>;
+  if (['or','nor','xor','xnor'].includes(s)) return <><path className="symbol-body" d="M39 8c22 0 63 4 84 32-21 28-62 32-84 32 18-20 18-44 0-64z"/><path className="lead" d={`${inputLeadPath(definition,45)} M${s==='nor'||s==='xnor'?134:123} 40H${w}`}/>{s.startsWith('x') && <path className="symbol-line" d="M31 8c18 20 18 44 0 64"/>}{(s === 'nor' || s === 'xnor') && <circle className="symbol-body" cx="128" cy="40" r="6"/>}</>;
   if (s === 'not') return <><path className="symbol-body" d="M42 8v64l72-32z"/><path className="lead" d={`M0 40H42 M126 40H${w}`}/><circle className="symbol-body" cx="120" cy="40" r="6"/></>;
   if (s === 'logic_input') return <><path className="lead" d={`M112 40H${w}`}/><rect className="symbol-body" x="26" y="11" width="86" height="58"/><text className="logic-value" x="69" y="51" textAnchor="middle">{active ? '1' : '0'}</text></>;
   if (s === 'npn' || s === 'pnp') return <BjtSymbol type={s}/>;
   if (s === 'nmos' || s === 'pmos') return <MosfetSymbol type={s}/>;
+  if (s === 'jfet_n' || s === 'jfet_p') return <JfetSymbol type={s}/>;
+  if (s === 'igbt_n' || s === 'igbt_p') return <IgbtSymbol type={s}/>;
   if (s === 'opamp' || s === 'comparator') return <><path className="symbol-body" d="M35 8v64l88-32z"/><path className="lead" d={`M0 28H35 M0 52H35 M123 40H${w}`}/><text className="op-sign" x="45" y="31">+</text><text className="op-sign" x="45" y="57">−</text></>;
   if (s === 'oscilloscope' || s === 'analyzer' || s === 'multimeter') return <InstrumentSymbol definition={definition}/>;
   if (s === 'display7') return <DisplaySymbol/>;
@@ -95,6 +97,10 @@ function symbolArtwork(definition: ComponentDefinition, component: ComponentInst
   return <><rect className="symbol-body" x="20" y="8" width={w - 40} height={h - 16}/><text className="generic-label" x={w / 2} y={h / 2 + 5} textAnchor="middle">{definition.name}</text></>;
 }
 
+function inputLeadPath(definition:ComponentDefinition,endX:number) {
+  return definition.pins.filter(pin=>pin.x===0&&pin.kind==='INPUT').map(pin=>`M0 ${pin.y*definition.height}H${endX}`).join(' ');
+}
+
 function InstrumentSymbol({ definition }: { definition: ComponentDefinition }) {
   const w = definition.width, h = definition.height;
   const screenRight = w - 65;
@@ -103,12 +109,22 @@ function InstrumentSymbol({ definition }: { definition: ComponentDefinition }) {
 
 function BjtSymbol({ type }: { type:'npn'|'pnp' }) {
   const npn = type === 'npn';
-  return <g className="transistor-symbol bjt"><circle cx="82" cy="40" r="33"/><path className="lead" d="M0 40H64 M100 24L126 20H160 M100 56L126 60H160"/><path className="junction" d="M68 14V66 M68 30L100 24 M68 50L100 56"/><path className="transistor-arrow" d={npn?'M104 54l17 5-12 13z':'M121 59l-17-5 12-13z'}/><text x="10" y="34">B</text><text x="142" y="14">C</text><text x="142" y="74">E</text><text className="device-type" x="82" y="76" textAnchor="middle">{type.toUpperCase()}</text></g>;
+  return <g className="transistor-symbol bjt"><circle cx="80" cy="40" r="32"/><path className="lead" d="M0 40H62 M72 29L104 19H160 M72 51L104 61H160"/><path className="junction" d="M68 16V64 M68 29H72 M68 51H72"/><path className={`transistor-arrow ${npn?'out':'in'}`} d={npn?'M88 56L101 60M101 60L96 53M101 60L93 63':'M101 60L88 56M88 56L96 53M88 56L93 63'}/><text x="9" y="34">B</text><text x="143" y="13">C</text><text x="143" y="75">E</text><text className="device-type" x="80" y="76" textAnchor="middle">{npn?'NPN · FLECHA SALE':'PNP · FLECHA ENTRA'}</text></g>;
 }
 
 function MosfetSymbol({ type }: { type:'nmos'|'pmos' }) {
   const nmos = type === 'nmos';
-  return <g className="transistor-symbol mosfet"><circle cx="82" cy="40" r="33"/><path className="lead" d="M0 40H52 M93 20H160 M93 60H160"/><path className="gate" d="M56 15V65 M66 18V30 M66 35V45 M66 50V62"/><path className="channel" d="M78 20H93 M78 60H93 M78 20V60"/><path className="body" d="M78 40H103V60"/><path className="transistor-arrow" d={nmos?'M75 40l12-6v12z':'M90 40l-12-6v12z'}/>{!nmos&&<circle className="gate-bubble" cx="53" cy="40" r="4"/>}<text x="10" y="34">G</text><text x="142" y="14">D</text><text x="142" y="74">S</text><text className="device-type" x="82" y="76" textAnchor="middle">{nmos?'NMOS':'PMOS'}</text></g>;
+  return <g className="transistor-symbol mosfet"><circle cx="80" cy="40" r="32"/><path className="lead" d="M0 40H50 M94 19H160 M94 61H160"/><path className="gate" d="M55 17V63 M66 18V29 M66 35V45 M66 51V62"/><path className="channel" d="M78 19H94 M78 61H94 M78 19V61"/><path className="body" d="M78 40H101V61"/><path className={`transistor-arrow ${nmos?'in':'out'}`} d={nmos?'M91 40H80M80 40L86 36M80 40L86 44':'M80 40H91M91 40L85 36M91 40L85 44'}/><text x="9" y="34">G</text><text x="143" y="13">D</text><text x="143" y="75">S</text><text className="device-type" x="80" y="76" textAnchor="middle">{nmos?'NMOS · FLECHA ENTRA':'PMOS · FLECHA SALE'}</text></g>;
+}
+
+function JfetSymbol({ type }: { type:'jfet_n'|'jfet_p' }) {
+  const n=type==='jfet_n';
+  return <g className="transistor-symbol jfet"><circle cx="80" cy="40" r="32"/><path className="lead" d="M0 40H68 M88 18H160 M88 62H160"/><path className="channel" d="M82 18V62M82 18H88M82 62H88"/><path className={`transistor-arrow ${n?'in':'out'}`} d={n?'M65 40H80M80 40L74 36M80 40L74 44':'M80 40H65M65 40L71 36M65 40L71 44'}/><text x="9" y="34">G</text><text x="143" y="13">D</text><text x="143" y="75">S</text><text className="device-type" x="80" y="76" textAnchor="middle">{n?'N-JFET · FLECHA ENTRA':'P-JFET · FLECHA SALE'}</text></g>;
+}
+
+function IgbtSymbol({ type }: { type:'igbt_n'|'igbt_p' }) {
+  const n=type==='igbt_n';
+  return <g className="transistor-symbol igbt"><circle cx="80" cy="40" r="32"/><path className="lead" d="M0 40H50 M101 18H160 M101 62H160"/><path className="gate" d="M55 18V62 M66 21V59"/><path className="channel" d="M77 22V58M77 29L101 18M77 51L101 62"/><path className="transistor-arrow" d={n?'M84 53L98 59M98 59L94 52M98 59L90 62':'M98 59L84 53M84 53L92 50M84 53L89 60'}/><text x="9" y="34">G</text><text x="143" y="13">C</text><text x="143" y="75">E</text><text className="device-type" x="80" y="76" textAnchor="middle">{n?'N-IGBT':'P-IGBT'}</text></g>;
 }
 
 function ChipSymbol({ definition }: { definition: ComponentDefinition }) {
@@ -224,9 +240,12 @@ function SemiconductorInternal({ definition, lod }: { definition:ComponentDefini
     <path className="carrier-flow" d="M22 68H138"/><path className="carrier-arrow" d="M137 68l-8-4v8z"/>
     {lod>=4&&<g className="crystal-lattice">{[30,42,54,99,111,123,135].map((x,index)=><circle key={x} cx={x} cy={index%2?30:55} r="2"/>)}<text x="80" y="72" textAnchor="middle">Si DOPADO · CAMPO INTERNO · BARRERA DE POTENCIAL</text></g>}
   </g>;
+  if(s==='jfet_n'||s==='jfet_p') { const n=s==='jfet_n'; return <g className="semiconductor-internal transistor-structure"><rect className="semiconductor-frame" x="5" y="5" width="150" height="70"/><text x="10" y="14">ESTRUCTURA DE UNIÓN · {n?'N-JFET':'P-JFET'}</text><rect className={n?'n-region':'p-region'} x="25" y="29" width="110" height="28"/><rect className={n?'p-region':'n-region'} x="59" y="20" width="42" height="13"/><rect className={n?'p-region':'n-region'} x="59" y="53" width="42" height="13"/><text className="region-label" x="80" y="46" textAnchor="middle">CANAL {n?'N':'P'}</text><text className="region-label" x="80" y="28" textAnchor="middle">GATE {n?'P':'N'}</text><path className="junction-marker" d="M58 34H102M58 52H102"/>{lod>=4&&<text className="junction-note" x="80" y="72" textAnchor="middle">UNIONES INVERSAS ENSANCHAN LA ZONA DE AGOTAMIENTO</text>}</g>; }
+  if(s==='igbt_n'||s==='igbt_p') { const n=s==='igbt_n'; return <g className="semiconductor-internal transistor-structure"><rect className="semiconductor-frame" x="5" y="5" width="150" height="70"/><text x="10" y="14">ESTRUCTURA MOS + BIPOLAR · {n?'N-IGBT':'P-IGBT'}</text><rect className={n?'p-region':'n-region'} x="18" y="23" width="124" height="10"/><rect className={n?'n-region':'p-region'} x="18" y="33" width="124" height="12"/><rect className={n?'p-region':'n-region'} x="18" y="45" width="124" height="10"/><rect className={n?'n-region':'p-region'} x="105" y="45" width="28" height="16"/><rect className="oxide-layer" x="53" y="43" width="38" height="4"/><rect className="metal-gate" x="53" y="36" width="38" height="6"/><text className="region-label" x="80" y="31" textAnchor="middle">COLECTOR · CAPA DE INYECCIÓN</text><text className="region-label" x="80" y="43" textAnchor="middle">REGIÓN DE DERIVA</text>{lod>=4&&<text className="junction-note" x="80" y="71" textAnchor="middle">PUERTA MOS CONTROLA CONDUCCIÓN BIPOLAR DE POTENCIA</text>}</g>; }
   const bjt=s==='npn'||s==='pnp'; const pFirst=s==='pnp'||s==='pmos';
   return <g className="semiconductor-internal transistor-structure"><rect className="semiconductor-frame" x="5" y="5" width="150" height="70"/><text x="10" y="14">ESTRUCTURA {bjt?'BIPOLAR':'MOS'} · {s.toUpperCase()}</text>{bjt?<>
-    <rect className={pFirst?'p-region':'n-region'} x="18" y="23" width="47" height="38"/><rect className={pFirst?'n-region':'p-region'} x="65" y="23" width="25" height="38"/><rect className={pFirst?'p-region':'n-region'} x="90" y="23" width="52" height="38"/><text className="region-label" x="41" y="45" textAnchor="middle">{pFirst?'P':'N'} · E</text><text className="region-label" x="77" y="45" textAnchor="middle">{pFirst?'N':'P'} · B</text><text className="region-label" x="116" y="45" textAnchor="middle">{pFirst?'P':'N'} · C</text>
+    <rect className={pFirst?'p-region':'n-region'} x="14" y="23" width="51" height="38"/><rect className={pFirst?'n-region':'p-region'} x="65" y="23" width="19" height="38"/><rect className={pFirst?'p-region':'n-region'} x="84" y="23" width="62" height="38"/><path className="junction-marker" d="M65 20V64M84 20V64"/><text className="region-label" x="39" y="42" textAnchor="middle">EMISOR {pFirst?'P+':'N+'}</text><text className="region-label base-label" x="75" y="58" textAnchor="middle" transform="rotate(-90 75 58)">BASE {pFirst?'N':'P'} · FINA</text><text className="region-label" x="115" y="42" textAnchor="middle">COLECTOR {pFirst?'P':'N'}</text>
+    {lod>=4&&<><path className="carrier-flow" d={pFirst?'M132 53H25':'M25 31H132'}/><path className="carrier-arrow" d={pFirst?'M25 53l8-4v8z':'M132 31l-8-4v8z'}/><text className="junction-note" x="80" y="70" textAnchor="middle">2 UNIONES P–N ACOPLADAS · E–B DIRECTA · B–C INVERSA</text></>}
   </>:<><rect className={pFirst?'n-region':'p-region'} x="18" y="34" width="124" height="27"/><rect className={pFirst?'p-region':'n-region'} x="99" y="28" width="34" height="33"/><rect className="oxide-layer" x="48" y="28" width="38" height="5"/><rect className="metal-gate" x="48" y="20" width="38" height="7"/><text className="region-label" x="67" y="18" textAnchor="middle">GATE</text><text className="region-label" x="36" y="51">S</text><text className="region-label" x="116" y="51">D</text><text className="region-label" x="67" y="39" textAnchor="middle">SiO₂</text></>}</g>;
 }
 

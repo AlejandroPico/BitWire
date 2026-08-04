@@ -87,7 +87,7 @@ export default function App() {
 
   const addDefinition = (definition: ComponentDefinition) => {
     const world = { x: (window.innerWidth * .5 - viewport.x) / viewport.scale, y: (window.innerHeight * .45 - viewport.y) / viewport.scale };
-    const instanceScale = Math.max(.04,Math.min(20,1/viewport.scale));
+    const instanceScale = Math.max(1e-9,Math.min(20,1/viewport.scale));
     const component = createInstance(definition.id, world.x - definition.width*instanceScale/2, world.y - definition.height*instanceScale/2, uid('node'), instanceScale);
     update(draft => { draft.components.push(component); if(activeModuleId) draft.modules.find(module=>module.id===activeModuleId)?.memberIds.push(component.id); });
     setSelected([component.id]); setSelectedModuleId(undefined);
