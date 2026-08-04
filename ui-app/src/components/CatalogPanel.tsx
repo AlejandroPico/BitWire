@@ -91,6 +91,11 @@ function glyphFor(symbol: string) {
   if (symbol === 'capacitor' || symbol === 'capacitor_polarized') return '‖';
   if (symbol === 'ground') return '⏚';
   if (symbol === 'oscilloscope') return '∿';
+  if (symbol === 'analyzer') return '▥';
+  if (symbol === 'multimeter') return 'VΩ';
+  if (symbol === 'spectrum') return '▥';
+  if (symbol === 'power_monitor') return 'W';
+  if (symbol === 'frequency_counter') return 'Hz';
   if (symbol === 'chip') return '▣';
   if (symbol === 'lamp' || symbol === 'led') return '✦';
   return '◇';

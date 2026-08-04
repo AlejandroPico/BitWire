@@ -1,4 +1,4 @@
-import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react';
+import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 import type { ComponentDefinition, ComponentInstance, ComponentSignal, PinDefinition, PropertyValue } from '../model/types';
 import type { LodLevel } from '../canvas/LODManager';
 
@@ -10,12 +10,13 @@ interface Props {
   signal?: ComponentSignal;
   onPointerDown(event: ReactPointerEvent<SVGGElement>, component: ComponentInstance): void;
   onDoubleClick(component: ComponentInstance): void;
+  onContextMenu(event: ReactMouseEvent<SVGGElement>, component: ComponentInstance): void;
   onPin(event: ReactPointerEvent<SVGCircleElement>, component: ComponentInstance, pin: PinDefinition): void;
   onQuickToggle(component: ComponentInstance): void;
   onProperty(component: ComponentInstance, key: string, value: PropertyValue): void;
 }
 
-export function CircuitSymbol({ component, definition, selected, lod, signal, onPointerDown, onDoubleClick, onPin, onQuickToggle, onProperty }: Props) {
+export function CircuitSymbol({ component, definition, selected, lod, signal, onPointerDown, onDoubleClick, onContextMenu, onPin, onQuickToggle, onProperty }: Props) {
   const w = definition.width;
   const h = definition.height;
   const active = Boolean(signal?.active);
@@ -26,6 +27,7 @@ export function CircuitSymbol({ component, definition, selected, lod, signal, on
     transform={`translate(${component.x} ${component.y}) scale(${component.scale || 1}) rotate(${component.rotation} ${w / 2} ${h / 2})`}
     onPointerDown={event => onPointerDown(event, component)}
     onDoubleClick={event => { event.stopPropagation(); onDoubleClick(component); }}
+    onContextMenu={event => onContextMenu(event,component)}
     data-component-id={component.id}
   >
     <rect className="component-hitbox" x="-8" y="-8" width={w + 16} height={h + 16}/>
@@ -85,7 +87,7 @@ function symbolArtwork(definition: ComponentDefinition, component: ComponentInst
   if (s === 'jfet_n' || s === 'jfet_p') return <JfetSymbol type={s}/>;
   if (s === 'igbt_n' || s === 'igbt_p') return <IgbtSymbol type={s}/>;
   if (s === 'opamp' || s === 'comparator') return <><path className="symbol-body" d="M35 8v64l88-32z"/><path className="lead" d={`M0 28H35 M0 52H35 M123 40H${w}`}/><text className="op-sign" x="45" y="31">+</text><text className="op-sign" x="45" y="57">−</text></>;
-  if (s === 'oscilloscope' || s === 'analyzer' || s === 'multimeter') return <InstrumentSymbol definition={definition}/>;
+  if (['oscilloscope','analyzer','multimeter','spectrum','power_monitor','frequency_counter'].includes(s)) return <InstrumentSymbol definition={definition}/>;
   if (s === 'display7') return <DisplaySymbol/>;
   if (s === 'display4') return <FourDigitDisplay/>;
   if (s === 'lcd16x2') return <LcdDisplay/>;

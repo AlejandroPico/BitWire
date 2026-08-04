@@ -141,20 +141,23 @@ const GUIDE: GuideSection[] = [
   },
   {
     id: 'instrumentos', group: 'SIMULACIÓN', title: 'Banco de instrumentos', icon: Activity,
-    summary: 'Combina las vistas necesarias y oculta las que no aporten información a la prueba actual.',
+    summary: 'Combina vistas generales y abre el frontal independiente de cada instrumento conectado al circuito.',
     steps: [
       'Abre Vistas en la cabecera del banco inferior.',
       'Activa simultáneamente osciloscopio, analizador lógico, multímetro, potencia, espectro o frecuencímetro.',
+      'Pulsa con el botón derecho sobre un instrumento del plano y elige Abrir interfaz del instrumento.',
+      'Arrastra la barra de título, redimensiona desde la esquina y usa la flecha para desplegar los controles profesionales.',
       'Desactiva cualquier vista para retirarla sin detener el motor ni perder muestras.',
       'Pliega todo el banco cuando necesites dedicar la altura completa al lienzo.',
     ],
     details: [
-      { title: 'Osciloscopio', text: 'Representa la tensión frente al tiempo y permite distinguir niveles continuos, pulsos y transitorios.' },
+      { title: 'Medida por instancia', text: 'Cada aparato resuelve exclusivamente los cables unidos a sus patillas. Dos osciloscopios conectados a redes distintas conservan gráficas e historiales diferentes.' },
+      { title: 'Osciloscopio profesional', text: 'La vista extendida incorpora CH1/CH2, volts/div, tiempo/div, posición, acoplamiento, memoria, ancho de banda, adquisición y disparo.' },
       { title: 'Analizador lógico', text: 'Muestra estados binarios y transiciones. Es la vista adecuada para relojes, puertas, buses y secuencias.' },
       { title: 'Medidas eléctricas', text: 'Multímetro y monitor de potencia resumen los valores instantáneos y el consumo agregado de las redes activas.' },
       { title: 'Frecuencia y espectro', text: 'El frecuencímetro estima transiciones por segundo; el espectro ofrece una lectura relativa del contenido frecuencial de la muestra.' },
     ],
-    note: 'La selección de instrumentos queda guardada localmente y se mantiene al volver a abrir BitWire.',
+    note: 'El botón derecho abre el menú propio de BitWire. El navegador ya no intercepta esa interacción dentro del laboratorio.',
   },
   {
     id: 'profundidad', group: 'ARQUITECTURA', title: 'Zoom semántico y composición interna', icon: Gauge,

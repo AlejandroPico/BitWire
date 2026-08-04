@@ -1,8 +1,10 @@
 import { CheckCircle2, CircleAlert, HelpCircle, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CatalogPanel } from './components/CatalogPanel';
+import { ContextMenu, type ContextAction, type ContextTarget } from './components/ContextMenu';
 import { HelpGuide } from './components/HelpGuide';
 import { Inspector } from './components/Inspector';
+import { InstrumentWindow, type InstrumentWindowState } from './components/InstrumentWindow';
 import { InstrumentTray } from './components/Oscilloscope';
 import { Topbar } from './components/Topbar';
 import { Workspace } from './components/Workspace';
@@ -37,11 +39,14 @@ export default function App() {
   const [savedRevision, setSavedRevision] = useState(initial.updatedAt);
   const [toast, setToast] = useState<{ type: 'ok' | 'error'; message: string }>();
   const [helpOpen, setHelpOpen] = useState(false);
+  const [contextTarget, setContextTarget] = useState<ContextTarget>();
+  const [instrumentWindows, setInstrumentWindows] = useState<InstrumentWindowState[]>([]);
   const [theme, setTheme] = useState<Theme>(loadThemePreference);
   const [themeClock, setThemeClock] = useState(() => Date.now());
   const workerRef = useRef<Worker | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const moduleImportRef = useRef<HTMLInputElement>(null);
+  const windowZ = useRef(120);
 
   const simulationProject = useCallback((source: BitWireProject) => {
     const next = structuredClone(source);
@@ -67,6 +72,11 @@ export default function App() {
     workerRef.current = worker;
     return () => worker.terminate();
   }, []);
+  useEffect(() => {
+    const preventNativeMenu = (event:MouseEvent) => event.preventDefault();
+    document.addEventListener('contextmenu',preventNativeMenu);
+    return () => document.removeEventListener('contextmenu',preventNativeMenu);
+  },[]);
 
   useEffect(() => { workerRef.current?.postMessage({ type: 'project', project: simulationProject(project) }); }, [project, simulationProject]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'control', running, speed }); }, [running, speed]);
@@ -92,13 +102,13 @@ export default function App() {
 
   const newProject = useCallback(() => {
     if (project.updatedAt !== savedRevision && !window.confirm('Hay cambios sin guardar. ¿Crear un proyecto nuevo?')) return;
-    reset(createBlankProject()); setSelected([]); setSelectedModuleId(undefined); setActiveModuleId(undefined); setRunning(false);
+    reset(createBlankProject()); setSelected([]); setSelectedModuleId(undefined); setActiveModuleId(undefined); setRunning(false); setInstrumentWindows([]);
   }, [project.updatedAt, savedRevision, reset]);
 
   const doImport = async (file?: File) => {
     if (!file) return;
     try {
-      const next = await importProject(file); reset(next); setSelected([]); setSelectedModuleId(undefined); setActiveModuleId(undefined); setRunning(false); setToast({ type: 'ok', message: `Proyecto «${next.name}» importado.` });
+      const next = await importProject(file); reset(next); setSelected([]); setSelectedModuleId(undefined); setActiveModuleId(undefined); setRunning(false); setInstrumentWindows([]); setToast({ type: 'ok', message: `Proyecto «${next.name}» importado.` });
     } catch (error) { setToast({ type: 'error', message: error instanceof Error ? error.message : 'No se pudo importar el proyecto.' }); }
   };
 
@@ -173,6 +183,58 @@ export default function App() {
     update(draft => { const module = draft.modules.find(item => item.id === selectedModuleId); if (module) Object.assign(module, patch); });
   };
 
+  const focusInstrumentWindow = useCallback((id:string) => {
+    const z=++windowZ.current;
+    setInstrumentWindows(current=>current.map(item=>item.id===id?{...item,z}:item));
+  },[]);
+
+  const openInstrumentWindow = useCallback((componentId:string) => {
+    const component=project.components.find(item=>item.id===componentId);
+    const definition=component&&EMBEDDED_CATALOG.find(item=>item.id===component.definitionId);
+    if(!component||!definition?.customGui)return;
+    setInstrumentWindows(current=>{
+      const existing=current.find(item=>item.componentId===componentId);
+      const z=++windowZ.current;
+      if(existing)return current.map(item=>item.id===existing.id?{...item,z,minimized:false}:item);
+      const expanded=localStorage.getItem('bitwire:instrument-professional-view')==='1';
+      const offset=(current.length%6)*24,width=expanded?960:580,height=expanded?610:370;
+      return [...current,{id:`instrument-window-${componentId}`,componentId,x:Math.max(8,Math.min(window.innerWidth-width-16,310+offset)),y:Math.max(58,Math.min(window.innerHeight-height-32,82+offset)),width,height,z,expanded,minimized:false,maximized:false}];
+    });
+  },[project.components]);
+
+  const deleteModuleDirect = useCallback((moduleId:string) => {
+    const moduleIds=new Set([moduleId]);let changed=true;
+    while(changed){changed=false;for(const module of project.modules)if(module.parentModuleId&&moduleIds.has(module.parentModuleId)&&!moduleIds.has(module.id)){moduleIds.add(module.id);changed=true;}}
+    const componentIds=new Set(project.modules.filter(module=>moduleIds.has(module.id)).flatMap(module=>module.memberIds));
+    update(draft=>{draft.modules=draft.modules.filter(module=>!moduleIds.has(module.id));draft.components=draft.components.filter(component=>!componentIds.has(component.id));draft.wires=draft.wires.filter(wire=>!moduleIds.has(wire.from.componentId)&&!moduleIds.has(wire.to.componentId)&&!componentIds.has(wire.from.componentId)&&!componentIds.has(wire.to.componentId));for(const module of draft.modules)module.memberIds=module.memberIds.filter(id=>!componentIds.has(id));});
+    setInstrumentWindows(current=>current.filter(item=>!componentIds.has(item.componentId)));
+    if(activeModuleId&&moduleIds.has(activeModuleId))setActiveModuleId(undefined);setSelectedModuleId(undefined);
+  },[activeModuleId,project.modules,update]);
+
+  const runContextAction = useCallback((action:ContextAction) => {
+    const target=contextTarget;if(!target)return;
+    if(target.kind==='canvas'){
+      if(action==='select-tool')setTool('select');if(action==='wire-tool')setTool('wire');if(action==='module-tool')setTool('module');return;
+    }
+    if(target.kind==='wire'){
+      if(action==='delete')update(draft=>{draft.wires=draft.wires.filter(wire=>wire.id!==target.id);});return;
+    }
+    if(target.kind==='component'){
+      const id=target.id;
+      if(action==='instrument'){openInstrumentWindow(id);return;}
+      if(action==='inspect'){setSelected([id]);setSelectedModuleId(undefined);setInspectorCollapsed(false);return;}
+      if(action==='duplicate'){let nextId='';update(draft=>{const source=draft.components.find(item=>item.id===id);if(!source)return;nextId=uid('node');draft.components.push({...structuredClone(source),id:nextId,x:source.x+40,y:source.y+40});});if(nextId)setSelected([nextId]);return;}
+      if(action==='delete'){update(draft=>{draft.components=draft.components.filter(item=>item.id!==id);draft.wires=draft.wires.filter(wire=>wire.from.componentId!==id&&wire.to.componentId!==id);for(const module of draft.modules)module.memberIds=module.memberIds.filter(member=>member!==id);});setInstrumentWindows(current=>current.filter(item=>item.componentId!==id));setSelected([]);return;}
+      update(draft=>{const item=draft.components.find(component=>component.id===id);if(!item)return;if(action==='rotate')item.rotation=(item.rotation+90)%360;if(action==='toggle')item.enabled=!item.enabled;if(action==='lock')item.locked=!item.locked;});return;
+    }
+    const module=project.modules.find(item=>item.id===target.id);if(!module)return;
+    if(action==='inspect'){setSelected([]);setSelectedModuleId(module.id);setInspectorCollapsed(false);return;}
+    if(action==='enter-module'){setActiveModuleId(module.id);setSelected([]);setSelectedModuleId(module.id);return;}
+    if(action==='save-module'){setModuleLibrary(saveModuleToLibrary(project,module));setToast({type:'ok',message:`«${module.name}» guardado en la biblioteca.`});return;}
+    if(action==='delete'){deleteModuleDirect(module.id);return;}
+    update(draft=>{const item=draft.modules.find(candidate=>candidate.id===module.id);if(!item)return;if(action==='toggle')item.enabled=!item.enabled;if(action==='collapse-module')item.collapsed=!item.collapsed;});
+  },[contextTarget,deleteModuleDirect,openInstrumentWindow,project,update]);
+
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       const typing = event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement;
@@ -202,7 +264,7 @@ export default function App() {
       onRouting={routing => update(draft => { draft.settings.wireRouting = routing; })} onSignalView={signalView => update(draft => { draft.settings.signalView = signalView; })}
       onNew={newProject} onSave={save} onImport={() => importRef.current?.click()} onExport={() => exportProject(project)} onUndo={undo} onRedo={redo}/>
       <CatalogPanel collapsed={catalogCollapsed} database={database} onToggle={() => setCatalogCollapsed(value => !value)} onAdd={addDefinition} modules={moduleLibrary} onInsertModule={insertModule} onImportModule={()=>moduleImportRef.current?.click()} onDeleteModule={id=>setModuleLibrary(deleteSavedModule(id))}/>
-      <Workspace project={project} resolvedTheme={resolvedTheme} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} running={running} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>setInspectorCollapsed(false)}/>
+      <Workspace project={project} resolvedTheme={resolvedTheme} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} running={running} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>setInspectorCollapsed(false)} onContextTarget={setContextTarget}/>
       <Inspector project={project} selected={selected} collapsed={inspectorCollapsed} onToggle={() => setInspectorCollapsed(value => !value)} selectedModule={selectedModule}
         onProperty={(id, key, value: PropertyValue) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) item.properties[key] = value; })}
         onPatch={(id, patch) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) Object.assign(item, patch); })}
@@ -219,6 +281,8 @@ export default function App() {
         </div>
       </footer>
     </div>
+    {instrumentWindows.map(windowState=>{const component=project.components.find(item=>item.id===windowState.componentId);return component?<InstrumentWindow key={windowState.id} state={windowState} component={component} project={project} samples={samples} onFocus={()=>focusInstrumentWindow(windowState.id)} onState={patch=>setInstrumentWindows(current=>current.map(item=>item.id===windowState.id?{...item,...patch}:item))} onPatch={properties=>update(draft=>{const item=draft.components.find(candidate=>candidate.id===component.id);if(item)Object.assign(item.properties,properties);})} onClose={()=>setInstrumentWindows(current=>current.filter(item=>item.id!==windowState.id))}/>:null;})}
+    {contextTarget&&<ContextMenu target={contextTarget} project={project} onAction={runContextAction} onClose={()=>setContextTarget(undefined)}/>} 
     <input ref={importRef} type="file" accept=".bitwire,.json,application/json" hidden onChange={event => { void doImport(event.target.files?.[0]); event.currentTarget.value = ''; }}/>
     <input ref={moduleImportRef} type="file" accept=".bitwire-module,.json,application/json" hidden onChange={event=>{void doImportModule(event.target.files?.[0]);event.currentTarget.value='';}}/>
     {toast && <div className={`toast ${toast.type}`}>{toast.type === 'ok' ? <CheckCircle2 size={18}/> : <CircleAlert size={18}/>}<span>{toast.message}</span><button onClick={() => setToast(undefined)}><X size={15}/></button></div>}

@@ -5,6 +5,7 @@ import { fitBounds, screenToWorld, zoomAt } from '../canvas/ViewportMatrix';
 import { lodForScale } from '../canvas/LODManager';
 import { nearestSegmentIndex, routePreview, routeWire } from '../canvas/WireRouter';
 import { CircuitSymbol } from './CircuitSymbol';
+import type { ContextTarget } from './ContextMenu';
 import type {
   BitWireProject, ComponentInstance, ModuleArea, PinDefinition, PinRef, Point,
   ModulePin, PropertyValue, SimulationSnapshot, Theme, ToolMode, ViewportState, Wire, WireSignal,
@@ -29,6 +30,7 @@ interface Props {
   activeModuleId?: string;
   onActiveModule(id?: string): void;
   onOpenInspector(): void;
+  onContextTarget(target:ContextTarget):void;
 }
 
 type Interaction =
@@ -41,7 +43,7 @@ type Interaction =
   | { type: 'marquee' | 'module'; start: Point; current: Point }
   | null;
 
-export function Workspace({ project, resolvedTheme, update, selected, onSelected, selectedModuleId, onSelectedModule, tool, onTool, snapshot, running, onViewport, activeModuleId, onActiveModule, onOpenInspector }: Props) {
+export function Workspace({ project, resolvedTheme, update, selected, onSelected, selectedModuleId, onSelectedModule, tool, onTool, snapshot, running, onViewport, activeModuleId, onActiveModule, onOpenInspector, onContextTarget }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [viewport, setViewportState] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
   const [interaction, setInteraction] = useState<Interaction>(null);
@@ -278,6 +280,10 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
   });
 
   const openComponentInspector = (component: ComponentInstance) => { onSelected([component.id]); onSelectedModule(undefined); onOpenInspector(); };
+  const componentContext = (event:React.MouseEvent<SVGGElement>,component:ComponentInstance) => {
+    event.preventDefault();event.stopPropagation();onSelected([component.id]);onSelectedModule(undefined);
+    onContextTarget({kind:'component',id:component.id,x:event.clientX,y:event.clientY});
+  };
 
   const fitProject = () => {
     const rect = svgRef.current!.getBoundingClientRect();
@@ -359,7 +365,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
   const renderedModules = activeModule ? childModules : project.modules.filter(module => !module.parentModuleId);
 
   return <main className={`workspace theme-${resolvedTheme} tool-${tool} ${spaceHeld ? 'space-pan' : ''} ${activeModule ? 'inside-module' : ''}`}>
-    <svg ref={svgRef} className="circuit-canvas" onWheel={onWheel} onPointerDown={onBackgroundDown} onPointerMove={onPointerMove} onPointerUp={finishInteraction} onPointerCancel={finishInteraction}
+    <svg ref={svgRef} className="circuit-canvas" onWheel={onWheel} onPointerDown={onBackgroundDown} onPointerMove={onPointerMove} onPointerUp={finishInteraction} onPointerCancel={finishInteraction} onContextMenu={event=>{event.preventDefault();if(event.target===event.currentTarget||((event.target as Element).classList?.contains('grid-plane')))onContextTarget({kind:'canvas',x:event.clientX,y:event.clientY});}}
       onDragOver={event => { if (event.dataTransfer.types.includes('application/x-bitwire-component')) { event.preventDefault(); event.dataTransfer.dropEffect = 'copy'; } }}
       onDrop={event => { event.preventDefault(); const id = event.dataTransfer.getData('application/x-bitwire-component'); addAt(id, screenToWorld(localPoint(event), viewport)); }}>
       <defs>
@@ -370,7 +376,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
       </defs>
       <g transform={`translate(${viewport.x} ${viewport.y}) scale(${viewport.scale})`}>
         <rect className="grid-plane" x={-100000} y={-100000} width={200000} height={200000} fill="url(#majorGrid)"/>
-        <g className="module-layer">{renderedModules.map(module => <g key={module.id} className={`module-area ${module.collapsed ? 'chip-mode' : 'area-mode'} ${module.id === selectedModuleId ? 'selected' : ''} ${module.enabled ? '' : 'disabled'}`} onPointerDown={event => onModuleDown(event,module)} onDoubleClick={event => { event.stopPropagation(); navigateToModule(module.id); }}>
+        <g className="module-layer">{renderedModules.map(module => <g key={module.id} className={`module-area ${module.collapsed ? 'chip-mode' : 'area-mode'} ${module.id === selectedModuleId ? 'selected' : ''} ${module.enabled ? '' : 'disabled'}`} onPointerDown={event => onModuleDown(event,module)} onDoubleClick={event => { event.stopPropagation(); navigateToModule(module.id); }} onContextMenu={event=>{event.preventDefault();event.stopPropagation();onSelected([]);onSelectedModule(module.id);onContextTarget({kind:'module',id:module.id,x:event.clientX,y:event.clientY});}}>
           <rect x={module.x} y={module.y} width={module.width} height={module.height} style={{ stroke: module.color }}/>
           <path d={`M${module.x} ${module.y + 34}h${module.width}`} style={{ stroke: module.color }}/>
           {module.collapsed && <>{Array.from({length:Math.max(2,Math.min(12,module.pins.length))},(_,index)=><path key={index} className="chip-decoration" d={`M${module.x+22+index*14} ${module.y+12}v10`} style={{stroke:module.color}}/>)}</>}
@@ -385,7 +391,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
           const mid = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
           const wirePath = routeWire(from, to, wire.routing, wire.controlPoints);
           return <g key={wire.id} className={`wire ${signal?.active ? 'active' : ''} logic-${signal?.logic ?? 'z'} ${running ? 'running' : ''}`}>
-            <path className="wire-hit" d={wirePath} onPointerDown={event => onWireDown(event,wire,from,to)} onDoubleClick={event => addWireNode(event,wire,from,to)}/>
+            <path className="wire-hit" d={wirePath} onPointerDown={event => onWireDown(event,wire,from,to)} onDoubleClick={event => addWireNode(event,wire,from,to)} onContextMenu={event=>{event.preventDefault();event.stopPropagation();setSelectedWireId(wire.id);onContextTarget({kind:'wire',id:wire.id,x:event.clientX,y:event.clientY});}}/>
             <path className="wire-base" d={wirePath}/>
             <path className="wire-signal" d={wirePath}/>
             {running && signal?.active && <>
@@ -400,7 +406,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
           const definition = CATALOG_BY_ID.get(component.definitionId);
           if (!definition) return null;
           const componentLod = lodForScale(viewport.scale * (component.scale || 1));
-          return <CircuitSymbol key={component.id} component={component} definition={definition} selected={selected.includes(component.id)} lod={componentLod.level} signal={snapshot?.componentSignals[component.id]} onPointerDown={onComponentDown} onDoubleClick={openComponentInspector} onPin={onPin} onQuickToggle={quickToggle} onProperty={(item,key,value) => update(draft => { const target=draft.components.find(node=>node.id===item.id); if(target) target.properties[key]=value; })}/>;
+          return <CircuitSymbol key={component.id} component={component} definition={definition} selected={selected.includes(component.id)} lod={componentLod.level} signal={snapshot?.componentSignals[component.id]} onPointerDown={onComponentDown} onDoubleClick={openComponentInspector} onContextMenu={componentContext} onPin={onPin} onQuickToggle={quickToggle} onProperty={(item,key,value) => update(draft => { const target=draft.components.find(node=>node.id===item.id); if(target) target.properties[key]=value; })}/>;
         })}</g>
         {marquee && <rect className={interaction?.type === 'module' ? 'module-marquee' : 'selection-marquee'} x={marquee.x} y={marquee.y} width={marquee.width} height={marquee.height}/>} 
       </g>

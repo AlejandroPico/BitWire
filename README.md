@@ -9,7 +9,7 @@ La primera versión funcional incluye un plano SVG de profundidad semántica, ca
 - Plano técnico virtualmente infinito con desplazamiento, zoom práctico hasta `1.000.000.000×`, rejilla adaptativa y encaje automático.
 - Cinco niveles de detalle: encapsulado, esquemático, funcional, dispositivo y físico.
 - Escala de inserción dependiente del zoom: una pieza conserva el tamaño visual con el que fue colocada y revela su escala relativa al alejarse.
-- Catálogo de **216 componentes** repartidos entre electricidad, semiconductores, RF, analógica, potencia, sensores, lógica, memorias, comunicaciones, audio, visualización e instrumentación.
+- Catálogo de **219 componentes** repartidos entre electricidad, semiconductores, RF, analógica, potencia, sensores, lógica, memorias, comunicaciones, audio, visualización e instrumentación.
 - Símbolos SVG nativos: no se utilizan bitmaps para los elementos del circuito.
 - Inserción mediante arrastre o doble clic, movimiento con ajuste a rejilla, selección múltiple, duplicado, giro, bloqueo y borrado seguro de conexiones.
 - Cableado terminal a terminal con rutas ortogonales, Bézier o rectas.
@@ -19,6 +19,9 @@ La primera versión funcional incluye un plano SVG de profundidad semántica, ca
 - Visualización sobre el cable de tensión, corriente, potencia o estado lógico.
 - Accionamiento directo de interruptores y entradas binarias desde el plano.
 - Banco de instrumentación multivista y persistente: osciloscopio, analizador lógico, multímetro, monitor de potencia, analizador de espectro y frecuencímetro; cualquier combinación puede mostrarse u ocultarse.
+- Captura independiente por aparato: cada osciloscopio, sonda o analizador lee únicamente las redes conectadas a sus propios terminales.
+- Menús contextuales propios mediante botón derecho para componentes, conexiones, lienzo y encapsulados; el menú nativo del navegador queda bloqueado dentro del laboratorio.
+- Ventanas de instrumento movibles, redimensionables, minimizables, maximizables y ordenadas por foco, con extensión a frontales profesionales de adquisición, disparo, escalas, rangos y filtros.
 - Encapsulados funcionales redimensionables y anidables sin límite práctico, con lienzo interno propio, navegación jerárquica, terminales fijos de borde, modo chip y patillas configurables.
 - Biblioteca local de encapsulados, importación y exportación `.bitwire-module` y reutilización entre proyectos.
 - Inspector editable con parámetros eléctricos, posición, rotación, estado y conectividad.
@@ -82,6 +85,8 @@ npm run build
 | Selección múltiple | `Mayús` + clic o recuadro |
 | Encapsular | herramienta de módulo + recuadro |
 | Zoom semántico | rueda del ratón; el doble clic selecciona y abre el inspector lateral |
+| Menú del objeto | botón derecho sobre componente, cable, encapsulado o lienzo |
+| Interfaz de instrumento | botón derecho → `Abrir interfaz del instrumento` |
 | Cambiar tema | clic en el icono de aspecto; `Alt` + clic abre el menú completo |
 | Eliminar | `Supr` |
 | Guardar | `Ctrl+S` |

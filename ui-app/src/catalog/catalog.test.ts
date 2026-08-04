@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { EMBEDDED_CATALOG } from './catalog';
 
 describe('expanded component catalog', () => {
-  it('contains 216 unique, connectable vector components', () => {
-    expect(EMBEDDED_CATALOG).toHaveLength(216);
-    expect(new Set(EMBEDDED_CATALOG.map(item=>item.id)).size).toBe(216);
+  it('contains 219 unique, connectable vector components', () => {
+    expect(EMBEDDED_CATALOG).toHaveLength(219);
+    expect(new Set(EMBEDDED_CATALOG.map(item=>item.id)).size).toBe(219);
     expect(EMBEDDED_CATALOG.every(item=>item.pins.length>0)).toBe(true);
   });
 
