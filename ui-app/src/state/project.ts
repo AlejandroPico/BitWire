@@ -1,4 +1,4 @@
-import type { BitWireProject, ComponentInstance, ModuleArea, ProjectSettings, Wire } from '../model/types';
+import type { BitWireProject, ComponentInstance, ModuleArea, ProjectSettings, Theme, Wire } from '../model/types';
 import { CATALOG_BY_ID } from '../catalog/catalog';
 
 const now = () => new Date().toISOString();
@@ -8,7 +8,7 @@ export const DEFAULT_SETTINGS: ProjectSettings = {
   gridSize: 20,
   snapToGrid: true,
   wireRouting: 'orthogonal',
-  theme: 'blueprint',
+  theme: 'auto',
   signalView: 'voltage',
   showValues: true,
 };
@@ -120,5 +120,7 @@ export function validateProject(input: unknown): BitWireProject {
     module.pins ??= [];
   }
   for (const connection of project.wires) connection.controlPoints ??= [];
+  if (project.settings.theme === ('dark' as Theme)) project.settings.theme = 'night';
+  if (project.settings.theme === ('light' as Theme)) project.settings.theme = 'morning';
   return project;
 }

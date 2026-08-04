@@ -150,7 +150,17 @@ export interface SimulationSnapshot {
 }
 
 export type ToolMode = 'select' | 'wire' | 'pan' | 'module';
-export type Theme = 'blueprint' | 'dark' | 'light' | 'auto';
+export type Theme =
+  | 'auto'
+  | 'morning'
+  | 'afternoon'
+  | 'night'
+  | 'classic'
+  | 'blueprint'
+  | 'laboratory'
+  | 'terminal'
+  | 'chalkboard'
+  | 'parchment';
 export type SignalView = 'voltage' | 'current' | 'logic' | 'power';
 
 export interface ViewportState { x: number; y: number; scale: number }

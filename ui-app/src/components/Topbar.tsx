@@ -3,6 +3,8 @@ import {
   MousePointer2, Pause, Play, Redo2, Save, StepForward, Undo2, Waypoints,
 } from 'lucide-react';
 import type { SignalView, ToolMode, Wire } from '../model/types';
+import type { Theme } from '../model/types';
+import { ThemeControl } from './ThemeControl';
 
 interface Props {
   projectName: string;
@@ -14,6 +16,7 @@ interface Props {
   canUndo: boolean;
   canRedo: boolean;
   dirty: boolean;
+  theme: Theme;
   onTool(tool: ToolMode): void;
   onRun(): void;
   onStep(): void;
@@ -26,6 +29,7 @@ interface Props {
   onExport(): void;
   onUndo(): void;
   onRedo(): void;
+  onTheme(theme: Theme): void;
 }
 
 export function Topbar(props: Props) {
@@ -55,6 +59,7 @@ export function Topbar(props: Props) {
     <label className="compact-select" title="Trazado de cables"><select value={props.routing} onChange={event => props.onRouting(event.target.value as Wire['routing'])}>
       <option value="orthogonal">Ortogonal</option><option value="bezier">Bézier</option><option value="straight">Recto</option>
     </select><ChevronDown size={12}/></label>
+    <ThemeControl theme={props.theme} onTheme={props.onTheme}/>
     <nav className="toolbar-group simulation-tools">
       <button className={props.running ? 'stop-action' : 'run-action'} onClick={props.onRun}>{props.running ? <Pause size={17}/> : <Play size={17}/>}<span>{props.running ? 'Pausar' : 'Ejecutar'}</span></button>
       <button onClick={props.onStep} disabled={props.running} title="Avanzar un paso"><StepForward size={17}/></button>
@@ -64,4 +69,3 @@ export function Topbar(props: Props) {
     </nav>
   </header>;
 }
-

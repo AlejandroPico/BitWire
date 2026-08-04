@@ -14,6 +14,7 @@ import { createBlankProject, createDemoProject, createInstance, uid } from './st
 import { useProjectHistory } from './state/useProjectHistory';
 import { exportProject, importProject, loadLocalProject, saveProjectLocally } from './utils/projectIO';
 import { deleteSavedModule, exportModule, importModule, insertSavedModule, loadModuleLibrary, saveModuleToLibrary } from './utils/moduleIO';
+import { loadThemePreference, resolveTheme, saveThemePreference, themeDefinition } from './theme/themes';
 
 export default function App() {
   const initial = useRef(loadLocalProject() ?? createDemoProject()).current;
@@ -35,6 +36,8 @@ export default function App() {
   const [savedRevision, setSavedRevision] = useState(initial.updatedAt);
   const [toast, setToast] = useState<{ type: 'ok' | 'error'; message: string }>();
   const [helpOpen, setHelpOpen] = useState(false);
+  const [theme, setTheme] = useState<Theme>(loadThemePreference);
+  const [themeClock, setThemeClock] = useState(() => Date.now());
   const workerRef = useRef<Worker | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const moduleImportRef = useRef<HTMLInputElement>(null);
@@ -67,6 +70,19 @@ export default function App() {
   useEffect(() => { workerRef.current?.postMessage({ type: 'project', project: simulationProject(project) }); }, [project, simulationProject]);
   useEffect(() => { workerRef.current?.postMessage({ type: 'control', running, speed }); }, [running, speed]);
   useEffect(() => { if (!toast) return; const id = window.setTimeout(() => setToast(undefined), 3200); return () => clearTimeout(id); }, [toast]);
+  useEffect(() => {
+    if (theme !== 'auto') return;
+    const refresh = () => setThemeClock(Date.now());
+    const id = window.setInterval(refresh, 60_000);
+    document.addEventListener('visibilitychange', refresh);
+    return () => { window.clearInterval(id); document.removeEventListener('visibilitychange', refresh); };
+  }, [theme]);
+
+  const changeTheme = useCallback((next: Theme) => {
+    saveThemePreference(next);
+    setTheme(next);
+    setThemeClock(Date.now());
+  }, []);
 
   const save = useCallback(() => {
     saveProjectLocally(project); setSavedRevision(project.updatedAt);
@@ -175,15 +191,17 @@ export default function App() {
 
   const selectedModule = project.modules.find(module => module.id === selectedModuleId);
   const activeWarnings = snapshot?.warnings.length ?? 0;
+  const resolvedTheme = resolveTheme(theme, new Date(themeClock));
 
-  return <div className="app-shell">
+  return <div className={`app-shell theme-${resolvedTheme}`} data-theme-mode={theme}>
     <Topbar projectName={project.name} tool={tool} running={running} speed={speed} routing={project.settings.wireRouting} signalView={project.settings.signalView} canUndo={canUndo} canRedo={canRedo} dirty={savedRevision !== project.updatedAt}
+      theme={theme} onTheme={changeTheme}
       onTool={setTool} onRun={() => setRunning(value => !value)} onStep={() => workerRef.current?.postMessage({ type: 'step' })} onSpeed={setSpeed}
       onRouting={routing => update(draft => { draft.settings.wireRouting = routing; })} onSignalView={signalView => update(draft => { draft.settings.signalView = signalView; })}
       onNew={newProject} onSave={save} onImport={() => importRef.current?.click()} onExport={() => exportProject(project)} onUndo={undo} onRedo={redo}/>
     <div className={`editor-grid ${catalogCollapsed ? 'left-collapsed' : ''} ${inspectorCollapsed ? 'right-collapsed' : ''} ${instrumentsCollapsed ? 'bottom-collapsed' : ''}`}>
       <CatalogPanel collapsed={catalogCollapsed} database={database} onToggle={() => setCatalogCollapsed(value => !value)} onAdd={addDefinition} modules={moduleLibrary} onInsertModule={insertModule} onImportModule={()=>moduleImportRef.current?.click()} onDeleteModule={id=>setModuleLibrary(deleteSavedModule(id))}/>
-      <Workspace project={project} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} running={running} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>setInspectorCollapsed(false)}/>
+      <Workspace project={project} resolvedTheme={resolvedTheme} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} running={running} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>setInspectorCollapsed(false)}/>
       <Inspector project={project} selected={selected} collapsed={inspectorCollapsed} onToggle={() => setInspectorCollapsed(value => !value)} selectedModule={selectedModule}
         onProperty={(id, key, value: PropertyValue) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) item.properties[key] = value; })}
         onPatch={(id, patch) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) Object.assign(item, patch); })}
@@ -194,7 +212,7 @@ export default function App() {
         <div><span className={`engine-light ${running ? 'running' : ''}`}/><b>{running ? `SIMULANDO ${speed}×` : 'MOTOR EN PAUSA'}</b><span>{snapshot ? `t = ${snapshot.time.toFixed(3)} s · tick ${snapshot.tick}` : 'Inicializando motor…'}</span></div>
         <div><span>{project.components.length} componentes</span><span>{project.wires.length} redes</span><span>{selected.length ? `${selected.length} seleccionados` : 'Sin selección'}</span></div>
         <div className="status-actions">
-          <label>Tema <select value={project.settings.theme} onChange={event => update(draft => { draft.settings.theme = event.target.value as Theme; })}><option value="blueprint">Plano</option><option value="dark">Noche</option><option value="light">Día</option><option value="auto">Automático</option></select></label>
+          <span className="theme-status">TEMA · {themeDefinition(theme).shortLabel.toUpperCase()}</span>
           <button onClick={() => setHelpOpen(true)}><HelpCircle size={14}/>Guía</button>
           <span className={activeWarnings ? 'warning-count active' : 'warning-count'}><CircleAlert size={13}/>{activeWarnings}</span>
         </div>

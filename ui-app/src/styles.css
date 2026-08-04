@@ -19,6 +19,75 @@
   --amber: #f5b942;
   --red: #ff5369;
   --blue: #64a8ff;
+  --text-strong: #f2f7f9;
+  --text-soft: #b9cad2;
+  --accent-contrast: #061511;
+  --shadow: #02070b88;
+  --screen-bg: #03100e;
+}
+
+.app-shell.theme-classic {
+  --chrome-0: #071018; --chrome-1: #0b151e; --chrome-2: #101d27; --chrome-3: #162631;
+  --line: #273a46; --line-strong: #38515f; --text: #dce7ed; --text-strong: #f2f7f9;
+  --text-soft: #b9cad2; --muted: #8297a3; --faint: #526a77; --cyan: #2be4c4;
+  --cyan-dark: #0f8878; --amber: #f5b942; --red: #ff5369; --blue: #64a8ff;
+  --accent-contrast: #061511; --shadow: #02070b88; --screen-bg: #03100e;
+}
+.app-shell.theme-night {
+  --chrome-0: #080a0c; --chrome-1: #0d1114; --chrome-2: #141a1e; --chrome-3: #1c2429;
+  --line: #29343a; --line-strong: #42535c; --text: #d9e0e3; --text-strong: #f4f6f7;
+  --text-soft: #bcc7cc; --muted: #839198; --faint: #56656c; --cyan: #74d5c3;
+  --cyan-dark: #287f71; --amber: #dfad55; --red: #e85d70; --blue: #76a9e8;
+  --accent-contrast: #08110f; --shadow: #000000a3; --screen-bg: #020806;
+}
+.app-shell.theme-morning {
+  --chrome-0: #e6e8e4; --chrome-1: #f4f3ed; --chrome-2: #dce1df; --chrome-3: #cbd4d2;
+  --line: #aebbb9; --line-strong: #778c8c; --text: #25363b; --text-strong: #14262c;
+  --text-soft: #40575d; --muted: #5d7378; --faint: #7c8d90; --cyan: #087f79;
+  --cyan-dark: #075f5b; --amber: #a96718; --red: #b43f50; --blue: #2469a0;
+  --accent-contrast: #f4fffd; --shadow: #50605b42; --screen-bg: #10251f;
+}
+.app-shell.theme-afternoon {
+  --chrome-0: #302016; --chrome-1: #3a271b; --chrome-2: #4a3020; --chrome-3: #5a3a25;
+  --line: #735038; --line-strong: #9c704b; --text: #eadac2; --text-strong: #fff1d8;
+  --text-soft: #d5bfa4; --muted: #b49878; --faint: #81684f; --cyan: #e19a55;
+  --cyan-dark: #9c5f2d; --amber: #efbe61; --red: #df6c61; --blue: #7ab1ca;
+  --accent-contrast: #29170d; --shadow: #160b058f; --screen-bg: #181008;
+}
+.app-shell.theme-blueprint {
+  --chrome-0: #342116; --chrome-1: #412a1b; --chrome-2: #50331f; --chrome-3: #634126;
+  --line: #765033; --line-strong: #a16f43; --text: #f0dfc4; --text-strong: #fff4df;
+  --text-soft: #ddc6a4; --muted: #b79b77; --faint: #866b4e; --cyan: #f0a04b;
+  --cyan-dark: #a96023; --amber: #ffd275; --red: #e96d5f; --blue: #7bc9ff;
+  --accent-contrast: #2d1709; --shadow: #170b058f; --screen-bg: #103d5d;
+}
+.app-shell.theme-laboratory {
+  --chrome-0: #dfe7e9; --chrome-1: #f3f7f8; --chrome-2: #d4e0e3; --chrome-3: #c3d4d8;
+  --line: #a5b9bf; --line-strong: #718e97; --text: #20363d; --text-strong: #102a32;
+  --text-soft: #39545c; --muted: #58727a; --faint: #81949a; --cyan: #087d92;
+  --cyan-dark: #07586a; --amber: #b87912; --red: #b43d4d; --blue: #2e6fab;
+  --accent-contrast: #f3fdff; --shadow: #53696f3b; --screen-bg: #0a2025;
+}
+.app-shell.theme-terminal {
+  --chrome-0: #030704; --chrome-1: #050c08; --chrome-2: #09150e; --chrome-3: #10251a;
+  --line: #173c26; --line-strong: #2d7145; --text: #8eeaac; --text-strong: #c4ffd5;
+  --text-soft: #72c990; --muted: #4d9c68; --faint: #326342; --cyan: #68f59a;
+  --cyan-dark: #24864a; --amber: #b8e866; --red: #ff6f7c; --blue: #72c7a1;
+  --accent-contrast: #031007; --shadow: #000000bd; --screen-bg: #010603;
+}
+.app-shell.theme-chalkboard {
+  --chrome-0: #2d1d14; --chrome-1: #39251a; --chrome-2: #493020; --chrome-3: #583b28;
+  --line: #704c33; --line-strong: #9a6c48; --text: #e6e3d4; --text-strong: #fffdf0;
+  --text-soft: #d3cdbb; --muted: #aaa18d; --faint: #7e715d; --cyan: #d9dfc5;
+  --cyan-dark: #7d8f72; --amber: #e7bd64; --red: #df716b; --blue: #89b7b2;
+  --accent-contrast: #243229; --shadow: #110a068f; --screen-bg: #0d241d;
+}
+.app-shell.theme-parchment {
+  --chrome-0: #4a3324; --chrome-1: #5b402c; --chrome-2: #6a4b33; --chrome-3: #7a583c;
+  --line: #8e6a4b; --line-strong: #b98d62; --text: #f0dec1; --text-strong: #fff4dd;
+  --text-soft: #dfc8a7; --muted: #bea17b; --faint: #8d7152; --cyan: #d9a45f;
+  --cyan-dark: #9d6a32; --amber: #f2c46d; --red: #d86258; --blue: #7ca8b8;
+  --accent-contrast: #342013; --shadow: #2112087a; --screen-bg: #2d1c11;
 }
 
 * { box-sizing: border-box; border-radius: 0 !important; }
@@ -26,34 +95,54 @@ html, body, #root { width: 100%; height: 100%; margin: 0; overflow: hidden; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { border: 0; background: none; cursor: pointer; }
 button:disabled { opacity: .35; cursor: default; }
-select option { color: #dce7ed; background: #0d1922; }
+select option { color: var(--text); background: var(--chrome-2); }
 button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 1px solid var(--cyan); outline-offset: -1px; }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: #0a141c; }
 ::-webkit-scrollbar-thumb { background: #2b414e; border: 2px solid #0a141c; }
 
 .app-shell { height: 100%; display: flex; flex-direction: column; background: var(--chrome-0); }
-.topbar { height: 56px; flex: 0 0 56px; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 0; background: #09131b; border-bottom: 1px solid var(--line); box-shadow: 0 1px 0 #02070b; z-index: 20; }
+.topbar { height: 56px; flex: 0 0 56px; display: flex; align-items: center; gap: 8px; padding: 0 10px 0 0; background: var(--chrome-0); border-bottom: 1px solid var(--line); box-shadow: 0 1px 0 var(--shadow); z-index: 20; }
 .brand-block { height: 55px; width: 216px; display: flex; align-items: center; gap: 10px; padding-left: 12px; border-right: 1px solid var(--line); }
-.brand-mark { width: 34px; height: 34px; display: grid; place-items: center; font: 700 12px/1 "IBM Plex Mono", monospace; color: #061511; background: var(--cyan); border: 1px solid #a0ffef; box-shadow: 3px 3px 0 #14473f; }
+.brand-mark { width: 34px; height: 34px; display: grid; place-items: center; font: 700 12px/1 "IBM Plex Mono", monospace; color: var(--accent-contrast); background: var(--cyan); border: 1px solid color-mix(in srgb, var(--cyan), white 45%); box-shadow: 3px 3px 0 color-mix(in srgb, var(--cyan), black 58%); }
 .brand-block div div { display: flex; flex-direction: column; }
-.brand-block strong { font: 700 14px/1.1 "IBM Plex Mono", monospace; letter-spacing: .18em; color: #f2f7f9; }
+.brand-block strong { font: 700 14px/1.1 "IBM Plex Mono", monospace; letter-spacing: .18em; color: var(--text-strong); }
 .brand-block small { margin-top: 4px; font: 500 8px/1 "IBM Plex Mono", monospace; letter-spacing: .15em; color: var(--muted); }
-.project-title { width: 190px; min-width: 110px; display: flex; align-items: center; gap: 8px; padding: 0 10px; font-size: 12px; color: #b6c5cd; white-space: nowrap; overflow: hidden; }
+.project-title { width: 190px; min-width: 110px; display: flex; align-items: center; gap: 8px; padding: 0 10px; font-size: 12px; color: var(--text-soft); white-space: nowrap; overflow: hidden; }
 .project-title span:last-child { overflow: hidden; text-overflow: ellipsis; }
 .dirty-dot, .saved-dot { width: 6px; height: 6px; flex: 0 0 6px; background: var(--amber); }
 .saved-dot { background: #3b5663; }
-.toolbar-group { height: 36px; display: flex; align-items: stretch; border: 1px solid var(--line); background: #0d1922; }
+.toolbar-group { height: 36px; display: flex; align-items: stretch; border: 1px solid var(--line); background: var(--chrome-2); }
 .toolbar-group button { min-width: 34px; display: flex; align-items: center; justify-content: center; gap: 7px; color: #8ea3ae; border-right: 1px solid #20323d; }
 .toolbar-group button:last-child { border-right: 0; }
-.toolbar-group button:hover:not(:disabled), .toolbar-group button.active { color: #ebf9f7; background: #172832; }
+.toolbar-group button:hover:not(:disabled), .toolbar-group button.active { color: var(--text-strong); background: var(--chrome-3); }
 .toolbar-group button.active { box-shadow: inset 0 -2px var(--cyan); color: var(--cyan); }
 .toolbar-spacer { flex: 1; }
-.simulation-tools button.run-action, .simulation-tools button.stop-action { padding: 0 12px; color: #071710; background: var(--cyan); font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: .08em; }
+.simulation-tools button.run-action, .simulation-tools button.stop-action { padding: 0 12px; color: var(--accent-contrast); background: var(--cyan); font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: .08em; }
 .simulation-tools button.stop-action { color: #1b0b0e; background: var(--red); }
-.simulation-tools .speed-select { min-width: 58px; border: 0; border-left: 1px solid var(--line); background: #0d1922; color: #bcd0d8; padding: 0 5px; font: 500 10px "IBM Plex Mono", monospace; }
-.compact-select { height: 36px; display: flex; align-items: center; gap: 6px; padding: 0 7px; border: 1px solid var(--line); background: #0d1922; color: #849aa6; }
-.compact-select select { max-width: 88px; appearance: none; border: 0; background: transparent; color: #b9cad2; font-size: 10px; text-transform: uppercase; outline: none; }
+.simulation-tools .speed-select { min-width: 58px; border: 0; border-left: 1px solid var(--line); background: var(--chrome-2); color: var(--text-soft); padding: 0 5px; font: 500 10px "IBM Plex Mono", monospace; }
+.compact-select { height: 36px; display: flex; align-items: center; gap: 6px; padding: 0 7px; border: 1px solid var(--line); background: var(--chrome-2); color: var(--muted); }
+.compact-select select { max-width: 88px; appearance: none; border: 0; background: transparent; color: var(--text-soft); font-size: 10px; text-transform: uppercase; outline: none; }
+
+.theme-control { position: relative; flex: 0 0 38px; height: 36px; z-index: 80; }
+.theme-trigger { width: 38px; height: 36px; display: grid; grid-template-rows: 21px 5px; place-items: center; padding: 4px 6px 3px; color: var(--muted); background: var(--chrome-2); border: 1px solid var(--line); }
+.theme-trigger:hover,.theme-trigger.active { color: var(--cyan); background: var(--chrome-3); border-color: var(--line-strong); }
+.theme-trigger-indicator { width: 23px; height: 4px; display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid var(--line-strong); }
+.theme-trigger-indicator i,.theme-swatch i { display: block; min-width: 0; }
+.theme-menu { position: absolute; top: 44px; right: 0; width: min(492px,calc(100vw - 20px)); max-height: calc(100vh - 76px); overflow: auto; background: var(--chrome-1); border: 1px solid var(--line-strong); box-shadow: 9px 9px 0 var(--shadow); color: var(--text); z-index: 500; }
+.theme-menu > header { height: 39px; display: flex; align-items: center; justify-content: space-between; padding: 0 11px; background: var(--chrome-0); border-bottom: 1px solid var(--line); }
+.theme-menu > header span { color: var(--text-strong); font: 600 9px "IBM Plex Mono",monospace; letter-spacing: .14em; }
+.theme-menu > header small { color: var(--faint); font: 600 7px "IBM Plex Mono",monospace; letter-spacing: .1em; }
+.theme-menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); }
+.theme-menu-grid > button { position: relative; min-height: 66px; display: grid; grid-template-columns: 49px 1fr 17px; align-items: center; gap: 8px; padding: 7px 8px; color: var(--muted); background: var(--chrome-2); text-align: left; }
+.theme-menu-grid > button:hover { color: var(--text); background: var(--chrome-3); }
+.theme-menu-grid > button.active { color: var(--cyan); box-shadow: inset 3px 0 var(--cyan); }
+.theme-menu-grid > button > span:nth-child(2) { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.theme-menu-grid strong { color: var(--text-strong); font-size: 10px; }
+.theme-menu-grid small { color: var(--muted); font-size: 8px; line-height: 1.35; }
+.theme-menu-grid svg { color: var(--cyan); }
+.theme-swatch { width: 48px; height: 34px; display: grid; grid-template-columns: repeat(3,1fr); border: 1px solid var(--line-strong); box-shadow: 3px 3px 0 var(--shadow); }
+.theme-menu > footer { min-height: 29px; display: flex; align-items: center; padding: 5px 10px; color: var(--faint); background: var(--chrome-0); border-top: 1px solid var(--line); font: 500 7px "IBM Plex Mono",monospace; }
 
 .editor-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: 282px minmax(360px, 1fr) 314px; grid-template-rows: minmax(280px, 1fr) 176px 27px; transition: grid-template-columns .18s ease, grid-template-rows .18s ease; }
 .editor-grid.left-collapsed { grid-template-columns: 36px minmax(360px, 1fr) 314px; }
@@ -112,8 +201,15 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .panel-help { flex: 0 0 29px; display: grid; place-items: center; border-top: 1px solid var(--line); color: #536c77; font-size: 9px; }
 
 .workspace { position: relative; grid-column: 2; grid-row: 1; min-width: 0; min-height: 0; overflow: hidden; --canvas-bg: #07141f; --grid-minor: #17364a; --grid-major: #23506c; --canvas-line: #b9d6e4; --component-fill: #0a1b27; --canvas-text: #d7eaf2; --module-fill: #0d1d27; }
-.workspace.theme-dark { --canvas-bg: #090c10; --grid-minor: #202b32; --grid-major: #2e3d46; --canvas-line: #cbd5db; --component-fill: #11171c; --canvas-text: #e2e8eb; --module-fill: #12191e; }
-.workspace.theme-light { --canvas-bg: #e9eef0; --grid-minor: #d0dadd; --grid-major: #b8c8ce; --canvas-line: #263b45; --component-fill: #f8fbfc; --canvas-text: #172b34; --module-fill: #dde7ea; }
+.workspace.theme-classic { --canvas-bg: #07141f; --grid-minor: #17364a; --grid-major: #23506c; --canvas-line: #b9d6e4; --component-fill: #0a1b27; --canvas-text: #d7eaf2; --module-fill: #0d1d27; }
+.workspace.theme-night { --canvas-bg: #090c10; --grid-minor: #202b32; --grid-major: #34444d; --canvas-line: #cbd5db; --component-fill: #11171c; --canvas-text: #e2e8eb; --module-fill: #12191e; }
+.workspace.theme-morning { --canvas-bg: #f3f0e8; --grid-minor: #d6ddd9; --grid-major: #aebdb8; --canvas-line: #263b45; --component-fill: #fbfaf5; --canvas-text: #172b34; --module-fill: #e4e7df; }
+.workspace.theme-afternoon { --canvas-bg: #d8bd92; --grid-minor: #c4a678; --grid-major: #9e7950; --canvas-line: #432d20; --component-fill: #ead3ad; --canvas-text: #352318; --module-fill: #c9a878; }
+.workspace.theme-blueprint { --canvas-bg: #287fba; --grid-minor: #ffffff4d; --grid-major: #ffffffa6; --canvas-line: #f8fcff; --component-fill: #1e70a7; --canvas-text: #ffffff; --module-fill: #195f91; }
+.workspace.theme-laboratory { --canvas-bg: #edf3f4; --grid-minor: #d2dfe2; --grid-major: #aabfc4; --canvas-line: #203a43; --component-fill: #fafcfc; --canvas-text: #18323a; --module-fill: #dce8ea; }
+.workspace.theme-terminal { --canvas-bg: #020805; --grid-minor: #0d2c1b; --grid-major: #1c5632; --canvas-line: #75ee9c; --component-fill: #06150d; --canvas-text: #a8f7bf; --module-fill: #091c12; }
+.workspace.theme-chalkboard { --canvas-bg: #173d33; --grid-minor: #31584e; --grid-major: #648076; --canvas-line: #e4e7d7; --component-fill: #1d493e; --canvas-text: #f1f0df; --module-fill: #244f44; }
+.workspace.theme-parchment { --canvas-bg: #ead9b5; --grid-minor: #d8bf93; --grid-major: #b58e5e; --canvas-line: #4c3322; --component-fill: #f2e2c1; --canvas-text: #3b281d; --module-fill: #d9bd8f; }
 .circuit-canvas { width: 100%; height: 100%; display: block; background: var(--canvas-bg); color: var(--canvas-line); touch-action: none; user-select: none; }
 .tool-pan .circuit-canvas, .space-pan .circuit-canvas { cursor: grab; }
 .tool-wire .circuit-canvas { cursor: crosshair; }
@@ -155,7 +251,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .wire-control-node:hover { fill: var(--cyan); }
 .signal-label { pointer-events: none; }
 .signal-label rect { fill: #071119; stroke: #344b57; stroke-width: 1; vector-effect: non-scaling-stroke; }
-.theme-light .signal-label rect { fill: #f6f9fa; }
+.signal-label rect { fill: var(--component-fill); }
 .signal-label text { fill: var(--canvas-text); font: 600 9px "IBM Plex Mono", monospace; }
 
 .circuit-component { color: var(--canvas-line); cursor: move; }
@@ -175,11 +271,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .symbol-model { fill: #637d89; font: 500 7px "IBM Plex Mono", monospace; letter-spacing: .12em; }
 .logic-value { fill: var(--cyan); font: 600 30px "IBM Plex Mono", monospace; }
 .generic-label, .chip-name { fill: var(--canvas-text); font: 600 10px Inter, sans-serif; }
-.chip-body { fill: #0e202b; }
-.theme-light .chip-body { fill: #dce7ea; }
+.chip-body { fill: var(--component-fill); }
 .chip-pad { fill: var(--amber); }
 .chip-notch { fill: var(--canvas-bg); stroke: var(--canvas-line); stroke-width: 1.5; }
-.instrument-body { fill: #101b21; }
+.instrument-body { fill: var(--component-fill); }
 .instrument-screen { fill: #03100e; stroke: #4a6b70; stroke-width: 1; vector-effect: non-scaling-stroke; }
 .scope-trace { fill: none; stroke: var(--cyan); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
 .dial { fill: #182930; stroke: #79909a; stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -316,6 +411,47 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .modal-backdrop { position: fixed; inset: 0; display: grid; place-items: center; padding: 30px; background: #02070bc9; z-index: 200; backdrop-filter: blur(3px); }
 .help-modal { width: min(760px, 95vw); background: #0b161e; border: 1px solid #3b515c; box-shadow: 12px 12px 0 #01040699; }.help-modal > header { height: 66px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px 0 18px; border-bottom: 1px solid #2b3f49; }.help-modal h2 { margin: 3px 0 0; font-size: 18px; }.help-modal header button { width: 32px; height: 32px; display: grid; place-items: center; color: #8297a1; border: 1px solid #253842; }
 .help-grid { display: grid; grid-template-columns: 1fr 1fr; }.help-grid article { min-height: 140px; padding: 20px; border-right: 1px solid #21343e; border-bottom: 1px solid #21343e; }.help-grid article:nth-child(even) { border-right: 0; }.help-grid svg { color: var(--cyan); }.help-grid h3 { margin: 12px 0 6px; font-size: 13px; }.help-grid p { margin: 0; color: #78909a; font-size: 10px; line-height: 1.55; }.shortcut-table { min-height: 54px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 15px; padding: 8px; color: #718893; font-size: 9px; }
+
+/* Puente cromático: hace que los temas afecten a todo el editor, no solo al SVG. */
+.app-shell .panel-heading,.app-shell .inspector-section h3,.app-shell .instrument-heading { background: var(--chrome-2); border-color: var(--line); }
+.app-shell .panel-heading h2,.app-shell .selection-identity strong,.app-shell .instrument-heading strong,.app-shell .help-modal h2 { color: var(--text-strong); }
+.app-shell .toolbar-group button,.app-shell .brand-block small,.app-shell .catalog-status,.app-shell .category-heading small,.app-shell .catalog-item small,.app-shell .component-description,.app-shell .selection-identity small,.app-shell .property-field > label,.app-shell .instrument-grid header,.app-shell .instrument-grid footer { color: var(--muted); }
+.app-shell .catalog-item strong,.app-shell .saved-module-card strong { color: var(--text-soft); }
+.app-shell .icon-button,.app-shell .category-heading,.app-shell .catalog-item,.app-shell .quick-actions button,.app-shell .status-actions button { color: var(--muted); }
+.app-shell .icon-button:hover,.app-shell .category-heading:hover,.app-shell .catalog-item:hover,.app-shell .quick-actions button:hover { color: var(--text-strong); background: var(--chrome-3); border-color: var(--line-strong); }
+.app-shell .search-box,.app-shell .saved-module-section,.app-shell .saved-module-list > div,.app-shell .catalog-glyph,.app-shell .identity-icon,.app-shell .module-pins-editor article { background: var(--chrome-0); border-color: var(--line); }
+.app-shell .catalog-item,.app-shell .inspector-section h3,.app-shell .module-pins-editor article > header input { background: var(--chrome-2); border-color: var(--line); }
+.app-shell .search-box input,.app-shell .property-field > input,.app-shell .property-field > textarea,.app-shell .number-control input,.app-shell .module-pins-editor input,.app-shell .module-pins-editor select { color: var(--text); }
+.app-shell .property-field > input,.app-shell .property-field > textarea,.app-shell .number-control,.app-shell .module-pins-editor input,.app-shell .module-pins-editor select { background: var(--chrome-0); border-color: var(--line); }
+.app-shell .instrument-tray,.app-shell .instrument-grid article { background: var(--chrome-1); border-color: var(--line); }
+.app-shell .instrument-grid { background: var(--line); }
+.app-shell .instrument-grid svg { background: var(--screen-bg); }
+.app-shell .statusbar { color: var(--muted); background: var(--chrome-0); border-color: var(--line); }
+.app-shell .statusbar b,.app-shell .theme-status { color: var(--text-soft); }
+.theme-status { font: 600 7px "IBM Plex Mono",monospace; letter-spacing: .08em; }
+.app-shell .toast,.app-shell .help-modal { color: var(--text); background: var(--chrome-1); border-color: var(--line-strong); box-shadow: 9px 9px 0 var(--shadow); }
+.app-shell .help-modal > header,.app-shell .help-grid article { border-color: var(--line); }
+.app-shell .help-grid p,.app-shell .shortcut-table { color: var(--muted); }
+.app-shell .empty-inspector kbd,.app-shell .shortcut-table kbd { color: var(--text-soft); background: var(--chrome-2); border-color: var(--line-strong); }
+.app-shell .modal-backdrop { background: color-mix(in srgb,var(--chrome-0),transparent 18%); }
+
+.workspace .workspace-breadcrumb,.workspace .lod-indicator,.workspace .wire-editor,.workspace .wire-hint,.workspace .zoom-controls,.workspace .module-port-dock {
+  color: var(--canvas-text); background: color-mix(in srgb,var(--canvas-bg),transparent 7%); border-color: color-mix(in srgb,var(--canvas-line),transparent 58%); box-shadow: 4px 4px 0 color-mix(in srgb,var(--canvas-bg),black 38%);
+}
+.workspace .workspace-breadcrumb button,.workspace .wire-editor button,.workspace .zoom-controls button,.workspace .lod-indicator small { color: color-mix(in srgb,var(--canvas-text),transparent 25%); border-color: color-mix(in srgb,var(--canvas-line),transparent 70%); }
+.workspace .lod-indicator strong,.workspace .wire-editor strong,.workspace .module-port-dock strong { color: var(--canvas-text); }
+.workspace .wire-editor select { color: var(--canvas-text); background: var(--component-fill); border-color: color-mix(in srgb,var(--canvas-line),transparent 65%); }
+.workspace .inline-property-editor,.workspace .compact-number,.workspace .compact-number input { color: var(--canvas-text); background: color-mix(in srgb,var(--canvas-bg),black 7%); border-color: color-mix(in srgb,var(--canvas-line),transparent 60%); }
+
+.app-shell.theme-blueprint .topbar,.app-shell.theme-blueprint .panel-heading,.app-shell.theme-blueprint .instrument-heading,.app-shell.theme-blueprint .statusbar {
+  background-image: repeating-linear-gradient(90deg,transparent 0 19px,#ffffff08 20px,#0000000b 21px,transparent 23px);
+}
+.app-shell.theme-terminal { text-shadow: 0 0 5px color-mix(in srgb,var(--cyan),transparent 72%); }
+
+@media (max-width: 620px) {
+  .theme-menu-grid { grid-template-columns: 1fr; }
+  .theme-menu { right: -86px; }
+}
 
 @media (max-width: 1180px) {
   .editor-grid, .editor-grid.right-collapsed { grid-template-columns: 244px minmax(350px,1fr) 280px; }

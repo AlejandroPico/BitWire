@@ -25,7 +25,8 @@ La primera versión funcional incluye un plano SVG de profundidad semántica, ca
 - Inspector lateral mediante doble clic y parámetros editables directamente dentro del elemento al alcanzar el LOD físico.
 - Redes internas equivalentes y CMOS para AND, OR, NOT, NAND, NOR, XOR y XNOR; estructura P–N, BJT y MOS visible mediante zoom semántico.
 - Displays vectoriales de uno y cuatro dígitos, LCD 16×2, matriz LED 8×8 y barra de diez segmentos.
-- Temas plano técnico, noche, día y automático.
+- Diez temas integrales y persistentes: automático por hora local, mañana, tarde, noche, BitWire clásico, plano azul con interfaz de madera, laboratorio, terminal, pizarra y pergamino.
+- Control rápido de aspecto: clic en el icono para recorrer `Automático → Mañana → Tarde → Noche`; `Alt + clic` abre el selector visual completo.
 - Deshacer/rehacer, guardado local, importación y exportación `.bitwire`.
 - Proyecto inicial con un circuito eléctrico de 5 V y un demostrador lógico AND.
 
@@ -79,6 +80,7 @@ npm run build
 | Selección múltiple | `Mayús` + clic o recuadro |
 | Encapsular | herramienta de módulo + recuadro |
 | Zoom semántico | rueda del ratón; el doble clic selecciona y abre el inspector lateral |
+| Cambiar tema | clic en el icono de aspecto; `Alt` + clic abre el menú completo |
 | Eliminar | `Supr` |
 | Guardar | `Ctrl+S` |
 | Deshacer / rehacer | `Ctrl+Z` / `Ctrl+Y` |

@@ -7,7 +7,7 @@ import { nearestSegmentIndex, routePreview, routeWire } from '../canvas/WireRout
 import { CircuitSymbol } from './CircuitSymbol';
 import type {
   BitWireProject, ComponentInstance, ModuleArea, PinDefinition, PinRef, Point,
-  ModulePin, PropertyValue, SimulationSnapshot, ToolMode, ViewportState, Wire, WireSignal,
+  ModulePin, PropertyValue, SimulationSnapshot, Theme, ToolMode, ViewportState, Wire, WireSignal,
 } from '../model/types';
 import { createInstance, uid } from '../state/project';
 
@@ -15,6 +15,7 @@ type Update = (recipe: (draft: BitWireProject) => void, record?: boolean) => voi
 
 interface Props {
   project: BitWireProject;
+  resolvedTheme: Exclude<Theme, 'auto'>;
   update: Update;
   selected: string[];
   onSelected(ids: string[]): void;
@@ -40,7 +41,7 @@ type Interaction =
   | { type: 'marquee' | 'module'; start: Point; current: Point }
   | null;
 
-export function Workspace({ project, update, selected, onSelected, selectedModuleId, onSelectedModule, tool, onTool, snapshot, running, onViewport, activeModuleId, onActiveModule, onOpenInspector }: Props) {
+export function Workspace({ project, resolvedTheme, update, selected, onSelected, selectedModuleId, onSelectedModule, tool, onTool, snapshot, running, onViewport, activeModuleId, onActiveModule, onOpenInspector }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [viewport, setViewportState] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
   const [interaction, setInteraction] = useState<Interaction>(null);
@@ -357,7 +358,7 @@ export function Workspace({ project, update, selected, onSelected, selectedModul
   const selectedWire = project.wires.find(wire => wire.id === selectedWireId);
   const renderedModules = activeModule ? childModules : project.modules.filter(module => !module.parentModuleId);
 
-  return <main className={`workspace theme-${resolveTheme(project.settings.theme)} tool-${tool} ${spaceHeld ? 'space-pan' : ''} ${activeModule ? 'inside-module' : ''}`}>
+  return <main className={`workspace theme-${resolvedTheme} tool-${tool} ${spaceHeld ? 'space-pan' : ''} ${activeModule ? 'inside-module' : ''}`}>
     <svg ref={svgRef} className="circuit-canvas" onWheel={onWheel} onPointerDown={onBackgroundDown} onPointerMove={onPointerMove} onPointerUp={finishInteraction} onPointerCancel={finishInteraction}
       onDragOver={event => { if (event.dataTransfer.types.includes('application/x-bitwire-component')) { event.preventDefault(); event.dataTransfer.dropEffect = 'copy'; } }}
       onDrop={event => { event.preventDefault(); const id = event.dataTransfer.getData('application/x-bitwire-component'); addAt(id, screenToWorld(localPoint(event), viewport)); }}>
@@ -409,7 +410,6 @@ function normalizedRect(a: Point, b: Point) { return { x: Math.min(a.x,b.x), y: 
 function intersects(a: {x:number;y:number;width:number;height:number}, b: {x:number;y:number;width:number;height:number}) { return a.x < b.x+b.width && a.x+a.width > b.x && a.y < b.y+b.height && a.y+a.height > b.y; }
 function adaptiveGrid(base: number, scale: number) { let size = base; while (size * scale < 10) size *= 5; while (size * scale > 80) size /= 2; return size; }
 function formatZoom(scale:number) { const percent=scale*100; if(percent<10_000)return `${Math.round(percent)}%`; if(percent<1_000_000)return `${(percent/1000).toFixed(1)}k%`; return `${(percent/1_000_000).toFixed(percent<10_000_000?1:0)}M%`; }
-function resolveTheme(theme: BitWireProject['settings']['theme']) { if (theme !== 'auto') return theme; return matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'; }
 function isTyping(target: EventTarget | null) { return target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement; }
 function formatSignal(signal: WireSignal | undefined, view: BitWireProject['settings']['signalView']) { if (!signal || !signal.active) return '—'; if (view === 'logic') return String(signal.logic); if (view === 'current') return signal.current >= 1 ? `${signal.current.toFixed(2)} A` : `${(signal.current*1000).toFixed(1)} mA`; if (view === 'power') return `${Math.abs(signal.voltage*signal.current).toFixed(3)} W`; return `${signal.voltage.toFixed(2)} V`; }
 function WayPointIcon() { return <svg viewBox="0 0 24 24" width="16"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="12" r="3"/><path d="M8 12h8" fill="none" stroke="currentColor" strokeWidth="2"/></svg>; }
