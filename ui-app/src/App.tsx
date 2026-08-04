@@ -1,6 +1,7 @@
-import { BookOpen, CheckCircle2, CircleAlert, Cpu, HelpCircle, Layers3, PanelLeftClose, PanelRightClose, X } from 'lucide-react';
+import { CheckCircle2, CircleAlert, HelpCircle, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CatalogPanel } from './components/CatalogPanel';
+import { HelpGuide } from './components/HelpGuide';
 import { Inspector } from './components/Inspector';
 import { InstrumentTray } from './components/Oscilloscope';
 import { Topbar } from './components/Topbar';
@@ -29,7 +30,7 @@ export default function App() {
   const [snapshot, setSnapshot] = useState<SimulationSnapshot>();
   const [samples, setSamples] = useState<SimulationSnapshot[]>([]);
   const [catalogCollapsed, setCatalogCollapsed] = useState(false);
-  const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
+  const [inspectorCollapsed, setInspectorCollapsed] = useState(true);
   const [instrumentsCollapsed, setInstrumentsCollapsed] = useState(false);
   const [database, setDatabase] = useState<CatalogDatabaseStatus>({ source: 'embedded', count: EMBEDDED_CATALOG.length });
   const [viewport, setViewport] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
@@ -194,12 +195,12 @@ export default function App() {
   const resolvedTheme = resolveTheme(theme, new Date(themeClock));
 
   return <div className={`app-shell theme-${resolvedTheme}`} data-theme-mode={theme}>
-    <Topbar projectName={project.name} tool={tool} running={running} speed={speed} routing={project.settings.wireRouting} signalView={project.settings.signalView} canUndo={canUndo} canRedo={canRedo} dirty={savedRevision !== project.updatedAt}
+    <div className={`editor-grid ${catalogCollapsed ? 'left-collapsed' : ''} ${inspectorCollapsed ? 'right-collapsed' : ''} ${instrumentsCollapsed ? 'bottom-collapsed' : ''}`}>
+      <Topbar projectName={project.name} tool={tool} running={running} speed={speed} routing={project.settings.wireRouting} signalView={project.settings.signalView} canUndo={canUndo} canRedo={canRedo} dirty={savedRevision !== project.updatedAt}
       theme={theme} onTheme={changeTheme}
       onTool={setTool} onRun={() => setRunning(value => !value)} onStep={() => workerRef.current?.postMessage({ type: 'step' })} onSpeed={setSpeed}
       onRouting={routing => update(draft => { draft.settings.wireRouting = routing; })} onSignalView={signalView => update(draft => { draft.settings.signalView = signalView; })}
       onNew={newProject} onSave={save} onImport={() => importRef.current?.click()} onExport={() => exportProject(project)} onUndo={undo} onRedo={redo}/>
-    <div className={`editor-grid ${catalogCollapsed ? 'left-collapsed' : ''} ${inspectorCollapsed ? 'right-collapsed' : ''} ${instrumentsCollapsed ? 'bottom-collapsed' : ''}`}>
       <CatalogPanel collapsed={catalogCollapsed} database={database} onToggle={() => setCatalogCollapsed(value => !value)} onAdd={addDefinition} modules={moduleLibrary} onInsertModule={insertModule} onImportModule={()=>moduleImportRef.current?.click()} onDeleteModule={id=>setModuleLibrary(deleteSavedModule(id))}/>
       <Workspace project={project} resolvedTheme={resolvedTheme} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} running={running} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>setInspectorCollapsed(false)}/>
       <Inspector project={project} selected={selected} collapsed={inspectorCollapsed} onToggle={() => setInspectorCollapsed(value => !value)} selectedModule={selectedModule}
@@ -221,15 +222,6 @@ export default function App() {
     <input ref={importRef} type="file" accept=".bitwire,.json,application/json" hidden onChange={event => { void doImport(event.target.files?.[0]); event.currentTarget.value = ''; }}/>
     <input ref={moduleImportRef} type="file" accept=".bitwire-module,.json,application/json" hidden onChange={event=>{void doImportModule(event.target.files?.[0]);event.currentTarget.value='';}}/>
     {toast && <div className={`toast ${toast.type}`}>{toast.type === 'ok' ? <CheckCircle2 size={18}/> : <CircleAlert size={18}/>}<span>{toast.message}</span><button onClick={() => setToast(undefined)}><X size={15}/></button></div>}
-    {helpOpen && <div className="modal-backdrop" onMouseDown={() => setHelpOpen(false)}><section className="help-modal" onMouseDown={event => event.stopPropagation()}>
-      <header><div><span className="eyebrow">GUÍA RÁPIDA</span><h2>Trabajar en BitWire</h2></div><button onClick={() => setHelpOpen(false)}><X size={18}/></button></header>
-      <div className="help-grid">
-        <article><PanelLeftClose/><h3>1. Inserta</h3><p>Arrastra símbolos desde el catálogo. Todos son vectoriales y conservan nitidez a cualquier escala.</p></article>
-        <article><Cpu/><h3>2. Configura</h3><p>Selecciona un elemento y modifica sus parámetros. Los interruptores y entradas lógicas también se accionan sobre el plano.</p></article>
-        <article><Layers3/><h3>3. Profundiza</h3><p>Amplía para revelar controles y circuitos internos. El doble clic selecciona el elemento y abre su inspector lateral sin mover la cámara.</p></article>
-        <article><BookOpen/><h3>4. Encapsula</h3><p>Dibuja un módulo, redimensiónalo y define sus patillas. Su lienzo interno puede guardarse o exportarse para reutilizarlo.</p></article>
-      </div>
-      <div className="shortcut-table"><span><kbd>V</kbd> Selección</span><span><kbd>W</kbd> Cable</span><span><kbd>H</kbd> Mano</span><span><kbd>Espacio</kbd> Desplazar</span><span><kbd>Supr</kbd> Eliminar</span><span><kbd>Ctrl S</kbd> Guardar</span></div>
-    </section></div>}
+    {helpOpen && <HelpGuide onClose={() => setHelpOpen(false)}/>}
   </div>;
 }

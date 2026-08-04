@@ -18,10 +18,12 @@ La primera versión funcional incluye un plano SVG de profundidad semántica, ca
 - Propagación de fuentes CC/CA, interruptores, cargas, pasivos, entradas digitales, reloj y puertas AND, OR, NOT, NAND, NOR, XOR y XNOR.
 - Visualización sobre el cable de tensión, corriente, potencia o estado lógico.
 - Accionamiento directo de interruptores y entradas binarias desde el plano.
-- Osciloscopio y analizador lógico vectoriales con captura en vivo.
+- Banco de instrumentación multivista y persistente: osciloscopio, analizador lógico, multímetro, monitor de potencia, analizador de espectro y frecuencímetro; cualquier combinación puede mostrarse u ocultarse.
 - Encapsulados funcionales redimensionables y anidables sin límite práctico, con lienzo interno propio, navegación jerárquica, terminales fijos de borde, modo chip y patillas configurables.
 - Biblioteca local de encapsulados, importación y exportación `.bitwire-module` y reutilización entre proyectos.
 - Inspector editable con parámetros eléctricos, posición, rotación, estado y conectividad.
+- Interfaz de trabajo compacta con identidad integrada en el catálogo, título de proyecto centrado, inspector plegado al iniciar y barra superior separada del plano.
+- Manual interactivo con búsqueda, índice navegable y doce tutoriales desarrollados sobre edición, simulación, encapsulados, instrumentos, LOD, archivos y diagnóstico.
 - Inspector lateral mediante doble clic y parámetros editables directamente dentro del elemento al alcanzar el LOD físico.
 - Redes internas equivalentes y CMOS para AND, OR, NOT, NAND, NOR, XOR y XNOR; estructura P–N, BJT y MOS visible mediante zoom semántico.
 - Displays vectoriales de uno y cuatro dígitos, LCD 16×2, matriz LED 8×8 y barra de diez segmentos.
@@ -98,7 +100,7 @@ La estructura actual deja preparadas las siguientes ampliaciones sin romper los 
 3. Apertura real de subgrafos anidados e importación de un proyecto como símbolo reutilizable.
 4. Autorouter Manhattan con evitación de obstáculos y edición de vértices.
 5. PCB, encapsulados físicos, footprints y reglas DRC/ERC.
-6. Más instrumentos: generador de funciones, analizador de espectro y protocolo, fuente de laboratorio.
+6. Más instrumentos: generador de funciones, analizador de protocolos y fuente de laboratorio regulable.
 7. Catálogo ampliable por paquetes de componentes versionados.
 
 ## Licencia

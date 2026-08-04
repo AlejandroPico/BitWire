@@ -22,6 +22,7 @@ export function CatalogPanel({ collapsed, database, onToggle, onAdd, modules, on
 
   if (collapsed) return (
     <aside className="catalog-panel collapsed-panel">
+      <button className="catalog-brand compact-brand" onClick={onToggle} title="Abrir catálogo"><img src={`${import.meta.env.BASE_URL}favicon.svg`} alt=""/></button>
       <button className="icon-button vertical-label" onClick={onToggle} title="Abrir catálogo">CATÁLOGO</button>
     </aside>
   );
@@ -34,6 +35,10 @@ export function CatalogPanel({ collapsed, database, onToggle, onAdd, modules, on
 
   return (
     <aside className="catalog-panel">
+      <div className="catalog-brand">
+        <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="Icono de BitWire"/>
+        <strong>BITWIRE</strong>
+      </div>
       <div className="panel-heading">
         <div><span className="eyebrow">BIBLIOTECA</span><h2>Componentes</h2></div>
         <button className="icon-button" onClick={onToggle} title="Ocultar catálogo"><X size={17}/></button>
