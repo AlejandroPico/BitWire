@@ -1,0 +1,85 @@
+import { ChevronDown, Database, GripVertical, Search, X } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { EMBEDDED_CATALOG, searchCatalog } from '../catalog/catalog';
+import type { CatalogDatabaseStatus, ComponentDefinition } from '../model/types';
+
+interface Props {
+  collapsed: boolean;
+  database: CatalogDatabaseStatus;
+  onToggle(): void;
+  onAdd(definition: ComponentDefinition): void;
+}
+
+export function CatalogPanel({ collapsed, database, onToggle, onAdd }: Props) {
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState<Set<string>>(() => new Set(['Fuentes y tierra', 'Pasivos', 'Lógica digital']));
+  const categories = useMemo(() => [...new Set(EMBEDDED_CATALOG.map(item => item.category))], []);
+  const items = useMemo(() => searchCatalog(query), [query]);
+
+  if (collapsed) return (
+    <aside className="catalog-panel collapsed-panel">
+      <button className="icon-button vertical-label" onClick={onToggle} title="Abrir catálogo">CATÁLOGO</button>
+    </aside>
+  );
+
+  const toggleCategory = (category: string) => setOpen(current => {
+    const next = new Set(current);
+    next.has(category) ? next.delete(category) : next.add(category);
+    return next;
+  });
+
+  return (
+    <aside className="catalog-panel">
+      <div className="panel-heading">
+        <div><span className="eyebrow">BIBLIOTECA</span><h2>Componentes</h2></div>
+        <button className="icon-button" onClick={onToggle} title="Ocultar catálogo"><X size={17}/></button>
+      </div>
+      <label className="search-box">
+        <Search size={15}/>
+        <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Buscar resistencia, CMOS…" />
+        {query && <button onClick={() => setQuery('')}><X size={14}/></button>}
+      </label>
+      <div className="catalog-status"><Database size={13}/><span>{database.count} símbolos · {database.source === 'sqlite' ? 'SQLite verificado' : 'catálogo integrado'}</span></div>
+      <div className="catalog-scroll">
+        {categories.map(category => {
+          const categoryItems = items.filter(item => item.category === category);
+          if (!categoryItems.length) return null;
+          const expanded = Boolean(query) || open.has(category);
+          return <section className="catalog-category" key={category}>
+            <button className="category-heading" onClick={() => toggleCategory(category)}>
+              <ChevronDown size={14} className={expanded ? '' : 'closed'}/>
+              <span>{category}</span><small>{categoryItems.length}</small>
+            </button>
+            {expanded && <div className="catalog-items">
+              {categoryItems.map(item => <button
+                key={item.id}
+                className="catalog-item"
+                draggable
+                onDragStart={event => { event.dataTransfer.setData('application/x-bitwire-component', item.id); event.dataTransfer.effectAllowed = 'copy'; }}
+                onDoubleClick={() => onAdd(item)}
+                title={`${item.description}\nDoble clic o arrastra al plano`}
+              >
+                <GripVertical size={13}/><span className="catalog-glyph">{glyphFor(item.symbol)}</span>
+                <span><strong>{item.name}</strong><small>{item.family}</small></span>
+              </button>)}
+            </div>}
+          </section>;
+        })}
+      </div>
+      <div className="panel-help">Arrastra al plano o haz doble clic para insertar.</div>
+    </aside>
+  );
+}
+
+function glyphFor(symbol: string) {
+  if (symbol.includes('gate') || ['and','or','not','nand','nor','xor','xnor'].includes(symbol)) return '∧';
+  if (symbol.includes('source') || symbol === 'battery') return '±';
+  if (symbol === 'resistor' || symbol === 'potentiometer') return '↯';
+  if (symbol === 'capacitor' || symbol === 'capacitor_polarized') return '‖';
+  if (symbol === 'ground') return '⏚';
+  if (symbol === 'oscilloscope') return '∿';
+  if (symbol === 'chip') return '▣';
+  if (symbol === 'lamp' || symbol === 'led') return '✦';
+  return '◇';
+}
+

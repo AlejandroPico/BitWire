@@ -1,0 +1,9 @@
+node_modules/
+dist/
+target/
+*.log
+*.tsbuildinfo
+.DS_Store
+.env.local
+ui-app/public/catalog.db
+ui-app/public/sql-wasm.wasm
