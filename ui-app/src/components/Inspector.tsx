@@ -1,6 +1,7 @@
 import { Box, ChevronRight, CirclePower, Copy, Download, ExternalLink, Layers3, Library, Plus, RotateCw, Trash2, X } from 'lucide-react';
 import { CATALOG_BY_ID } from '../catalog/catalog';
 import type { BitWireProject, ComponentInstance, ModuleArea, ModulePin, ModulePinSide, PinKind, PropertyValue, SignalDomain } from '../model/types';
+import { redistributeModulePins } from '../model/moduleScope';
 import { uid } from '../state/project';
 
 interface Props {
@@ -85,14 +86,20 @@ function unitFor(key: string) { const keyLower = key.toLowerCase(); if (keyLower
 function MouseHint() { return <svg viewBox="0 0 50 64" width="34"><rect x="9" y="2" width="32" height="58" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M25 3v20" stroke="currentColor"/><rect x="21" y="10" width="8" height="14" fill="currentColor"/></svg>; }
 
 function ModulePinsEditor({ module, onChange }: { module: ModuleArea; onChange(pins: ModulePin[]): void }) {
-  const change = (id: string, patch: Partial<ModulePin>) => onChange(module.pins.map(pin => pin.id === id ? { ...pin, ...patch } : pin));
-  const add = (side: ModulePinSide) => onChange([...module.pins, {
+  const change = (id: string, patch: Partial<ModulePin>) => {
+    const current=module.pins.find(pin=>pin.id===id);
+    const next=module.pins.map(pin => pin.id === id ? { ...pin, ...patch } : pin);
+    onChange(current&&patch.side&&patch.side!==current.side?redistributeModulePins(next,[current.side,patch.side]):next);
+  };
+  const add = (side: ModulePinSide) => onChange(redistributeModulePins([...module.pins, {
     id: uid('pin'), name: `PIN ${module.pins.length + 1}`, kind: 'BIDIRECTIONAL', domain: 'MIXED', side,
-    position: Math.min(.9, Math.max(.1, (module.pins.filter(pin => pin.side === side).length + 1) / (module.pins.filter(pin => pin.side === side).length + 2))),
-  }]);
+    position: .5,
+  }],[side]));
+  const remove=(pin:ModulePin)=>onChange(redistributeModulePins(module.pins.filter(item=>item.id!==pin.id),[pin.side]));
   return <div className="module-pins-editor">
+    <div className="add-pin-toolbar"><span>AÑADIR PATILLA · AUTOESPACIADO</span><div className="add-pin-row">{(['left','right','top','bottom'] as ModulePinSide[]).map(side => <button type="button" key={side} onClick={() => add(side)}><Plus size={12}/>{side === 'left' ? 'Izq.' : side === 'right' ? 'Der.' : side === 'top' ? 'Sup.' : 'Inf.'}</button>)}</div></div>
     {module.pins.map((pin,index) => <article key={pin.id}>
-      <header><b>{index + 1}</b><input value={pin.name} onChange={e => change(pin.id,{ name:e.target.value })}/><button onClick={() => onChange(module.pins.filter(item => item.id !== pin.id))}><Trash2 size={13}/></button></header>
+      <header><b>{index + 1}</b><input value={pin.name} onChange={e => change(pin.id,{ name:e.target.value })}/><button type="button" onClick={() => remove(pin)}><Trash2 size={13}/></button></header>
       <div className="pin-editor-grid">
         <label>Lado<select value={pin.side} onChange={e => change(pin.id,{ side:e.target.value as ModulePinSide })}><option value="left">Izquierda</option><option value="right">Derecha</option><option value="top">Superior</option><option value="bottom">Inferior</option></select></label>
         <label>Tipo<select value={pin.kind} onChange={e => change(pin.id,{ kind:e.target.value as PinKind })}><option>INPUT</option><option>OUTPUT</option><option>BIDIRECTIONAL</option><option>POWER</option><option>VCC</option><option>GND</option><option>ANALOG</option></select></label>
@@ -101,6 +108,5 @@ function ModulePinsEditor({ module, onChange }: { module: ModuleArea; onChange(p
         <label>Tensión nominal<input type="number" value={pin.nominalVoltage ?? ''} placeholder="—" onChange={e => change(pin.id,{ nominalVoltage:e.target.value === '' ? undefined : Number(e.target.value) })}/></label>
       </div>
     </article>)}
-    <div className="add-pin-row">{(['left','right','top','bottom'] as ModulePinSide[]).map(side => <button key={side} onClick={() => add(side)}><Plus size={12}/>{side === 'left' ? 'Izq.' : side === 'right' ? 'Der.' : side === 'top' ? 'Sup.' : 'Inf.'}</button>)}</div>
   </div>;
 }

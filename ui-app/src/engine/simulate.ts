@@ -1,4 +1,5 @@
 import { CATALOG_BY_ID } from '../catalog/catalog';
+import { respectsModuleBoundaries } from '../model/moduleScope';
 import type {
   BitWireProject, ComponentInstance, ComponentSignal, LogicValue,
   SimulationSnapshot, WireSignal,
@@ -107,9 +108,11 @@ function evaluateComponent(
 export function evaluateCircuit(project: BitWireProject, time = 0, tick = 0): SimulationSnapshot {
   const endpointSignals = new Map<string, WireSignal>();
   const componentSignals: Record<string, ComponentSignal> = {};
+  const validWires=project.wires.filter(wire=>respectsModuleBoundaries(project,wire));
+  const invalidWires=project.wires.filter(wire=>!respectsModuleBoundaries(project,wire));
 
   const connectedTo = new Map<string, string[]>();
-  for (const wire of project.wires) {
+  for (const wire of validWires) {
     const from = keyOf(wire.from.componentId, wire.from.pinId);
     const to = keyOf(wire.to.componentId, wire.to.pinId);
     connectedTo.set(from, [...(connectedTo.get(from) ?? []), to]);
@@ -164,8 +167,9 @@ export function evaluateCircuit(project: BitWireProject, time = 0, tick = 0): Si
   }
 
   const wireSignals: Record<string, WireSignal> = {};
-  const warnings: string[] = [];
-  for (const wire of project.wires) {
+  const warnings: string[] = invalidWires.map(wire=>`Cable ${wire.label ?? wire.id} aislado: atraviesa un encapsulado sin patilla`);
+  for (const wire of invalidWires) wireSignals[wire.id]=cloneSignal();
+  for (const wire of validWires) {
     const left = signalOnNet(keyOf(wire.from.componentId, wire.from.pinId));
     const right = signalOnNet(keyOf(wire.to.componentId, wire.to.pinId));
     const signal = left?.active ? left : right?.active ? right : left ?? right ?? cloneSignal();

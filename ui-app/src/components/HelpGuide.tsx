@@ -127,13 +127,15 @@ const GUIDE: GuideSection[] = [
     steps: [
       'Activa Crear encapsulado y dibuja el rectángulo que contendrá el circuito.',
       'Selecciona el área para redimensionarla, nombrarla y elegir si se presenta como área o como chip.',
-      'Añade patillas por los cuatro lados y configura nombre, dominio, dirección, posición y tensión nominal.',
+      'Usa la barra superior de patillas para añadir entradas o salidas a izquierda, derecha, arriba o abajo. BitWire las reparte de forma equidistante en cada lado.',
       'Abre el lienzo interno y conecta los terminales fijos del borde con los componentes del circuito.',
       'Guarda el encapsulado en la biblioteca o expórtalo como .bitwire-module.',
     ],
     details: [
-      { title: 'Interior independiente', text: 'El contenido usa su propio lienzo y su propia cámara. Desde fuera, el encapsulado se comporta como una sola pieza.' },
-      { title: 'Comunicación exterior', text: 'Las patillas son la única frontera pública. Una conexión interna debe llegar al terminal correspondiente para atravesar el encapsulado.' },
+      { title: 'Mapa exterior protegido', text: 'Desde el nivel superior se muestra un resumen autoajustado y recortado dentro del contorno. Ese mapa no se puede seleccionar, mover ni borrar: el encapsulado se comporta como una sola pieza.' },
+      { title: 'Interior independiente', text: 'El contenido usa su propio lienzo y su propia cámara. Haz doble clic o usa Entrar en el lienzo interno para editarlo.' },
+      { title: 'Comunicación exterior', text: 'Las patillas son la única frontera pública. Los cables que intenten atravesar directamente un encapsulado quedan aislados y generan un aviso.' },
+      { title: 'Autoespaciado', text: 'Al añadir, mover de lado o eliminar una patilla, las restantes se redistribuyen uniformemente. La posición numérica continúa disponible para ajustes deliberados.' },
       { title: 'Anidamiento', text: 'Puedes crear encapsulados dentro de otros. La ruta superior permite volver a cualquier antecesor sin destruir el estado interno.' },
       { title: 'Biblioteca local', text: 'Los módulos guardados se almacenan en el navegador. Exportarlos es la forma segura de conservarlos fuera de ese dispositivo.' },
     ],

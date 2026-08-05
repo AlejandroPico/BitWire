@@ -9,6 +9,8 @@ import { lodForScale } from '../canvas/LODManager';
 import { nearestSegmentIndex, routePreview, routeWire } from '../canvas/WireRouter';
 import { CircuitSymbol } from './CircuitSymbol';
 import type { ContextTarget } from './ContextMenu';
+import { ModulePreview } from './ModulePreview';
+import { canvasScope } from '../model/moduleScope';
 import type {
   BitWireProject, ComponentInstance, ModuleArea, PinDefinition, PinRef, Point,
   ModulePin, PropertyValue, SimulationSnapshot, Theme, ToolMode, ViewportState, Wire, WireSignal,
@@ -58,7 +60,8 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
   const lod = lodForScale(viewport.scale);
   const selectedModule = project.modules.find(module => module.id === selectedModuleId);
   const activeModule = project.modules.find(module => module.id === activeModuleId);
-  const childModules = useMemo(() => project.modules.filter(module => module.parentModuleId === activeModuleId), [project.modules, activeModuleId]);
+  const scope = useMemo(() => canvasScope(project,activeModuleId),[project,activeModuleId]);
+  const childModules = scope.modules;
   const ancestors = useMemo(() => {
     const path: ModuleArea[] = [];
     let cursor = activeModule;
@@ -66,16 +69,8 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
     while (cursor && !visited.has(cursor.id)) { visited.add(cursor.id); path.unshift(cursor); cursor = project.modules.find(module => module.id === cursor?.parentModuleId); }
     return path;
   }, [activeModule, project.modules]);
-  const hiddenMemberIds = useMemo(() => new Set(project.modules.filter(module => module.collapsed && module.id !== activeModuleId && (!activeModuleId || module.parentModuleId === activeModuleId)).flatMap(module => module.memberIds)), [project.modules, activeModuleId]);
-  const activeMemberIds = useMemo(() => activeModule ? new Set(activeModule.memberIds) : undefined, [activeModule]);
-  const visibleComponents = useMemo(() => project.components.filter(component => activeMemberIds ? activeMemberIds.has(component.id) && !hiddenMemberIds.has(component.id) : !hiddenMemberIds.has(component.id)), [project.components, activeMemberIds, hiddenMemberIds]);
-  const visibleWires = useMemo(() => project.wires.filter(wire => {
-    if (activeMemberIds && activeModule) {
-      const visibleEndpoints = new Set([activeModule.id, ...activeMemberIds, ...childModules.map(module => module.id)]);
-      return [wire.from.componentId, wire.to.componentId].every(id => visibleEndpoints.has(id));
-    }
-    return !project.modules.some(module => module.collapsed && [wire.from.componentId, wire.to.componentId].every(id => module.memberIds.includes(id) || id === module.id));
-  }), [project.wires, project.modules, activeMemberIds, activeModule, childModules]);
+  const visibleComponents = scope.components;
+  const visibleWires = scope.wires;
 
   const setCurrentInteraction = useCallback((value: Interaction) => {
     interactionRef.current = value;
@@ -292,8 +287,8 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
 
   const fitProject = () => {
     const rect = svgRef.current!.getBoundingClientRect();
-    if (!visibleComponents.length) { setViewport({ x: rect.width / 2, y: rect.height / 2, scale: 1 }); return; }
-    const boxes = visibleComponents.map(component => { const d = CATALOG_BY_ID.get(component.definitionId)!; const scale = component.scale || 1; return { x: component.x, y: component.y, width: d.width * scale, height: d.height * scale }; });
+    const boxes = [...visibleComponents.map(component => { const d = CATALOG_BY_ID.get(component.definitionId)!; const scale = component.scale || 1; return { x: component.x, y: component.y, width: d.width * scale, height: d.height * scale }; }),...childModules];
+    if (!boxes.length) { setViewport({ x: rect.width / 2, y: rect.height / 2, scale: 1 }); return; }
     const minX = Math.min(...boxes.map(b => b.x)), minY = Math.min(...boxes.map(b => b.y));
     const maxX = Math.max(...boxes.map(b => b.x + b.width)), maxY = Math.max(...boxes.map(b => b.y + b.height));
     setViewport(fitBounds({ x: minX, y: minY, width: maxX - minX, height: maxY - minY }, { width: rect.width, height: rect.height }, 110));
@@ -369,7 +364,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
   const gridSize = adaptiveGrid(project.settings.gridSize, viewport.scale);
   const renderedWires = useMemo(() => visibleWires.map(wire => ({ wire, from: pinWorld(wire.from), to: pinWorld(wire.to) })), [visibleWires, pinWorld]);
   const selectedWire = project.wires.find(wire => wire.id === selectedWireId);
-  const renderedModules = activeModule ? childModules : project.modules.filter(module => !module.parentModuleId);
+  const renderedModules = childModules;
 
   return <main className={`workspace theme-${resolvedTheme} tool-${tool} ${spaceHeld ? 'space-pan' : ''} ${activeModule ? 'inside-module' : ''}`}>
     <svg ref={svgRef} className="circuit-canvas" onWheel={onWheel} onPointerDown={onBackgroundDown} onPointerMove={onPointerMove} onPointerUp={finishInteraction} onPointerCancel={finishInteraction} onContextMenu={event=>{event.preventDefault();if(event.target===event.currentTarget||((event.target as Element).classList?.contains('grid-plane')))onContextTarget({kind:'canvas',x:event.clientX,y:event.clientY});}}
@@ -384,7 +379,8 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
       <g transform={`translate(${viewport.x} ${viewport.y}) scale(${viewport.scale})`}>
         <rect className="grid-plane" x={-100000} y={-100000} width={200000} height={200000} fill="url(#majorGrid)"/>
         <g className="module-layer">{renderedModules.map(module => <g key={module.id} className={`module-area ${module.collapsed ? 'chip-mode' : 'area-mode'} ${module.id === selectedModuleId ? 'selected' : ''} ${module.enabled ? '' : 'disabled'}`} onPointerDown={event => onModuleDown(event,module)} onDoubleClick={event => { event.stopPropagation(); navigateToModule(module.id); }} onContextMenu={event=>{event.preventDefault();event.stopPropagation();onSelected([]);onSelectedModule(module.id);onContextTarget({kind:'module',id:module.id,x:event.clientX,y:event.clientY});}}>
-          <rect x={module.x} y={module.y} width={module.width} height={module.height} style={{ stroke: module.color }}/>
+          <rect className="module-shell" x={module.x} y={module.y} width={module.width} height={module.height} style={{ stroke: module.color }}/>
+          <ModulePreview project={project} module={module} snapshot={snapshot}/>
           <path d={`M${module.x} ${module.y + 34}h${module.width}`} style={{ stroke: module.color }}/>
           {module.collapsed && <>{Array.from({length:Math.max(2,Math.min(12,module.pins.length))},(_,index)=><path key={index} className="chip-decoration" d={`M${module.x+22+index*14} ${module.y+12}v10`} style={{stroke:module.color}}/>)}</>}
           <text x={module.x + 14} y={module.y + 23} style={{ fill: module.color }}>{module.name.toUpperCase()}</text><text className="module-state" x={module.x + module.width - 14} y={module.y + 23} textAnchor="end">{module.collapsed ? `${module.pins.length} PINES` : module.enabled ? 'ACTIVO' : 'AISLADO'}</text>
