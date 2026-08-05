@@ -1,48 +1,290 @@
-þº(·úk¡ø¥zX§{ßÝzÿçºYOz¹¢²È¨×§‰çZ[\ÜÂˆXÝ]š]K›ÛÚÓÜ[‹›ÞØX›KÚ]œ›Û“YÚ]œ›Û”šYÚÚ\˜ÛR[ˆÜK›Û\“Ü[‹Ø]YÙK^Y\œÌË[Ý\ÙTÚ[\Œ‹ÙX\˜ÚÜ\šÛ\ËÜ™[˜ÚŸHœ›ÛH	ÛXÚYK\™XXÝ	ÎÂš[\ÜÈ\ÙQY™™XÝ\ÙSY[[Ë\ÙTÝ]HHœ›ÛH	Ü™XXÝ	ÎÂ‚š[\™˜XÙH›ÜÈÈÛÛÜÙJ
-Nˆ›ÚYB‚š[\™˜XÙHÝZYTÙXÝ[ÛˆÂˆYˆÝš[™ÎÂˆÜ›Ý\ˆÝš[™ÎÂˆ]NˆÝš[™ÎÂˆÝ[[X\žNˆÝš[™ÎÂˆXÛÛŽˆ\[Ùˆ›ÛÚÓÜ[ŽÂˆÝ\ÎˆÝš[™Ö×NÂˆ]Z[Îˆ\œ˜^OÈ]NˆÝš[™ÎÈ^ˆÝš[™ÈOŽÂˆ›ÝNˆÝš[™ÎÂŸB‚˜ÛÛœÝÕRQNˆÝZYTÙXÝ[Û–×HHÂˆÂˆYˆ	Ú[šXÚ[ÉËÜ›Ý\ˆ	ÑSTVT‰Ë]Nˆ	Ôš[Y\ˆÚ\˜ÝZ]È[ˆÚ[˜ÛÈZ[]ÜÉËXÛÛŽˆÜ\šÛ\ËˆÝ[[X\žNˆ	ÐÛÛœÝ^YKÛÛ™XÝHHZ™XÝ]H[ˆÚ\˜ÝZ]ÈÙ[˜Ú[ÈÚ[ˆ™XÙ\Ú]\ˆÛÛ›ØÚ[ZY[ÜÈ™]š[ÜÈ[Y]Ü‹‰ËˆÝ\ÎˆÂˆ	ÓØØ[^˜HY[HÐË[\œ\ÜˆÔÕ™\Ú\Ý[˜ÚXK0è[\\˜HHY\œ˜H[ˆ[Ø]0è[ÙÛÈ^œ]ZY\™Ë‰Ëˆ	Ð\œ˜\Ý˜HØYHðë[X›ÛÈ[Y[ž›Ëˆš]Ú\™HÛÛœÙ\˜H[[Xpì[Èš\ÝX[ÛÜœ™\ÜÛ™Y[H[š]™[H›ÛÛHH[œÙ\˜ÚpìÛ‹‰Ëˆ	Ô[ØHÈÈ[XÛÛ›ÈHØX›KÙ[XØÚ[Û˜H[ˆ\›Z[˜[H\Üpê\È[\›Z[˜[H\Ý[›Ë‰Ëˆ	ÔÙ[XØÚ[Û˜HØYHÛÛ\Û™[H\˜HZ\Ý\ˆ[œÚpìÛ‹™\Ú\Ý[˜ÚXHÈ\ÝYÈ\ÙH[[œÜXÝÜ‹‰Ëˆ	Ô[ØHZ™XÝ]\‹ˆÜÈ˜[[ÜÈXÝ]›ÜÈ]Y\Ý˜[ˆ[ÛÜÈpìÝš[\ÈH\È]\]Y]\È[™XØ[ˆHXYÛš]YÙ[XØÚ[Û˜YK‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	Ô]pêHX™\È™\‰Ë^ˆ	Õ[ˆ™XÛÜœšYÈÙ\œ˜YÈ\ÙHHY[H\ÝHY\œ˜KˆÚH[[\œ\Üˆ\Ý0èHXšY\Ë[›Z›ÈÙH]Y[™NÈ[Ù\œ˜\›ËH0ë[™XHXÝ]˜HY[™HH[š[X\œÙK‰ÈKˆÈ]Nˆ	ÔÚH[ÛÈ›È[˜Ú[Û˜IË^ˆ	Ð\ØØH\›Z[˜[\ÈÚ[ˆÛÛ™XÝ\‹ÛÛ\Û™[\È\ØXÝ]˜YÜÈH]š\ÛÜÈ[ˆH\Ü]Z[˜H[™™\š[Üˆ\™XÚKˆ[˜H™Y›Ý[H›ÈY[™H™Y™\™[˜ÚXH[0êXÝšXØHÛÛ\]K‰ÈKˆÈ]Nˆ	ÑÝX\™\ˆ[˜X˜Z›ÉË^ˆ	ÐÝ›
-ÔÈÛÛœÙ\˜H[›ÞYXÝÈ[ˆ\ÝH˜]™YØYÜ‹ˆ^Ü\ˆÙ[™\˜H[ˆ\˜Ú]›È˜š]Ú\™H\˜H\˜Ú]˜\›ÈÈ˜\ÛY\›ÈHÝ›È\]Z\Ë‰ÈKˆKˆ›ÝNˆ	ÐÛÛœÙZ›Îˆ[\Y^˜HÛÛˆØÛÜÈÛÛ\Û™[\ÈHZ™XÝ]H\Üpê\ÈHØYHØ[Xš[Ëˆ\ðëHØXœ°è\È^XÝ[Y[H]pêH[ÙYšXØXÚpìÛˆ[\˜H[Ú\˜ÝZ]Ë‰ËˆKˆÂˆYˆ	ÛY[ž›ÉËÜ›Ý\ˆ	Ñ•S‘SQS•ÔÉË]Nˆ	ÓY[ž›Ëðè[X\˜HH˜]™YØXÚpìÛ‰ËXÛÛŽˆ[Ý\ÙTÚ[\Œ‹ˆÝ[[X\žNˆ	ÑÛZ[˜H[[›Èš\X[[\Ü^˜[ZY[ÈHH\ØØ[H°èXÝXØHH\ÝHKŒŒŒ0åË‰ËˆÝ\ÎˆÂˆ	Õ\ØHHYYHÛØœ™H[[È]YH]ZY\˜\È[\X\ŽÈ\ÙH[È\›X[™XÙH[˜ÛYÈ˜Z›È[Ý\œÛÜ‹‰Ëˆ	ÓX[0ê[ˆ\ÜXÚ[ÈH\œ˜\Ý˜K][^˜H[›Ý0ìÛˆÙ[˜[ÈXÝ]˜HH\œ˜[ZY[HX[›ÈÛÛˆ‰Ëˆ	Ô[ØH[˜ØZ˜\ˆ›ÞYXÝÈ\˜H™XÝ\\˜\ˆÙÜÈÜÈ[[Y[ÜÈš\ÚX›\ÈÝX[™ÈH^X\È[Z˜YÈ[X\ÚXYË‰Ëˆ	Õ\ØHÙ[˜\ˆÜšYÙ[ˆ\˜H›Û™\ˆ[[ÈH™Y™\™[˜ÚXH[[›ÈÚ[ˆ[ÙYšXØ\ˆÜÈÛÛ\Û™[\Ë‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	Ô™Zš[HY\]]˜IË^ˆ	ÓHÙ\\˜XÚpìÛˆš\ÚX›HØ[XšXH]]Ûpè]XØ[Y[HÛÛˆ[›ÛÛKˆ[[Xpì[È0ìÙÚXÛÈHHÝXY°ëXÝ[HÚYÝYHÚY[™È\ÝX›H\˜H[[˜ØZ™K‰ÈKˆÈ]Nˆ	Ñ\ØØ[HH[œÙ\˜ÚpìÛ‰Ë^ˆ	Õ[ˆ[[Y[ÈÛÛØØYÈÛÛˆ]XÚÈ›ÛÛHYYHÙ\ˆZXÜ›ÜØðìÜXÛÈ™\ÜXÝÈHÝ›È[œÙ\YÈ\ÙH[˜Hš\ÝHÙ[™\˜[ˆ\ÝHY™\™[˜ÚXH\È[[˜Ú[Û˜YK‰ÈKˆÈ]Nˆ	Ô]H[Y[ž›ÉË^ˆ	ÓHZYØHH˜]™YØXÚpìÛˆÝ\\š[Üˆ[™XØHÚH˜X˜Z˜\È[ˆ[›ÞYXÝÈÈ[›ÈH[ˆ[˜Ø\Ý[YËˆØYH›ÛXœ™H\È[ˆ›Ý0ìÛˆ\˜H™YÜ™\Ø\ˆH\ÙHš]™[‰ÈKˆÈ]Nˆ	Ò\œ˜[ZY[\ÈHðè[X\˜IË^ˆ	ÐØ[XšX\ˆ[™HÙ[XØÚpìÛ‹ØX›HHX[›È›È[\˜H[Ú\˜ÝZ]Ëˆ\ØØ\HØ[˜Ù[HHXØÚpìÛˆXÝX[HY[™HHH\œ˜[ZY[HHÙ[XØÚpìÛ‹‰ÈKˆKˆ›ÝNˆ	Ñ[›ÛÛH›ÈXœ™H™[[˜\ÈšHÝ\Ý]^YH[Y[ž›Îˆ][Y[H›ÙÜ™\Ú]˜[Y[HH[™›Ü›XXÚpìÛˆ]YHÙHXZ˜H[›ÈHØYHØš™]Ë‰ËˆKˆÂˆYˆ	ØØ][ÙÛÉËÜ›Ý\ˆ	Ñ•S‘SQS•ÔÉË]Nˆ	ÐØ]0è[ÙÛÈHÛÛØØXÚpìÛˆHÛÛ\Û™[\ÉËXÛÛŽˆ^Y\œÌËˆÝ[[X\žNˆ	Ñ[˜ÝY[˜Hðë[X›ÛÜÈ[™H\ÈØ]YÛÜ°ëX\È[0êXÝšXØ\ËYÚ][\Ë[˜[0ìÙÚXØ\Ë‘‹Ù[œÛÜ™\ÈH›ØÙ\Ø[ZY[Ë‰ËˆÝ\ÎˆÂˆ	Ñ\ØÜšX™H›ÛXœ™K˜[Z[XHÈ[˜ÚpìÛˆ[ˆ[\ØØYÜˆ[Ø]0è[ÙÛË‰Ëˆ	Ñ^[™H[˜HØ]YÛÜ°ëXHH\œ˜\Ý˜H[ÛÛ\Û™[H[[È^XÝÈ[[›Ë‰Ëˆ	Õ[Xšpê[ˆYY\ÈXÙ\ˆØ›HÛXÈ\˜H[œÙ\\›È[ˆ[Ù[›ÈHHš\ÝK‰Ëˆ	ÔÙ[XØÚ[Û˜H˜\š[ÜÈ[[Y[ÜÈÛÛˆX^pîœÈÈXZ˜[™È[ˆ™XÝXY›ÈÛØœ™H[Y[ž›Ë‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	Ôðë[X›ÛÜÈ™\]YÜÉË^ˆ	Õ[ˆZ\Û[ÈÛÛ˜Ù\ÈYYH\\™XÙ\ˆ[ˆ\Ý[\ÈØ]YÛÜ°ëX\ÈÝX[™ÈY[™H\ÛÜÈ[0êXÝšXÛÜÈH[XÝ°ìÛšXÛÜÈY™\™[\Ë‰ÈKˆÈ]Nˆ	Õ™XÝÜšX[H™\™Y	Ë^ˆ	ÓÜÈðë[X›ÛÜÈÙHÙ[™\˜[ˆÛÛ[ÈÙ[ÛY]°ëXHÕ‘Ëˆ›ÈY\™[ˆYš[šXÚpìÛˆ[[\X\ˆHYY[ˆ™]™[\ˆ™\™\Ù[XÚ[Û™\È[\›˜\ÈYXÚ[Û˜[\Ë‰ÈKˆÈ]Nˆ	Ñ\XØ\ˆHÚ\˜\‰Ë^ˆ	Ñ[[œÜXÝÜˆÙœ™XÙHXØÚ[Û™\È°è\Y\ËˆH\XØXÚpìÛˆÛÛœÙ\˜H\°è[Y]›ÜÈHH›ÝXÚpìÛˆ˜[œÙ›Ü›XH[Xšpê[ˆHÜÚXÚpìÛˆHÝ\È\›Z[˜[\Ë‰ÈKˆÈ]Nˆ	Ñ[[Y[ÜÈÛÛ\Z›ÜÉË^ˆ	Ô[[\ËÜØÚ[ÜØÛÜ[ÜËY[[ÜšX\ÈH›ØÙ\ØYÜ™\ÈÛÛˆXXÜ›Û[Ù[ÜËˆÝHÛÛ\Ü[ZY[ÈH›Ù[™YYš\ÝX[ÙH[\X\°è[ˆ›ÙÜ™\Ú]˜[Y[K‰ÈKˆÈ]Nˆ	Ñ\Ü^\ÈQ	Ë^ˆ	Ðx $ÑÈÛÛ›Û[ˆ[™]šYX[Y[HÜÈÚY]HÙYÛY[ÜÎÈx $ÑÙ[XØÚ[Û˜[ˆ[0ëYÚ]È][\^YÎÈHX]š^ˆÜ^˜HŒ8 $ÔÈÛÛˆÌ8 $ÐÍÈHH˜\œ˜H™\ÜÛ™HHÝ\ÈY^ˆ[˜Y\Ë‰ÈKˆKˆ›ÝNˆ	Ñ[Ø]0è[ÙÛÈÔS]HH[Ø]0è[ÙÛÈ[YÜ˜YÈÛÛY[™[ˆ\ÈZ\ÛX\ÈYš[šXÚ[Û™\ÎÈ[[™XØYÜˆÝ\\š[Üˆ[™›Ü›XHHHY[HØ\™ØYK‰ËˆKˆÂˆYˆ	Ú[œÜXÝÜ‰ËÜ›Ý\ˆ	ÑQPÒpäÓ‰Ë]Nˆ	ÔÙ[XØÚpìÛ‹˜[Ü™\ÈH[œÜXÝÜ‰ËXÛÛŽˆÜ™[˜ÚˆÝ[[X\žNˆ	ÑY]H\°è[Y]›ÜÈ[0êXÝšXÛÜËÜÚXÚpìÛ‹\ÝYÈHÛÛ™XÝ]šYYÚ[ˆ\™\ˆ\ÜXÚ[ÈHY[ž›Ë‰ËˆÝ\ÎˆÂˆ	Ò^ˆÛXÈÛØœ™H[ˆÛÛ\Û™[HÈ[˜Ø\Ý[YÈ\˜HÙ[XØÚ[Û˜\›Ë‰Ëˆ	Ò^ˆØ›HÛXÈ\˜HXœš\ˆ[[œÜXÝÜˆ]\˜[ÝX[™È\Ý0êHYØYË‰Ëˆ	Ó[ÙYšXØH[˜[ÜˆH[ØHY\˜H[Ø[\ÎÈ[[ÝÜˆ™XÚX™H[›ÞYXÝÈXÝX[^˜YË‰Ëˆ	Õ\ØHH\[\˜H[[œÜXÝÜˆÈÝ\ˆ\˜H[[Z[˜\ˆHÙ[XØÚpìÛˆHÝ\ÈÛÛ™^[Û™\È\ÛØÚXY\Ë‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	ÑYXÚpìÛˆ[\›˜IË^ˆ	ÐÝX[™È[š]™[H][H\ÈÝYšXÚY[K]\›Z[˜YÜÈ˜[Ü™\È\\™XÙ[ˆ[›È[›Ü[Èðë[X›ÛÈHYY[ˆØ[XšX\œÙHÚ[ˆXœš\ˆ[[™[‰ÈKˆÈ]Nˆ	Ð›Ü]Y[ÈH\ÝYÉË^ˆ	Ñ\ØXÝ]˜\ˆ[ˆ[[Y[ÈÈX[Y[™H[ˆ[[›Ë\›ÈÈ^Û^YHHHÚ[][XÚpìÛ‹ˆ[[œÜXÝÜˆ™Y›Z˜HÝH\ÝYÈXÝX[‰ÈKˆÈ]Nˆ	ÔÙ[XØÚpìÛˆpî›\IË^ˆ	ÓX^pîœÈ\›Z]HXÝ[][\ˆ[[Y[ÜËˆ\ÈÜ\˜XÚ[Û™\ÈÛÛXÝ]˜\ÈX™[ˆ™X[^˜\œÙHÛÛˆÝZYYÈÜœ]YHY™XÝ[ˆHÙ\È\ÈY^˜\ÈÙ[XØÚ[Û˜Y\Ë‰ÈKˆÈ]Nˆ	Ñ\ÚXÙ\ˆH™ZXÙ\‰Ë^ˆ	ÐÝ›
-ÖˆHÝ›
-ÖH™XÝ\\˜[ˆØ[Xš[ÜÈH\ÝXÝ\˜HH›ÜYYY\ËˆHÚ[][XÚpìÛˆÙH™XØ[Ý[HÛÛˆH™\œÚpìÛˆ™\Ý]\˜YK‰ÈKˆKˆ›ÝNˆ	Ñ[[œÜXÝÜˆÛÛZY[ž˜HYØYÈ\˜H™\Ù\˜\ˆ\ÜXÚ[È[[›ÈHÙHXœ™H]]Ûpè]XØ[Y[HÝX[™È[˜HXØÚpìÛˆ™XÙ\Ú]H[ÜÝ˜\ˆ›ÜYYY\Ë‰ËˆKˆÂˆYˆ	ØØX›\ÉËÜ›Ý\ˆ	ÑQPÒpäÓ‰Ë]Nˆ	ÐØX›XYË›ÙÜÈH]\ÉËXÛÛŽˆØX›KˆÝ[[X\žNˆ	ÐÜ™XHÛÛ™^[Û™\È™XÝ\ËÜÙÛÛ˜[\ÈÈ°ê^šY\ˆH™[Ü™Ø[š^˜HÝH™XÛÜœšYÈÚ[ˆ[\˜\ˆH™Y[0êXÝšXØK‰ËˆÝ\ÎˆÂˆ	ÐXÝ]˜HØX›H\ÙHH[]H™\XØ[[Y[ž›È8 %ÈÛÛˆø %H[ØH[ˆ\›Z[˜[\ÜÛšX›K‰Ëˆ	Ô[ØH[ÙYÝ[™È\›Z[˜[ˆš]Ú\™HÜ™XH[˜H™YÛÛˆ[\Ý[È[YÚYÈ[ˆÛÛ™šYÝ\˜XÚpìÛˆ8 %[[™Ü˜[˜Z™HÝ\\š[Üˆ\™XÚø %‰Ëˆ	ÔÙ[XØÚ[Û˜H[ØX›H\˜HXœš\ˆ[Y]Üˆ›Ý[HHÛÛ™^pìÛ‹‰Ëˆ	Ò^ˆØ›HÛXÈ[ˆ[ˆ˜[[È\˜HpìXY\ˆ[ˆ›ÙÈH\œ°è\Ý˜[È\ÝH\ÜZ˜\ˆ[\Ü]Y[XK‰Ëˆ	Ò^ˆØ›HÛXÈÛØœ™H[ˆ›ÙÈ\˜H[[Z[˜\›ÈÈ][^˜H[\X\ˆ›ÙÜÈ\˜H™XØ[Ý[\ˆH]K‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	ÓÜÙÛÛ˜[	Ë^ˆ	Ô›ÙXÙH0è[™Ý[ÜÈ™XÝÜÈH\ÈHÜÚpìÛˆpè\ÈYÚX›H\˜H[›ÜÈ[œÛÜË‰ÈKˆÈ]Nˆ	Ð°ê^šY\‰Ë^ˆ	Õ][^˜HÜÈ›ÙÜÈÛÛ[È[ÜÈHÛÛ›Û\˜H›Ü›X\ˆÝ\˜\ÈÝX]™\ÈHÙ\\˜\ˆ™Y\ÈÝ\\œY\Ý\Ë‰ÈKˆÈ]Nˆ	Ô™XÝIË^ˆ	Õ[™HÜÈ\›Z[˜[\ÈÜˆ[Ø[Z[›Èpë[š[[Ëˆ™\Ý[H0î[[ˆ\Ùpì[ÜÈÙ[˜Ú[ÜÈHÛÛ™^[Û™\È[\›˜\ÈÛÜ\Ë‰ÈKˆÈ]Nˆ	Ñ]\]Y]H[˜ÛYIË^ˆ	ÓHXÝ\˜HH[œÚpìÛ‹ÛÜœšY[K0ìÙÚXØHÈÝ[˜ÚXHÙHÛÛØØHHZ]YHHÛ™Ú]Y™X[[˜^˜YËˆ[[Ý™\ˆÈ[[Z[˜\ˆ›ÙÜËXÛÛ\pìXHÚY[\™H[ØX›K‰ÈKˆÈ]Nˆ	ÓXÝ\˜H[›Z›ÉË^ˆ	ÓH˜\ÙH[™XØHÛÛ[ZYYÈÜÈ[ÛÜÈ\ØÛÛ[[ÜÈ\\™XÙ[ˆ0î›šXØ[Y[HÝX[™ÈH™Y\Ý0èHXÝ]˜HH[[ÝÜˆÙH\Ý0èHZ™XÝ][™Ë‰ÈKˆKˆ›ÝNˆ	Ó[Ý™\ˆ[ˆ›ÙÈØ[XšXHÛÛ[Y[HHÙ[ÛY]°ëXHš\ÝX[ˆÜÈ^™[[ÜÈ[0êXÝšXÛÜÈÛÛ[°î˜[ˆÛÛ™XÝYÜÈHÜÈZ\Û[ÜÈ\›Z[˜[\Ë‰ËˆKˆÂˆYˆ	ÜÚ[][XÚ[Û‰ËÜ›Ý\ˆ	ÔÒSUSPÒpäÓ‰Ë]Nˆ	ÑZ™XÝ]\‹]\Ø\ˆHY\ˆÙpìX[\ÉËXÛÛŽˆÜKˆÝ[[X\žNˆ	ÐÛÛ\™[™H]pêHØ[Ý[H[[ÝÜˆHðìÛ[È[\œ™]\ˆ[œÚpìÛ‹ÛÜœšY[KÝ[˜ÚXHH0ìÙÚXØK‰ËˆÝ\ÎˆÂˆ	ÐXœ™H[[™Ü˜[˜Z™HÝ\\š[Üˆ\™XÚÈHÙ[XØÚ[Û˜HHXYÛš]Yš\ÚX›Nˆ[œÚpìÛ‹ÛÜœšY[K0ìÙÚXØHÌHÈÝ[˜ÚXK‰Ëˆ	Õ\ØH[›Ü]YHÙ[˜[\ÝXØYÎˆZ™XÝ]\ˆ[šXÚXHHÚ[][XÚpìÛˆÛÛ[XHH\ÛÈ]˜[ž˜H[˜H]\˜XÚpìÛˆ\Ý[™È[ˆ]\ØK‰Ëˆ	ÐZ\ÝHH™[ØÚYY[™HpåÈHL0åÈÙYðî›ˆ™XÙ\Ú]\ÈØœÙ\˜\ˆ˜[œÚ]Üš[ÜÈÈ\ÝYÜÈ\ÝX›\Ë‰Ëˆ	ÓYH\È]\]Y]\ÈÛØœ™HØYH™YHÛÛœÝ[HÜÈ[œÝ[Y[ÜÈ\˜H\ÝYX\ˆÝH]›ÛXÚpìÛˆ[\Ü˜[‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	Õ[œÚpìÛ‰Ë^ˆ	Ñ\ÈHY™\™[˜ÚXHHÝ[˜ÚX[[™HH™YHÝH™Y™\™[˜ÚXKˆÙH^™\ØH›Ü›X[Y[H[ˆ›Û[ÜË‰ÈKˆÈ]Nˆ	ÐÛÜœšY[IË^ˆ	Ò[™XØH[›Z›È[0êXÝšXÛÈ\Ý[XYËˆš]Ú\™H]Y\Ý˜H[\\š[ÜÈÈZ[X[\\š[ÜÈÙYðî›ˆHXYÛš]Y‰ÈKˆÈ]Nˆ	ÔÝ[˜ÚXIË^ˆ	ÔÙHØ[Ý[HH\\ˆH[œÚpìÛˆHÛÜœšY[Kˆ\›Z]HØØ[^˜\ˆØ\™Ø\ÈH]\\ÈÛÛˆX^[ÜˆÛÛœÝ[[Ë‰ÈKˆÈ]Nˆ	Ó0ìÙÚXØIË^ˆ	ÓÜÈ\ÝYÜÈYÚ][\ÈYY[ˆÙ\ˆK›Ý[HˆÈ[™]\›Z[˜YËˆ[˜H[˜YHÚ[ˆ™Y™\™[˜ÚXH›ÈÚY[\™H\]Z]˜[HHÙ\›Ë‰ÈKˆÈ]Nˆ	Ð[š[XXÚpìÛˆHÛÜœšY[IË^ˆ	Ñ\Ý0èHXÝ]˜YHÜˆY™XÝËˆYYHØÝ[\œÙH\ÙHÛÛ™šYÝ\˜XÚpìÛˆÚ[ˆ][™\ˆ[[ÝÜˆšH[\˜\ˆ[ðè[Ý[È[0êXÝšXÛË‰ÈKˆKˆ›ÝNˆ	ÓÜÈÛÛÜ™\È^]Y[ˆH\Ý[™ÝZ\ˆ\ÝYÜË\›È[˜[Üˆ[pê\šXÛÈÈ0ìÙÚXÛÈHH]\]Y]H\ÈH™Y™\™[˜ÚXHš[˜Ú\[‰ËˆKˆÂˆYˆ	Ù[˜Ø\Ý[YÜÉËÜ›Ý\ˆ	ÐT”URUPÕTIË]Nˆ	Ñ[˜Ø\Ý[YÜÈHY[ž›ÜÈ[\››ÜÉËXÛÛŽˆ›ÞˆÝ[[X\žNˆ	ÐYÜ\HÚ\˜ÝZ]ÜËYš[™H][\È^\›˜\ÈHÛÛœÝ^YHÚ\È™]][^˜X›\ÈÛÛˆš]™[\È[\››ÜÈ[šYYÜË‰ËˆÝ\ÎˆÂˆ	ÐXÝ]˜HÜ™X\ˆ[˜Ø\Ý[YÈHXZ˜H[™XÝ0è[™Ý[È]YHÛÛ[™°èH[Ú\˜ÝZ]Ë‰Ëˆ	ÔÙ[XØÚ[Û˜H[0è\™XH\˜H™Y[Y[œÚ[Û˜\›K›ÛXœ˜\›HH[YÚ\ˆÚHÙH™\Ù[HÛÛ[È0è\™XHÈÛÛ[ÈÚ\‰Ëˆ	Õ\ØHH˜\œ˜HÝ\\š[ÜˆH][\È\˜HpìXY\ˆ[˜Y\ÈÈØ[Y\ÈH^œ]ZY\™K\™XÚK\œšX˜HÈX˜Z›Ëˆš]Ú\™H\È™\\HH›Ü›XH\]ZY\Ý[H[ˆØYHYË‰Ëˆ	ÐXœ™H[Y[ž›È[\››ÈHÛÛ™XÝHÜÈ\›Z[˜[\ÈšZ›ÜÈ[›Ü™HÛÛˆÜÈÛÛ\Û™[\È[Ú\˜ÝZ]Ë‰Ëˆ	ÑÝX\™H[[˜Ø\Ý[YÈ[ˆHšX›[ÝXØHÈ^0ìÜ[ÈÛÛ[È˜š]Ú\™K[[Ù[K‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	ÓX\H^\š[Üˆ›ÝYÚYÉË^ˆ	Ñ\ÙH[š]™[Ý\\š[ÜˆÙH]Y\Ý˜H[ˆ™\Ý[Y[ˆ]]ØZ\ÝYÈH™XÛÜYÈ[›È[ÛÛÜ››Ëˆ\ÙHX\H›ÈÙHYYHÙ[XØÚ[Û˜\‹[Ý™\ˆšH›Üœ˜\Žˆ[[˜Ø\Ý[YÈÙHÛÛ\ÜHÛÛ[È[˜HÛÛHY^˜K‰ÈKˆÈ]Nˆ	Ò[\š[Üˆ[™\[™Y[IË^ˆ	Ñ[ÛÛ[šYÈ\ØHÝH›Ü[ÈY[ž›ÈHÝH›ÜXHðè[X\˜Kˆ^ˆØ›HÛXÈÈ\ØH[˜\ˆ[ˆ[Y[ž›È[\››È\˜HY]\›Ë‰ÈKˆÈ]Nˆ	ÐÛÛ][šXØXÚpìÛˆ^\š[Ü‰Ë^ˆ	Ó\È][\ÈÛÛˆH0î›šXØHœ›Û\˜H0î˜›XØKˆÜÈØX›\È]YH[[[ˆ]˜]™\Ø\ˆ\™XÝ[Y[H[ˆ[˜Ø\Ý[YÈ]YY[ˆZ\ÛYÜÈHÙ[™\˜[ˆ[ˆ]š\ÛË‰ÈKˆÈ]Nˆ	Ð]]Ù\ÜXÚXYÉË^ˆ	Ð[pìXY\‹[Ý™\ˆHYÈÈ[[Z[˜\ˆ[˜H][K\È™\Ý[\ÈÙH™Y\ÝšX^Y[ˆ[šY›Ü›Y[Y[KˆHÜÚXÚpìÛˆ[pê\šXØHÛÛ[°î˜H\ÜÛšX›H\˜HZ\Ý\È[X™\˜YÜË‰ÈKˆÈ]Nˆ	Ð[šY[ZY[ÉË^ˆ	ÔYY\ÈÜ™X\ˆ[˜Ø\Ý[YÜÈ[›ÈHÝ›ÜËˆH]HÝ\\š[Üˆ\›Z]H›Û™\ˆHÝX[]ZY\ˆ[XÙ\ÛÜˆÚ[ˆ\ÝZ\ˆ[\ÝYÈ[\››Ë‰ÈKˆÈ]Nˆ	ÐšX›[ÝXØHØØ[	Ë^ˆ	ÓÜÈpìÙ[ÜÈÝX\™YÜÈÙH[XXÙ[˜[ˆ[ˆ[˜]™YØYÜ‹ˆ^Ü\›ÜÈ\ÈH›Ü›XHÙYÝ\˜HHÛÛœÙ\˜\›ÜÈY\˜HH\ÙH\ÜÜÚ]]›Ë‰ÈKˆKˆ›ÝNˆ	Ð[\ÈHÝX\™\ˆ[ˆÚ\\ÚYÛ˜H›ÛXœ™\ÈÛ\›ÜÈHÙ\ÈÝ\È][\ÈHYX˜H[Y[ž›È[\››ÈHX[™\˜HZ\ÛYK‰ËˆKˆÂˆYˆ	Ú[œÝ[Y[ÜÉËÜ›Ý\ˆ	ÔÒSUSPÒpäÓ‰Ë]Nˆ	Ð˜[˜ÛÈH[œÝ[Y[ÜÉËXÛÛŽˆXÝ]š]KˆÝ[[X\žNˆ	ÐÛÛXš[˜Hš\Ý\ÈÙ[™\˜[\ÈHXœ™H[œ›Û[[™\[™Y[HHØYH[œÝ[Y[ÈÛÛ™XÝYÈ[Ú\˜ÝZ]Ë‰ËˆÝ\ÎˆÂˆ	ÐXœ™Hš\Ý\È[ˆHØX™XÙ\˜H[˜[˜ÛÈ[™™\š[Ü‹‰Ëˆ	ÐXÝ]˜HÚ[][0è[™X[Y[HÜØÚ[ÜØÛÜ[Ë[˜[^˜YÜˆ0ìÙÚXÛË][0ë[Y]›ËÝ[˜ÚXK\ÜXÝ›ÈÈœ™XÝY[˜ðë[Y]›Ë‰Ëˆ	Ô[ØHÛÛˆ[›Ý0ìÛˆ\™XÚÈÛØœ™H[ˆ[œÝ[Y[È[[›ÈH[YÙHXœš\ˆ[\™˜^ˆ[[œÝ[Y[Ë‰Ëˆ	Ð\œ˜\Ý˜HH˜\œ˜HH0ë][Ë™Y[Y[œÚ[Û˜H\ÙHH\Ü]Z[˜HH\ØHH›XÚH\˜H\ÜYØ\ˆÜÈÛÛ›Û\È›Ù™\Ú[Û˜[\Ë‰Ëˆ	Ñ\ØXÝ]˜HÝX[]ZY\ˆš\ÝH\˜H™]\˜\›HÚ[ˆ][™\ˆ[[ÝÜˆšH\™\ˆ]Y\Ý˜\Ë‰Ëˆ	ÔYYØHÙÈ[˜[˜ÛÈÝX[™È™XÙ\Ú]\ÈYXØ\ˆH[\˜HÛÛ\]H[Y[ž›Ë‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	ÓYYYHÜˆ[œÝ[˜ÚXIË^ˆ	ÐØYH\\˜]È™\ÝY[™H^Û\Ú]˜[Y[HÜÈØX›\È[šYÜÈHÝ\È][\ËˆÜÈÜØÚ[ÜØÛÜ[ÜÈÛÛ™XÝYÜÈH™Y\È\Ý[\ÈÛÛœÙ\˜[ˆÜ°èYšXØ\ÈH\ÝÜšX[\ÈY™\™[\Ë‰ÈKˆÈ]Nˆ	ÓÜØÚ[ÜØÛÜ[È›Ù™\Ú[Û˜[	Ë^ˆ	ÓHš\ÝH^[™YH[˜ÛÜœÜ˜HÒKÐÒ‹›ÛËÙ]‹Y[\ËÙ]‹ÜÚXÚpìÛ‹XÛÜ[ZY[ËY[[ÜšXK[˜ÚÈH˜[™KY]Z\ÚXÚpìÛˆH\Ü\›Ë‰ÈKˆÈ]Nˆ	Ð[˜[^˜YÜˆ0ìÙÚXÛÉË^ˆ	Ó]Y\Ý˜H\ÝYÜÈš[˜\š[ÜÈH˜[œÚXÚ[Û™\Ëˆ\ÈHš\ÝHYXÝXYH\˜H™[Ú™\ËY\\Ë\Ù\ÈHÙXÝY[˜ÚX\Ë‰ÈKˆÈ]Nˆ	ÓYYY\È[0êXÝšXØ\ÉË^ˆ	Ó][0ë[Y]›ÈH[Ûš]ÜˆHÝ[˜ÚXH™\Ý[Y[ˆÜÈ˜[Ü™\È[œÝ[0è[™[ÜÈH[ÛÛœÝ[[ÈYÜ™YØYÈH\È™Y\ÈXÝ]˜\Ë‰ÈKˆÈ]Nˆ	Ñœ™XÝY[˜ÚXHH\ÜXÝ›ÉË^ˆ	Ñ[œ™XÝY[˜ðë[Y]›È\Ý[XH˜[œÚXÚ[Û™\ÈÜˆÙYÝ[™ÎÈ[\ÜXÝ›ÈÙœ™XÙH[˜HXÝ\˜H™[]]˜H[ÛÛ[šYÈœ™XÝY[˜ÚX[HH]Y\Ý˜K‰ÈKˆKˆ›ÝNˆ	Ñ[›Ý0ìÛˆ\™XÚÈXœ™H[Y[°îˆ›Ü[ÈHš]Ú\™Kˆ[˜]™YØYÜˆXH›È[\˜Ù\H\ØH[\˜XØÚpìÛˆ[›È[X›Ü˜]Üš[Ë‰ËˆKˆÂˆYˆ	Ü›Ù[™YY	ËÜ›Ý\ˆ	ÐT”URUPÕTIË]Nˆ	Ö›ÛÛHÙ[pè[XÛÈHÛÛ\ÜÚXÚpìÛˆ[\›˜IËXÛÛŽˆØ]YÙKˆÝ[[X\žNˆ	Ò[\œ™]HÜÈš]™[\ÈH][H]YH˜[œÙ›Ü›X[ˆ[ˆ›Ü]YH[˜Ú[Û˜[[ˆÝH\ÝXÝ\˜H[XÝ°ìÛšXØHH°ë\ÚXØK‰ËˆÝ\ÎˆÂˆ	ÓØœÙ\˜H[[™XØYÜˆÑHH\Ü]Z[˜HÝ\\š[Üˆ\™XÚH[Y[ž›Ë‰Ëˆ	Ð[\0ëXHÛØœ™H[ˆðë[X›ÛÈ\ÝH\Ø\ˆHš\ÝH\Ü]Y[pè]XØHH[˜Ú[Û˜[HH\ÜÜÚ]]›ÈH\ÝXÝ\˜H°ë\ÚXØK‰Ëˆ	Ñ[ˆY\\È0ìÙÚXØ\Ë\ÝYXHš[Y\›ÈH™Y\]Z]˜[[HH\Üpê\ÈH[\[Y[XÚpìÛˆÓSÔË‰Ëˆ	Ñ[ˆÙ[ZXÛÛ™XÝÜ™\ËY[YšXØH™YÚ[Û™\ÈÓ‹[š[Û™\Ë›Û˜HHYÛÝ[ZY[ËY\K˜\ÙHÈØ[˜[‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	ÓÑ8 %[˜Ø\Ý[YÉË^ˆ	Ôš[Üš^˜HY[YYÛÛÜ››ÈH\›Z[˜[\Ëˆ\ÈHš\ÝH\›ÜXYH\˜HÚ\Ý[X\ÈÜ˜[™\Ë‰ÈKˆÈ]Nˆ	ÓÑKÌˆ8 %\Ü]Y[XHH[˜ÚpìÛ‰Ë^ˆ	Ó]Y\Ý˜H[ðë[X›ÛÈ›Ü›X[^˜YË˜[Ü™\È\Ù[˜ÚX[\ÈHH™[XÚpìÛˆ0ìÙÚXØHÈ[0êXÝšXØH[™H[˜Y\ÈHØ[Y\Ë‰ÈKˆÈ]Nˆ	ÓÑÈ8 %\ÜÜÚ]]›ÉË^ˆ	Ô™]™[H™Y\È[\›˜\Ë˜[œÚ\ÝÜ™\ËÛÛXÝÜÈH›Ü]Y\È]YH^XØ[ˆ[ÛÛ\Ü[ZY[È[ÛÛ\Û™[K‰ÈKˆÈ]Nˆ	ÓÑ8 %°ë\ÚXÛÉË^ˆ	Ò[›ÙXÙH™YÚ[Û™\ÈÜY\Ë[š[Û™\ÈH][\ÈX]\šX[\Ëˆ\È[ˆ[Ù[ÈYXØ]]›Ë›È[˜Hpè\ØØ\˜HH˜XœšXØXÚpìÛˆÛÛ\]K‰ÈKˆKˆ›ÝNˆ	ÓH›Ù[™YY\[™H[›ÙXÝÈ[›ÛÛH[Y[ž›ÈHH\ØØ[H›ÜXH[ÛÛ\Û™[K‰ËˆKˆÂˆYˆ	Ø\˜Ú]›ÜÉËÜ›Ý\ˆ	Ô“ÖQPÕÉË]Nˆ	Ô›ÞYXÝÜËÝX\™YÈH[\˜Ø[Xš[ÉËXÛÛŽˆ›Û\“Ü[‹ˆÝ[[X\žNˆ	ÑY™\™[˜ÚXH[™HÝX\™YÈØØ[^ÜXÚpìÛˆ[›ÞYXÝÈHšX›[ÝXØHH[˜Ø\Ý[YÜË‰ËˆÝ\ÎˆÂˆ	ÓY]›ÈÜ™XH[ˆ›ÞYXÝÈ˜Xðë[È\Üpê\ÈHY™\\ˆÚH^\Ý[ˆØ[Xš[ÜÈÚ[ˆÝX\™\‹‰Ëˆ	ÐXœš\ˆ[\ÜH[ˆ\˜Ú]›È˜š]Ú\™HÈ”ÓÓˆÛÛ\]X›K‰Ëˆ	ÑÝX\™\ˆ\ØÜšX™HH™\œÚpìÛˆXÝX[[ˆ[[XXÙ[˜[ZY[ÈØØ[[˜]™YØYÜ‹‰Ëˆ	Ñ^Ü\ˆ\ØØ\™ØH[ˆ\˜Ú]›È˜[œÜÜX›HÛÛˆÛÛ\Û™[\Ë™Y\ËpìÙ[ÜÈHZ\Ý\È[›ÞYXÝË‰Ëˆ	Ó[ÙÈÙ™›[™H]XÝHÚ[™ÝÜËXXÓÔÈÈ[^H\ØØ\™ØHH\XØXÚpìÛˆÜX›HYXÝXYK‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	ÑÝX\™YÈØØ[	Ë^ˆ	Ñ\È°è\YÈHðìÛ[ÙË\›È\[™XÙH[˜]™YØYÜˆH\ÜÜÚ]]›ÈXÝX[\Ëˆ›Üœ˜\ˆÜÈ]ÜÈ[Ú][ÈYYH[[Z[˜\›Ë‰ÈKˆÈ]Nˆ	Ð\˜Ú]›È˜š]Ú\™IË^ˆ	Ñ\È”ÓÓˆ™\œÚ[Û˜YÈHYÚX›KˆÚ\™HÛÛ[ÈÛÜXHHÙYÝ\šYYHÛÛ[È›Ü›X]ÈH[\˜Ø[Xš[È[™H\]Z\ÜË‰ÈKˆÈ]Nˆ	Ð\˜Ú]›ÈHpìÙ[ÉË^ˆ	Õ[ˆ˜š]Ú\™K[[Ù[HÛÛY[™H[ˆ[˜Ø\Ý[YÈ™]][^˜X›HHÝ\Èš]™[\È\ØÙ[™Y[\Ë›È[›ÞYXÝÈÛÛ\]Ë‰ÈKˆÈ]Nˆ	ÐÛÛ\]Xš[YY	Ë^ˆ	Ðš]Ú\™H˜[YH\È™Y™\™[˜ÚX\ÈHÜÈØX›\È[[\Ü\‹ˆ[ˆ\˜Ú]›ÈÛÛˆ\›Z[˜[\È[™^\Ý[\ÈÙH™XÚ^˜H\˜H]š]\ˆÜ˜Y›ÜÈÛÜœ\ÜË‰ÈKˆÈ]Nˆ	Ð\XØXÚpìÛˆÜX›IË^ˆ	ÓÜÈZ™XÝ]X›\ÈÙHÛÛ\[[ˆ™]šX[Y[H[ˆÚ]XˆXÝ[ÛœÈH[˜Û^Y[ˆ[\™˜^‹Ø]0è[ÙÛÈH[ÝÜ‹ˆ[\ÝX\š[È›È™XÙ\Ú]HÛÛœÛÛK›ÙKšœË]ÛˆšH[ˆ[œÝ[YÜ‹‰ÈKˆKˆ›ÝNˆ	Ô\˜H˜X˜Z›ÜÈ[\Ü[\ËÛÛXš[˜HÝX\™\ˆ\˜[HHYXÚpìÛˆÛÛˆ^ÜXÚ[Û™\È\špìÙXØ\È™\œÚ[Û˜Y\Ë‰ËˆKˆÂˆYˆ	ÙXYÛ›ÜÝXÛÉËÜ›Ý\ˆ	Ô‘Q‘T‘SÒPIË]Nˆ	ÑXYÛ°ìÜÝXÛÈH›Ø›[X\Èœ™XÝY[\ÉËXÛÛŽˆÚ\˜ÛR[ˆÝ[[X\žNˆ	Ô™\ÝY[™H°è\Y[Y[H˜[ÜÈHÙ[XØÚpìÛ‹™Y\ÈÚ[ˆÙpìX[ðè[X\˜H\™YHHpìÙ[ÜÈ\\™[[Y[H˜Xðë[ÜË‰ËˆÝ\ÎˆÂˆ	ÔÚH[ˆÛÛ\Û™[H›ÈÙH]Y]™KÛÛ™š\›XH]YH\Ý0èHÙ[XØÚ[Û˜YË›È›Ü]YXYÈH]YHH\œ˜[ZY[HXÝ]˜H\ÈÙ[XØÚpìÛ‹‰Ëˆ	ÔÚH[˜H™Y›ÈÙH[š[XKZ™XÝ]H[[ÝÜˆHÛÛ\YX˜H]YHHY[K[™]Ü››ÈHÜÈ[[Y[ÜÈ[\›YY[ÜÈ›Ü›X[ˆ[ˆ™XÛÜœšYÈ°è[YË‰Ëˆ	ÔÚH›È[˜ÝY[˜\È[Ú\˜ÝZ]Ë[ØH[˜ØZ˜\ˆ›ÞYXÝË‰Ëˆ	ÔÚH[[\š[ÜˆH[ˆpìÙ[È\™XÙH˜Xðë[Ë™]š\ØHH]HÝ\\š[ÜˆH\È][\ÈšZ˜\È[›Ü™K‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	Õ˜[Üˆ8 '8 %8 'IË^ˆ	Ó›È^\ÝH[˜HYYYHXÝ]˜HÈH™Y\Ý0èH›Ý[KˆÛÛ\YX˜H™Y™\™[˜ÚX\Ë[[Y[XÚpìÛˆHÛÛ[ZYY‰ÈKˆÈ]Nˆ	Ñ\ÝYÈ‰Ë^ˆ	ÓH0ë[™XHYÚ][\Ý0èH[ˆ[H[\Y[˜ÚXKˆ™XÙ\Ú]H[˜HY[H0ìÙÚXØHÈ[˜H™\Ú\Ý[˜ÚXHHÛ\š^˜XÚpìÛˆÙYðî›ˆ[\Ùpì[Ë‰ÈKˆÈ]Nˆ	Ð]š\ÛÜÈ[[ÝÜ‰Ë^ˆ	Ñ[ÛÛYÜˆ[™™\š[ÜˆYÜ\HY™\[˜ÚX\ÈHÚ[][XÚpìÛ‹ˆ]\ØHH™]š\ØHÛÛ™^[Û™\È[\ÈH[\X\ˆ[Ú\˜ÝZ]Ë‰ÈKˆÈ]Nˆ	Ô™[™[ZY[ÉË^ˆ	ÔYYØH[œÝ[Y[ÜÈ]YH›È\Ù\Ë˜X˜Z˜HÜˆ[˜Ø\Ý[YÜÈH]š]H[ÜÝ˜\ˆ˜[Ü™\ÈÝ\\œY\ÝÜÈ[ˆZ[\ÈH™Y\ÈÚ[][0è[™X[Y[K‰ÈKˆKˆ›ÝNˆ	ÐÝX[™È[™\ÝYÝY\È[ˆ›Ø›[XHÛÛ\Z›ËÜ™XH[˜HÛÜXHH™YXÙH[Ú\˜ÝZ]È\ÝH[ÛÛš[Èpë[š[[È]YHÙ]°ëXH™\›Ù^˜ØH[˜[Ë‰ËˆKˆÂˆYˆ	Ø]Z›ÜÉËÜ›Ý\ˆ	Ô‘Q‘T‘SÒPIË]Nˆ	Ð]Z›ÜÈH›ØØX[\š[È\Ù[˜ÚX[	ËXÛÛŽˆ›ÛÚÓÜ[‹ˆÝ[[X\žNˆ	ÐÛÛœÝ[HÜÈÛÛ›Û\Èš[˜Ú\[\ÈHÜÈÛÛ˜Ù\ÜÈ]YH\\™XÙ[ˆ[ˆH[\™˜^‹‰ËˆÝ\ÎˆÂˆ	ÕŽˆÙ[XØÚpìÛˆ0­ÈÎˆØX›H0­ÈˆX[›È0­È\ÜXÚ[È
-È\œ˜\Ý™Nˆ\Ü^˜\‹‰Ëˆ	ÐÝ›
-ÔÎˆÝX\™\ˆ0­ÈÝ›
-ÓŽˆY]›È0­ÈÝ›
-ÖŽˆ\ÚXÙ\ˆ0­ÈÝ›
-ÖNˆ™ZXÙ\‹‰Ëˆ	ÔÝ\ˆÈ™]›ØÙ\ÛÎˆ[[Z[˜\ˆ0­È\ØØ\NˆØ[˜Ù[\ˆÙ[XØÚpìÛˆÈ\œ˜[ZY[K‰Ëˆ	ÔYYNˆ›ÛÛH0­ÈX^pîœÈ
-ÈÛXÎˆÙ[XØÚpìÛˆpî›\H0­ÈØ›HÛXÎˆ[œÜXÝÜˆÈ˜]™YØXÚpìÛˆ[\›˜K‰ËˆKˆ]Z[ÎˆÂˆÈ]Nˆ	Õ\›Z[˜[	Ë^ˆ	Ô[È[\˜XÝ]›ÈH[˜YKØ[YK[[Y[XÚpìÛˆÈ™Y™\™[˜ÚXHH[ˆÛÛ\Û™[K‰ÈKˆÈ]Nˆ	Ô™Y	Ë^ˆ	ÐÛÛš[ÈH[ÜÈ[0êXÝšXØ[Y[HÛÛ™XÝYÜÈYYX[H[›ÈÈpè\ÈØX›\Ë‰ÈKˆÈ]Nˆ	Ñ[˜Ø\Ý[YÉË^ˆ	ÐÛÛ[™YÜˆ™\°è\œ]ZXÛÈÛÛˆÚ\˜ÝZ]È[\››ÈH[˜H[\™˜^ˆ^\š[Üˆ›Ü›XYHÜˆ][\Ë‰ÈKˆÈ]Nˆ	ÓÑ	Ë^ˆ	Óš]™[H][HÙ[pè[XÛÈ[YÚYÈÙYðî›ˆ[›ÛÛHY™XÝ]›ÈHHš\ÝHH[ÛÛ\Û™[K‰ÈKˆKˆ›ÝNˆ	ÓX[0ê[ˆ[Ý\œÛÜˆÛØœ™HÝX[]ZY\ˆ›Ý0ìÛˆ\˜HÛÛœÝ[\ˆÝH[˜ÚpìÛˆKÝX[™È^\ÝK[]Z›È\ÛØÚXYË‰ËˆK—NÂ‚™^Ü[˜Ý[Ûˆ[ÝZYJÈÛÛÜÙHNˆ›ÜÊHÂˆÛÛœÝØXÝ]™RYÙ]XÝ]™RYHH\ÙTÝ]JÕRQVÌKšY
-NÂˆÛÛœÝÜ]Y\žKÙ]]Y\žWHH\ÙTÝ]J	ÉÊNÂˆÛÛœÝš[\™YH\ÙSY[[Ê
+import {
+  Activity, BookOpen, Box, Cable, ChevronLeft, ChevronRight, CircleHelp,
+  Cpu, FolderOpen, Gauge, Layers3, MousePointer2, Search, Sparkles, Wrench, X,
+} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
-HOˆÂˆÛÛœÝ™YYHH]Y\žKš[J
-KÓØØ[SÝÙ\Ø\ÙJ	Ù\ÉÊNÂˆYˆ
-[™YYJH™]\›ˆÕRQNÂˆ™]\›ˆÕRQK™š[\ŠÙXÝ[ÛˆOˆÜÙXÝ[Û‹]KÙXÝ[Û‹œÝ[[X\žKÙXÝ[Û‹™Ü›Ý\‹‹œÙXÝ[Û‹œÝ\Ë‹‹œÙXÝ[Û‹™]Z[Ë™›]X\
-][OO–Ú][K]K][K^JWKš›Ú[Š	È	ÊKÓØØ[SÝÙ\Ø\ÙJ	Ù\ÉÊKš[˜ÛY\Ê™YYJJNÂˆKÜ]Y\žWJNÂ‚ˆ\ÙQY™™XÝ
+interface Props { onClose(): void }
 
+interface GuideSection {
+  id: string;
+  group: string;
+  title: string;
+  summary: string;
+  icon: typeof BookOpen;
+  steps: string[];
+  details: Array<{ title: string; text: string }>;
+  note: string;
+}
 
-HOˆÂˆYˆ
-š[\™Y›[™Ý	‰ˆYš[\™YœÛÛYJÙXÝ[ÛˆOˆÙXÝ[Û‹šYOOHXÝ]™RY
-JHÙ]XÝ]™RY
-š[\™YÌKšY
-NÂˆKØXÝ]™RYš[\™YJNÂ‚ˆÛÛœÝXÝ]™HHÕRQK™š[™
-ÙXÝ[ÛˆOˆÙXÝ[Û‹šYOOHXÝ]™RY
-HÏÈÕRQVÌNÂˆÛÛœÝ[™^HÕRQK™š[™[™^
-ÙXÝ[ÛˆOˆÙXÝ[Û‹šYOOHXÝ]™KšY
-NÂˆÛÛœÝXÛÛˆHXÝ]™KšXÛÛŽÂ‚ˆ™]\›ˆ]ˆÛ\ÜÓ˜[YOH›[Ù[X˜XÚÙ›ÜÝZYKX˜XÚÙ›ÜˆÛ“[Ý\ÙQÝÛ^ÛÛÛÜÙ_O‚ˆÙXÝ[ÛˆÛ\ÜÓ˜[YOHš[YÝZYHˆÛ“[Ý\ÙQÝÛ^Ù]™[Oˆ]™[œÝÜ›ÜYØ][ÛŠ
-_H\šXK[X™[H‘ÝpëXHÛÛ\]HHš]Ú\™H‚ˆXY\ˆÛ\ÜÓ˜[YOH™ÝZYKZXY\ˆ‚ˆ]ˆÛ\ÜÓ˜[YOH™ÝZYK]]H›ÛÚÓÜ[ˆÚ^™O^ÌŒ_KÏ]Ü[ˆÛ\ÜÓ˜[YOH™^YXœ›ÝÈ“PS•PSS•TPÕU“ÏÜÜ[‘ÝpëXHÛÛ\]HHš]Ú\™OÚÙ]Ù]‚ˆX™[Û\ÜÓ˜[YOH™ÝZYK\ÙX\˜ÚÙX\˜ÚÚ^™O^ÌM_KÏ[œ]˜[YO^Ü]Y\ž_HÛÚ[™ÙO^Ù]™[OœÙ]]Y\žJ]™[\™Ù]˜[YJ_HXÙZÛ\H\ØØ\ˆØX›XYË[˜Ø\Ý[YÜËÑ8 )ˆ‹ÏÛX™[‚ˆ]ÛˆÛ\ÜÓ˜[YOH™ÝZYKXÛÜÙHˆÛÛXÚÏ^ÛÛÛÜÙ_H\šXK[X™[HÙ\œ˜\ˆÝpëXHÚ^™O^ÌN_KÏØ]Û‚ˆÚXY\‚ˆ]ˆÛ\ÜÓ˜[YOH™ÝZYK[^[Ý]‚ˆ\ÚYHÛ\ÜÓ˜[YOH™ÝZYKZ[™^‚ˆ]ˆÛ\ÜÓ˜[YOH™ÝZYKZ[™^\Ý[[X\žHÝ›Û™ÏžÑÕRQK›[™ÝOÜÝ›Û™ÏÜ[˜Ø\0ë][ÜÈ0­È\ÙH[š[Y\ˆÚ\˜ÝZ]È\ÝHH\œ]Z]XÝ\˜H™\°è\œ]ZXØOÜÜ[Ù]‚ˆ˜]ˆ\šXK[X™[H°ã[™XÙHHHÝpëXH‚ˆÙš[\™Y›X\
-ÙXÝ[ÛˆOˆÂˆÛÛœÝ][RXÛÛ\ÙXÝ[Û‹šXÛÛŽÂˆ™]\›ˆ]ÛˆÙ^O^ÜÙXÝ[Û‹šYHÛ\ÜÓ˜[YO^ÜÙXÝ[Û‹šYOOXXÝ]™KšYÉØXÝ]™IÎ‰ÉßHÛÛXÚÏ^Ê
-OOœÙ]XÝ]™RY
-ÙXÝ[Û‹šY
-_O‚ˆ][RXÛÛˆÚ^™O^ÌM_KÏÜ[ÛX[žÜÙXÝ[Û‹™Ü›Ý\OÜÛX[Ý›Û™ÏžÜÙXÝ[Û‹]_OÜÝ›Û™ÏÜÜ[‚ˆØ]ÛŽÂˆJ_BˆÈYš[\™Y›[™Ý	‰ˆÛ\ÜÓ˜[YOH™ÝZYK[›Ë\™\Ý[È“›È^HØ\0ë][ÜÈ]YHÛÚ[˜ÚY[ˆÛÛˆH°îœÜ]YYKÜŸBˆÛ˜]‚ˆØ\ÚYO‚ˆ\XÛHÛ\ÜÓ˜[YOH™ÝZYKXÛÛ[ˆÙ^O^ØXÝ]™KšYO‚ˆ]ˆÛ\ÜÓ˜[YOH™ÝZYKXÚ\\‹ZXY[™ÈÜ[XÛÛˆÚ^™O^ÌŒßKÏÜÜ[]ÛX[žØXÝ]™K™Ü›Ý\H0­ÈÐT0ãUSÈÚ[™^
-Ì_OÜÛX[ÏžØXÝ]™K]_OÚÏžØXÝ]™KœÝ[[X\ž_OÜÙ]Ù]‚ˆÙXÝ[ÛˆÛ\ÜÓ˜[YOH™ÝZYK]]ÜšX[•UÔ’PSTÓÈHTÓÏÚÛžØXÝ]™KœÝ\Ë›X\
+const GUIDE: GuideSection[] = [
+  {
+    id: 'inicio', group: 'EMPEZAR', title: 'Primer circuito en cinco minutos', icon: Sparkles,
+    summary: 'Construye, conecta y ejecuta un circuito sencillo sin necesitar conocimientos previos del editor.',
+    steps: [
+      'Localiza Fuente CC, Interruptor SPST, Resistencia, LÃ¡mpara y Tierra en el catÃ¡logo izquierdo.',
+      'Arrastra cada sÃ­mbolo al lienzo. BitWire conserva el tamaÃ±o visual correspondiente al nivel de zoom de inserciÃ³n.',
+      'Pulsa W o el icono de cable, selecciona un terminal y despuÃ©s el terminal de destino.',
+      'Selecciona cada componente para ajustar tensiÃ³n, resistencia o estado desde el inspector.',
+      'Pulsa Ejecutar. Los tramos activos muestran pulsos mÃ³viles y las etiquetas indican la magnitud seleccionada.',
+    ],
+    details: [
+      { title: 'QuÃ© debes ver', text: 'Un recorrido cerrado desde la fuente hasta tierra. Si el interruptor estÃ¡ abierto, el flujo se detiene; al cerrarlo, la lÃ­nea activa vuelve a animarse.' },
+      { title: 'Si algo no funciona', text: 'Busca terminales sin conectar, componentes desactivados y avisos en la esquina inferior derecha. Una red flotante no tiene referencia elÃ©ctrica completa.' },
+      { title: 'Guardar el trabajo', text: 'Ctrl+S conserva el proyecto en este navegador. Exportar genera un archivo .bitwire para archivarlo o trasladarlo a otro equipo.' },
+    ],
+    note: 'Consejo: empieza con pocos componentes y ejecuta despuÃ©s de cada cambio. AsÃ­ sabrÃ¡s exactamente quÃ© modificaciÃ³n altera el circuito.',
+  },
+  {
+    id: 'lienzo', group: 'FUNDAMENTOS', title: 'Lienzo, cÃ¡mara y navegaciÃ³n', icon: MousePointer2,
+    summary: 'Domina el plano virtual, el desplazamiento y la escala prÃ¡ctica de hasta 1.000.000.000Ã—.',
+    steps: [
+      'Usa la rueda sobre el punto que quieras ampliar; ese punto permanece anclado bajo el cursor.',
+      'MantÃ©n Espacio y arrastra, utiliza el botÃ³n central o activa la herramienta Mano con H.',
+      'Pulsa Encajar proyecto para recuperar todos los elementos visibles cuando te hayas alejado demasiado.',
+      'Usa Centrar origen para volver al punto de referencia del plano sin modificar los componentes.',
+    ],
+    details: [
+      { title: 'Rejilla adaptativa', text: 'La separaciÃ³n visible cambia automÃ¡ticamente con el zoom. El tamaÃ±o lÃ³gico de la cuadrÃ­cula sigue siendo estable para el encaje.' },
+      { title: 'Escala de inserciÃ³n', text: 'Un elemento colocado con mucho zoom puede ser microscÃ³pico respecto a otro insertado desde una vista general. Esta diferencia es intencionada.' },
+      { title: 'Ruta del lienzo', text: 'La miga de navegaciÃ³n superior indica si trabajas en el proyecto o dentro de un encapsulado. Cada nombre es un botÃ³n para regresar a ese nivel.' },
+      { title: 'Herramientas y cÃ¡mara', text: 'Cambiar entre SelecciÃ³n, Cable y Mano no altera el circuito. Escape cancela la acciÃ³n actual y vuelve a la herramienta de selecciÃ³n.' },
+    ],
+    note: 'El zoom no abre ventanas ni sustituye el lienzo: aumenta progresivamente la informaciÃ³n que se dibuja dentro de cada objeto.',
+  },
+  {
+    id: 'catalogo', group: 'FUNDAMENTOS', title: 'CatÃ¡logo y colocaciÃ³n de componentes', icon: Layers3,
+    summary: 'Encuentra sÃ­mbolos entre las categorÃ­as elÃ©ctricas, digitales, analÃ³gicas, RF, sensores y procesamiento.',
+    steps: [
+      'Escribe nombre, familia o funciÃ³n en el buscador del catÃ¡logo.',
+      'Expande una categorÃ­a y arrastra el componente al punto exacto del plano.',
+      'TambiÃ©n puedes hacer doble clic para insertarlo en el centro de la vista.',
+      'Selecciona varios elementos con MayÃºs o dibujando un recuadro sobre el lienzo.',
+    ],
+    details: [
+      { title: 'SÃ­mbolos repetidos', text: 'Un mismo concepto puede aparecer en distintas categorÃ­as cuando tiene usos elÃ©ctricos y electrÃ³nicos diferentes.' },
+      { title: 'Vectorial de verdad', text: 'Los sÃ­mbolos se generan como geometrÃ­a SVG. No pierden definiciÃ³n al ampliar y pueden revelar representaciones internas adicionales.' },
+      { title: 'Duplicar y girar', text: 'El inspector ofrece acciones rÃ¡pidas. La duplicaciÃ³n conserva parÃ¡metros y la rotaciÃ³n transforma tambiÃ©n la posiciÃ³n de sus terminales.' },
+      { title: 'Elementos complejos', text: 'Pantallas, osciloscopios, memorias y procesadores son macromodelos. Su comportamiento y profundidad visual se ampliarÃ¡n progresivamente.' },
+      { title: 'Displays LED', text: 'Aâ€“G controlan individualmente los siete segmentos; D1â€“D4 seleccionan el dÃ­gito multiplexado; la matriz cruza R0â€“R7 con C0â€“C7 y la barra responde a sus diez entradas.' },
+    ],
+    note: 'El catÃ¡logo SQLite y el catÃ¡logo integrado contienen las mismas definiciones; el indicador superior informa de la fuente cargada.',
+  },
+  {
+    id: 'inspector', group: 'EDICIÃ“N', title: 'SelecciÃ³n, valores e inspector', icon: Wrench,
+    summary: 'Edita parÃ¡metros elÃ©ctricos, posiciÃ³n, estado y conectividad sin perder espacio de lienzo.',
+    steps: [
+      'Haz clic sobre un componente o encapsulado para seleccionarlo.',
+      'Haz doble clic para abrir el inspector lateral cuando estÃ© plegado.',
+      'Modifica el valor y pulsa fuera del campo; el motor recibe el proyecto actualizado.',
+      'Usa la papelera del inspector o Supr para eliminar la selecciÃ³n y sus conexiones asociadas.',
+    ],
+    details: [
+      { title: 'EdiciÃ³n interna', text: 'Cuando el nivel de detalle es suficiente, determinados valores aparecen dentro del propio sÃ­mbolo y pueden cambiarse sin abrir el panel.' },
+      { title: 'Bloqueo y estado', text: 'Desactivar un elemento lo mantiene en el plano, pero lo excluye de la simulaciÃ³n. El inspector refleja su estado actual.' },
+      { title: 'SelecciÃ³n mÃºltiple', text: 'MayÃºs permite acumular elementos. Las operaciones colectivas deben realizarse con cuidado porque afectan a todas las piezas seleccionadas.' },
+      { title: 'Deshacer y rehacer', text: 'Ctrl+Z y Ctrl+Y recuperan cambios de estructura y propiedades. La simulaciÃ³n se recalcula con la versiÃ³n restaurada.' },
+    ],
+    note: 'El inspector comienza plegado para reservar espacio al plano y se abre automÃ¡ticamente cuando una acciÃ³n necesita mostrar propiedades.',
+  },
+  {
+    id: 'cables', group: 'EDICIÃ“N', title: 'Cableado, nodos y rutas', icon: Cable,
+    summary: 'Crea conexiones rectas, ortogonales o BÃ©zier y reorganiza su recorrido sin alterar la red elÃ©ctrica.',
+    steps: [
+      'Activa Cable desde la paleta vertical del lienzo â€”o con Wâ€” y pulsa un terminal disponible.',
+      'Pulsa el segundo terminal. BitWire crea una red con el estilo elegido en ConfiguraciÃ³n â€”el engranaje superior derechoâ€”.',
+      'Selecciona el cable para abrir el editor flotante de conexiÃ³n.',
+      'Haz doble clic en un tramo para aÃ±adir un nodo y arrÃ¡stralo hasta despejar el esquema.',
+      'Haz doble clic sobre un nodo para eliminarlo o utiliza Limpiar nodos para recalcular la ruta.',
+    ],
+    details: [
+      { title: 'Ortogonal', text: 'Produce Ã¡ngulos rectos y es la opciÃ³n mÃ¡s legible para planos densos.' },
+      { title: 'BÃ©zier', text: 'Utiliza los nodos como puntos de control para formar curvas suaves y separar redes superpuestas.' },
+      { title: 'Recta', text: 'Une los terminales por el camino mÃ­nimo. Resulta Ãºtil en diseÃ±os sencillos y conexiones internas cortas.' },
+      { title: 'Etiqueta anclada', text: 'La lectura de tensiÃ³n, corriente, lÃ³gica o potencia se coloca a mitad de la longitud real del trazado. Al mover o eliminar nodos, acompaÃ±a siempre al cable.' },
+      { title: 'Lectura del flujo', text: 'La base indica continuidad; los pulsos discontinuos aparecen Ãºnicamente cuando la red estÃ¡ activa y el motor se estÃ¡ ejecutando.' },
+    ],
+    note: 'Mover un nodo cambia solamente la geometrÃ­a visual. Los extremos elÃ©ctricos continÃºan conectados a los mismos terminales.',
+  },
+  {
+    id: 'simulacion', group: 'SIMULACIÃ“N', title: 'Ejecutar, pausar y leer seÃ±ales', icon: Cpu,
+    summary: 'Comprende quÃ© calcula el motor y cÃ³mo interpretar tensiÃ³n, corriente, potencia y lÃ³gica.',
+    steps: [
+      'Abre el engranaje superior derecho y selecciona la magnitud visible: TensiÃ³n, Corriente, LÃ³gica 0/1 o Potencia.',
+      'Usa el bloque central destacado: Ejecutar inicia la simulaciÃ³n continua y Paso avanza una iteraciÃ³n estando en pausa.',
+      'Ajusta la velocidad entre 0,25Ã— y 10Ã— segÃºn necesites observar transitorios o estados estables.',
+      'Lee las etiquetas sobre cada red y consulta los instrumentos para estudiar su evoluciÃ³n temporal.',
+    ],
+    details: [
+      { title: 'TensiÃ³n', text: 'Es la diferencia de potencial entre la red y su referencia. Se expresa normalmente en voltios.' },
+      { title: 'Corriente', text: 'Indica el flujo elÃ©ctrico estimado. BitWire muestra amperios o miliamperios segÃºn la magnitud.' },
+      { title: 'Potencia', text: 'Se calcula a partir de tensiÃ³n y corriente. Permite localizar cargas y etapas con mayor consumo.' },
+      { title: 'LÃ³gica', text: 'Los estados digitales pueden ser 0, 1, flotante Z o indeterminado. Una entrada sin referencia no siempre equivale a cero.' },
+      { title: 'AnimaciÃ³n de corriente', text: 'EstÃ¡ activada por defecto. Puede ocultarse desde ConfiguraciÃ³n sin detener el motor ni alterar el cÃ¡lculo elÃ©ctrico.' },
+    ],
+    note: 'Los colores ayudan a distinguir estados, pero el valor numÃ©rico o lÃ³gico de la etiqueta es la referencia principal.',
+  },
+  {
+    id: 'encapsulados', group: 'ARQUITECTURA', title: 'Encapsulados y lienzos internos', icon: Box,
+    summary: 'Agrupa circuitos, define patillas externas y construye chips reutilizables con niveles internos anidados.',
+    steps: [
+      'Activa Crear encapsulado y dibuja el rectÃ¡ngulo que contendrÃ¡ el circuito.',
+      'Selecciona el Ã¡rea para redimensionarla, nombrarla y elegir si se presenta como Ã¡rea o como chip.',
+      'Usa la barra superior de patillas para aÃ±adir entradas o salidas a izquierda, derecha, arriba o abajo. BitWire las reparte de forma equidistante en cada lado.',
+      'Abre el lienzo interno y conecta los terminales fijos del borde con los componentes del circuito.',
+      'Guarda el encapsulado en la biblioteca o expÃ³rtalo como .bitwire-module.',
+    ],
+    details: [
+      { title: 'Mapa exterior protegido', text: 'Desde el nivel superior se muestra un resumen autoajustado y recortado dentro del contorno. Ese mapa no se puede seleccionar, mover ni borrar: el encapsulado se comporta como una sola pieza.' },
+      { title: 'Interior independiente', text: 'El contenido usa su propio lienzo y su propia cÃ¡mara. Haz doble clic o usa Entrar en el lienzo interno para editarlo.' },
+      { title: 'ComunicaciÃ³n exterior', text: 'Las patillas son la Ãºnica frontera pÃºblica. Los cables que intenten atravesar directamente un encapsulado quedan aislados y generan un aviso.' },
+      { title: 'Autoespaciado', text: 'Al aÃ±adir, mover de lado o eliminar una patilla, las restantes se redistribuyen uniformemente. La posiciÃ³n numÃ©rica continÃºa disponible para ajustes deliberados.' },
+      { title: 'Anidamiento', text: 'Puedes crear encapsulados dentro de otros. La ruta superior permite volver a cualquier antecesor sin destruir el estado interno.' },
+      { title: 'Biblioteca local', text: 'Los mÃ³dulos guardados se almacenan en el navegador. Exportarlos es la forma segura de conservarlos fuera de ese dispositivo.' },
+    ],
+    note: 'Antes de guardar un chip, asigna nombres claros a todas sus patillas y prueba el lienzo interno de manera aislada.',
+  },
+  {
+    id: 'instrumentos', group: 'SIMULACIÃ“N', title: 'Banco de instrumentos', icon: Activity,
+    summary: 'Combina vistas generales y abre el frontal independiente de cada instrumento conectado al circuito.',
+    steps: [
+      'Abre Vistas en la cabecera del banco inferior.',
+      'Activa simultÃ¡neamente osciloscopio, analizador lÃ³gico, multÃ­metro, potencia, espectro o frecuencÃ­metro.',
+      'Pulsa con el botÃ³n derecho sobre un instrumento del plano y elige Abrir interfaz del instrumento.',
+      'Arrastra la barra de tÃ­tulo, redimensiona desde la esquina y usa la flecha para desplegar los controles profesionales.',
+      'Desactiva cualquier vista para retirarla sin detener el motor ni perder muestras.',
+      'Pliega todo el banco cuando necesites dedicar la altura completa al lienzo.',
+    ],
+    details: [
+      { title: 'Medida por instancia', text: 'Cada aparato resuelve exclusivamente los cables unidos a sus patillas. Dos osciloscopios conectados a redes distintas conservan grÃ¡ficas e historiales diferentes.' },
+      { title: 'Osciloscopio profesional', text: 'La vista extendida incorpora CH1/CH2, volts/div, tiempo/div, posiciÃ³n, acoplamiento, memoria, ancho de banda, adquisiciÃ³n y disparo.' },
+      { title: 'Analizador lÃ³gico', text: 'Muestra estados binarios y transiciones. Es la vista adecuada para relojes, puertas, buses y secuencias.' },
+      { title: 'Medidas elÃ©ctricas', text: 'MultÃ­metro y monitor de potencia resumen los valores instantÃ¡neos y el consumo agregado de las redes activas.' },
+      { title: 'Frecuencia y espectro', text: 'El frecuencÃ­metro estima transiciones por segundo; el espectro ofrece una lectura relativa del contenido frecuencial de la muestra.' },
+    ],
+    note: 'El botÃ³n derecho abre el menÃº propio de BitWire. El navegador ya no intercepta esa interacciÃ³n dentro del laboratorio.',
+  },
+  {
+    id: 'profundidad', group: 'ARQUITECTURA', title: 'Zoom semÃ¡ntico y composiciÃ³n interna', icon: Gauge,
+    summary: 'Interpreta los niveles de detalle que transforman un bloque funcional en su estructura electrÃ³nica y fÃ­sica.',
+    steps: [
+      'Observa el indicador LOD de la esquina superior derecha del lienzo.',
+      'AmplÃ­a sobre un sÃ­mbolo hasta pasar de vista esquemÃ¡tica a funcional y de dispositivo a estructura fÃ­sica.',
+      'En puertas lÃ³gicas, estudia primero la red equivalente y despuÃ©s la implementaciÃ³n CMOS.',
+      'En semiconductores, identifica regiones P/N, uniones, zona de agotamiento, puerta, base o canal.',
+    ],
+    details: [
+      { title: 'LOD 0 â€” Encapsulado', text: 'Prioriza identidad, contorno y terminales. Es la vista apropiada para sistemas grandes.' },
+      { title: 'LOD 1/2 â€” Esquema y funciÃ³n', text: 'Muestra el sÃ­mbolo normalizado, valores esenciales y la relaciÃ³n lÃ³gica o elÃ©ctrica entre entradas y salidas.' },
+      { title: 'LOD 3 â€” Dispositivo', text: 'Revela redes internas, transistores, contactos y bloques que explican el comportamiento del componente.' },
+      { title: 'LOD 4 â€” FÃ­sico', text: 'Introduce regiones dopadas, uniones y detalles materiales. Es un modelo educativo, no una mÃ¡scara de fabricaciÃ³n completa.' },
+    ],
+    note: 'La profundidad depende del producto del zoom del lienzo y la escala propia del componente.',
+  },
+  {
+    id: 'archivos', group: 'PROYECTO', title: 'Proyectos, guardado e intercambio', icon: FolderOpen,
+    summary: 'Diferencia entre guardado local, exportaciÃ³n del proyecto y biblioteca de encapsulados.',
+    steps: [
+      'Nuevo crea un proyecto vacÃ­o despuÃ©s de advertir si existen cambios sin guardar.',
+      'Abrir importa un archivo .bitwire o JSON compatible.',
+      'Guardar escribe la versiÃ³n actual en el almacenamiento local del navegador.',
+      'Exportar descarga un archivo transportable con componentes, redes, mÃ³dulos y ajustes del proyecto.',
+      'Modo offline detecta Windows, macOS o Linux y descarga la aplicaciÃ³n portable adecuada.',
+    ],
+    details: [
+      { title: 'Guardado local', text: 'Es rÃ¡pido y cÃ³modo, pero pertenece al navegador y dispositivo actuales. Borrar los datos del sitio puede eliminarlo.' },
+      { title: 'Archivo .bitwire', text: 'Es JSON versionado y legible. Sirve como copia de seguridad y como formato de intercambio entre equipos.' },
+      { title: 'Archivo de mÃ³dulo', text: 'Un .bitwire-module contiene un encapsulado reutilizable y sus niveles descendientes, no el proyecto completo.' },
+      { title: 'Compatibilidad', text: 'BitWire valida las referencias de los cables al importar. Un archivo con terminales inexistentes se rechaza para evitar grafos corruptos.' },
+      { title: 'AplicaciÃ³n portable', text: 'Los ejecutables se compilan previamente en GitHub Actions e incluyen interfaz, catÃ¡logo y motor. El usuario no necesita consola, Node.js, Python ni un instalador.' },
+    ],
+    note: 'Para trabajos importantes, combina Guardar durante la ediciÃ³n con exportaciones periÃ³dicas versionadas.',
+  },
+  {
+    id: 'diagnostico', group: 'REFERENCIA', title: 'DiagnÃ³stico de problemas frecuentes', icon: CircleHelp,
+    summary: 'Resuelve rÃ¡pidamente fallos de selecciÃ³n, redes sin seÃ±al, cÃ¡mara perdida y mÃ³dulos aparentemente vacÃ­os.',
+    steps: [
+      'Si un componente no se mueve, confirma que estÃ¡ seleccionado, no bloqueado y que la herramienta activa es SelecciÃ³n.',
+      'Si una red no se anima, ejecuta el motor y comprueba que la fuente, el retorno y los elementos intermedios forman un recorrido vÃ¡lido.',
+      'Si no encuentras el circuito, pulsa Encajar proyecto.',
+      'Si el interior de un mÃ³dulo parece vacÃ­o, revisa la ruta superior y las patillas fijas del borde.',
+    ],
+    details: [
+      { title: 'Valor â€œâ€”â€', text: 'No existe una medida activa o la red estÃ¡ flotante. Comprueba referencias, alimentaciÃ³n y continuidad.' },
+      { title: 'Estado Z', text: 'La lÃ­nea digital estÃ¡ en alta impedancia. Necesita una fuente lÃ³gica o una resistencia de polarizaciÃ³n segÃºn el diseÃ±o.' },
+      { title: 'Avisos del motor', text: 'El contador inferior agrupa advertencias de simulaciÃ³n. Pausa y revisa conexiones antes de ampliar el circuito.' },
+      { title: 'Rendimiento', text: 'Pliega instrumentos que no uses, trabaja por encapsulados y evita mostrar valores superpuestos en miles de redes simultÃ¡neamente.' },
+    ],
+    note: 'Cuando investigues un problema complejo, crea una copia y reduce el circuito hasta el conjunto mÃ­nimo que todavÃ­a reproduzca el fallo.',
+  },
+  {
+    id: 'atajos', group: 'REFERENCIA', title: 'Atajos y vocabulario esencial', icon: BookOpen,
+    summary: 'Consulta los controles principales y los conceptos que aparecen en la interfaz.',
+    steps: [
+      'V: selecciÃ³n Â· W: cable Â· H: mano Â· Espacio + arrastre: desplazar.',
+      'Ctrl+S: guardar Â· Ctrl+N: nuevo Â· Ctrl+Z: deshacer Â· Ctrl+Y: rehacer.',
+      'Supr o Retroceso: eliminar Â· Escape: cancelar selecciÃ³n o herramienta.',
+      'Rueda: zoom Â· MayÃºs + clic: selecciÃ³n mÃºltiple Â· Doble clic: inspector o navegaciÃ³n interna.',
+    ],
+    details: [
+      { title: 'Terminal', text: 'Punto interactivo de entrada, salida, alimentaciÃ³n o referencia de un componente.' },
+      { title: 'Red', text: 'Conjunto de puntos elÃ©ctricamente conectados mediante uno o mÃ¡s cables.' },
+      { title: 'Encapsulado', text: 'Contenedor jerÃ¡rquico con circuito interno y una interfaz exterior formada por patillas.' },
+      { title: 'LOD', text: 'Nivel de detalle semÃ¡ntico elegido segÃºn el zoom efectivo de la vista y del componente.' },
+    ],
+    note: 'MantÃ©n el cursor sobre cualquier botÃ³n para consultar su funciÃ³n y, cuando exista, el atajo asociado.',
+  },
+];
 
-Ý\][R[™^
-OOHÙ^O^ÜÝ\OžÔÝš[™Ê][R[™^
-ÌJKœYÝ\
-‹	Ì	Ê_OØÜ[žÜÝ\OÜÜ[ÛOŠ_OÛÛÜÙXÝ[Û‚ˆÙXÝ[ÛˆÛ\ÜÓ˜[YOH™ÝZYKY]Z[YÜšYžØXÝ]™K™]Z[Ë›X\
-][OO]ˆÙ^O^Ú][K]_OžÚ][K]_OÚžÚ][K^OÜÙ]Š_OÜÙXÝ[Û‚ˆ\ÚYHÛ\ÜÓ˜[YOH™ÝZYK[›ÝHÚ\˜ÛR[Ú^™O^ÌMßKÏžØXÝ]™K››Ý_OÜØ\ÚYO‚ˆ›ÛÝ\ˆÛ\ÜÓ˜[YOH™ÝZYK[˜]šYØ][Ûˆ‚ˆ]Ûˆ\ØX›Y^Ú[™^OOLHÛÛXÚÏ^Ê
-OOœÙ]XÝ]™RY
-ÕRQVÚ[™^LWKšY
-_OÚ]œ›Û“YÚ^™O^ÌM_KÏ[\š[ÜØ]Û‚ˆÜ[žÚ[™^
-Ì_HÈÑÕRQK›[™ÝOÜÜ[‚ˆ]Ûˆ\ØX›Y^Ú[™^OOQÕRQK›[™ÝL_HÛÛXÚÏ^Ê
-OOœÙ]XÝ]™RY
-ÕRQVÚ[™^
-ÌWKšY
-_O”ÚYÝZY[OÚ]œ›Û”šYÚÚ^™O^ÌM_KÏØ]Û‚ˆÙ›ÛÝ\‚ˆØ\XÛO‚ˆÙ]‚ˆÜÙXÝ[Û‚ˆÙ]ŽÂŸB
+export function HelpGuide({ onClose }: Props) {
+  const [activeId, setActiveId] = useState(GUIDE[0].id);
+  const [query, setQuery] = useState('');
+  const filtered = useMemo(() => {
+    const needle = query.trim().toLocaleLowerCase('es');
+    if (!needle) return GUIDE;
+    return GUIDE.filter(section => [section.title,section.summary,section.group,...section.steps,...section.details.flatMap(item=>[item.title,item.text])].join(' ').toLocaleLowerCase('es').includes(needle));
+  }, [query]);
+
+  useEffect(() => {
+    if (filtered.length && !filtered.some(section => section.id === activeId)) setActiveId(filtered[0].id);
+  }, [activeId, filtered]);
+
+  const active = GUIDE.find(section => section.id === activeId) ?? GUIDE[0];
+  const index = GUIDE.findIndex(section => section.id === active.id);
+  const Icon = active.icon;
+
+  return <div className="modal-backdrop guide-backdrop" onMouseDown={onClose}>
+    <section className="help-guide" onMouseDown={event => event.stopPropagation()} aria-label="GuÃ­a completa de BitWire">
+      <header className="guide-header">
+        <div className="guide-title"><BookOpen size={21}/><div><span className="eyebrow">MANUAL INTERACTIVO</span><h2>GuÃ­a completa de BitWire</h2></div></div>
+        <label className="guide-search"><Search size={15}/><input value={query} onChange={event=>setQuery(event.target.value)} placeholder="Buscar cableado, encapsulados, LODâ€¦"/></label>
+        <button className="guide-close" onClick={onClose} aria-label="Cerrar guÃ­a"><X size={19}/></button>
+      </header>
+      <div className="guide-layout">
+        <aside className="guide-index">
+          <div className="guide-index-summary"><strong>{GUIDE.length}</strong><span>capÃ­tulos Â· desde el primer circuito hasta la arquitectura jerÃ¡rquica</span></div>
+          <nav aria-label="Ãndice de la guÃ­a">
+            {filtered.map(section => {
+              const ItemIcon=section.icon;
+              return <button key={section.id} className={section.id===active.id?'active':''} onClick={()=>setActiveId(section.id)}>
+                <ItemIcon size={15}/><span><small>{section.group}</small><strong>{section.title}</strong></span>
+              </button>;
+            })}
+            {!filtered.length && <p className="guide-no-results">No hay capÃ­tulos que coincidan con la bÃºsqueda.</p>}
+          </nav>
+        </aside>
+        <article className="guide-content" key={active.id}>
+          <div className="guide-chapter-heading"><span><Icon size={23}/></span><div><small>{active.group} Â· CAPÃTULO {index+1}</small><h3>{active.title}</h3><p>{active.summary}</p></div></div>
+          <section className="guide-tutorial"><h4>TUTORIAL PASO A PASO</h4><ol>{active.steps.map((step,itemIndex)=><li key={step}><b>{String(itemIndex+1).padStart(2,'0')}</b><span>{step}</span></li>)}</ol></section>
+          <section className="guide-detail-grid">{active.details.map(item=><div key={item.title}><h4>{item.title}</h4><p>{item.text}</p></div>)}</section>
+          <aside className="guide-note"><CircleHelp size={17}/><p>{active.note}</p></aside>
+          <footer className="guide-navigation">
+            <button disabled={index===0} onClick={()=>setActiveId(GUIDE[index-1].id)}><ChevronLeft size={15}/>Anterior</button>
+            <span>{index+1} / {GUIDE.length}</span>
+            <button disabled={index===GUIDE.length-1} onClick={()=>setActiveId(GUIDE[index+1].id)}>Siguiente<ChevronRight size={15}/></button>
+          </footer>
+        </article>
+      </div>
+    </section>
+  </div>;
+}
