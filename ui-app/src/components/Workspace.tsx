@@ -235,6 +235,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
 
   const onComponentDown = (event: React.PointerEvent<SVGGElement>, component: ComponentInstance) => {
     event.stopPropagation();
+    if (event.button === 2) return;
     if (tool === 'pan' || event.button === 1 || spaceHeld) {
       const local = localPoint(event);
       setCurrentInteraction({ type: 'pan', start: local, origin: viewport });
@@ -268,6 +269,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
 
   const onPin = (event: React.PointerEvent<SVGCircleElement>, component: ComponentInstance, pin: PinDefinition) => {
     event.stopPropagation();
+    if (event.button !== 0) return;
     connectPin({ componentId: component.id, pinId: pin.id });
   };
 
@@ -313,6 +315,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
 
   const onModuleDown = (event: React.PointerEvent<SVGGElement>, module: ModuleArea) => {
     event.stopPropagation();
+    if (event.button === 2) return;
     onSelected([]); onSelectedModule(module.id); setSelectedWireId(undefined);
     if (tool !== 'select' || activeModuleId === module.id) return;
     const world = screenToWorld(localPoint(event), viewport);
@@ -329,6 +332,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
 
   const onWireDown = (event: React.PointerEvent<SVGPathElement>, wire: Wire, from: Point, to: Point) => {
     event.stopPropagation();
+    if (event.button === 2) return;
     setSelectedWireId(wire.id); onSelected([]); onSelectedModule(undefined);
     if (event.detail > 1) return;
     const world = screenToWorld(localPoint(event), viewport);

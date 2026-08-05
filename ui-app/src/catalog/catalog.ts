@@ -74,7 +74,7 @@ export async function verifyCatalogDatabase(): Promise<CatalogDatabaseStatus> {
   try {
     const base = import.meta.env.BASE_URL;
     const SQL = await initSqlJs({ locateFile: () => `${base}sql-wasm.wasm` });
-    const response = await fetch(`${base}catalog.db`);
+    const response = await fetch(`${base}catalog.db?v=${EMBEDDED_CATALOG.length}`, { cache: 'no-store' });
     if (!response.ok) throw new Error('database unavailable');
     const db = new SQL.Database(new Uint8Array(await response.arrayBuffer()));
     const result = db.exec('SELECT COUNT(*) AS count FROM components');
