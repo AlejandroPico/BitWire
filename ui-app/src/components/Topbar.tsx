@@ -1,57 +1,182 @@
-şº(·úk¡ø¥zX§{ßİzÿçºYOz¹¢²È¨×§‰çZ[\ÜÂˆXİ]š]Kš[˜\KØX›KÚXÚËÚ]œ›Û‘İÛ‹Ú\˜ÛQØ]YÙKÛÜ›™\‘İÛ”šYÚİÛ›ØYˆ^YKš[T\Ì‹›Û\“Ü[‹Ø]YÙKÜšYÖË\ÜZ[\Ë]\ÙK^K™YÌ‹ˆ›İ]KØ]™KÙ][™ÜÌ‹Ü[™Kİ\›ÜØ\™YÜË[™Ì‹˜\ŸHœ›ÛH	ÛXÚYK\™XXİ	ÎÂš[\ÜÈ\ÙQY™™Xİ\ÙT™Y‹\ÙTİ]K\H™XXİ›ÙHHœ›ÛH	Ü™XXİ	ÎÂš[\Ü\HÈ›Ú™XİÙ][™ÜË[YHHœ›ÛH	Ë‹‹Û[Ù[İ\\ÉÎÂš[\ÜÈSQWÑQ’S’USÓ”ÈHœ›ÛH	Ë‹‹İ[YKİ[Y\ÉÎÂ‚š[\™˜XÙH›ÜÈÂˆ›Ú™Xİ˜[YNˆİš[™ÎÂˆ[›š[™Îˆ›ÛÛX[ÂˆÜYYˆ[X™\ÂˆÙ][™ÜÎˆ›Ú™XİÙ][™ÜÎÂˆØ[•[™Îˆ›ÛÛX[ÂˆØ[”™YÎˆ›ÛÛX[Âˆ\Nˆ›ÛÛX[Âˆ[YNˆ[YNÂˆÛ”[Š
-Nˆ›ÚYÂˆÛ”İ\
+import {
+  Activity, Binary, Cable, Check, ChevronDown, CircleGauge, CornerDownRight, Download,
+  Eye, FilePlus2, FolderOpen, Gauge, Grid3X3, Laptop, Minus, Pause, Play, Redo2,
+  Route, Save, Settings2, Spline, StepForward, Tags, Undo2, Zap,
+} from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import type { ProjectSettings, Theme } from '../model/types';
+import { THEME_DEFINITIONS } from '../theme/themes';
 
-Nˆ›ÚYÂˆÛ”ÜYY
-ÜYYˆ[X™\ŠNˆ›ÚYÂˆÛ”Ù][™ÜÊ]Úˆ\X[›Ú™XİÙ][™ÜÏŠNˆ›ÚYÂˆÛ“™]Ê
-Nˆ›ÚYÂˆÛ”Ø]™J
-Nˆ›ÚYÂˆÛ’[\Ü
+interface Props {
+  projectName: string;
+  running: boolean;
+  speed: number;
+  settings: ProjectSettings;
+  canUndo: boolean;
+  canRedo: boolean;
+  dirty: boolean;
+  theme: Theme;
+  onRun(): void;
+  onStep(): void;
+  onSpeed(speed: number): void;
+  onSettings(patch: Partial<ProjectSettings>): void;
+  onNew(): void;
+  onSave(): void;
+  onImport(): void;
+  onExport(): void;
+  onOffline(): void;
+  onUndo(): void;
+  onRedo(): void;
+  onTheme(theme: Theme): void;
+}
 
-Nˆ›ÚYÂˆÛ‘^Ü
+const SIGNAL_OPTIONS = [
+  { value: 'voltage' as const, label: 'TensiÃ³n', detail: 'Voltios en cada red', icon: <Zap size={15}/> },
+  { value: 'current' as const, label: 'Corriente', detail: 'Flujo en amperios', icon: <Cable size={15}/> },
+  { value: 'logic' as const, label: 'LÃ³gica 0/1', detail: 'Estados digitales', icon: <Binary size={15}/> },
+  { value: 'power' as const, label: 'Potencia', detail: 'Consumo en vatios', icon: <Gauge size={15}/> },
+];
 
-Nˆ›ÚYÂˆÛ“Ù™›[™J
-Nˆ›ÚYÂˆÛ•[™Ê
-Nˆ›ÚYÂˆÛ”™YÊ
-Nˆ›ÚYÂˆÛ•[YJ[YNˆ[YJNˆ›ÚYÂŸB‚˜ÛÛœİÒQÓSÓÔSÓ”ÈHÂˆÈ˜[YNˆ	İ›ÛYÙIÈ\ÈÛÛœİX™[ˆ	Õ[œÚpìÛ‰Ë]Z[ˆ	Õ›Û[ÜÈ[ˆØYH™Y	ËXÛÛˆ˜\Ú^™O^ÌM_KÏˆKˆÈ˜[YNˆ	Øİ\œ™[	È\ÈÛÛœİX™[ˆ	ĞÛÜœšY[IË]Z[ˆ	Ñ›Z›È[ˆ[\\š[ÜÉËXÛÛˆØX›HÚ^™O^ÌM_KÏˆKˆÈ˜[YNˆ	ÛÙÚXÉÈ\ÈÛÛœİX™[ˆ	Ó0ìÙÚXØHÌIË]Z[ˆ	Ñ\İYÜÈYÚ][\ÉËXÛÛˆš[˜\HÚ^™O^ÌM_KÏˆKˆÈ˜[YNˆ	ÜİÙ\‰È\ÈÛÛœİX™[ˆ	Ôİ[˜ÚXIË]Z[ˆ	ĞÛÛœİ[[È[ˆ˜][ÜÉËXÛÛˆØ]YÙHÚ^™O^ÌM_KÏˆK—NÂ‚˜ÛÛœİ“ÕUS‘×ÓÔSÓ”ÈHÂˆÈ˜[YNˆ	ÛÜÙÛÛ˜[	È\ÈÛÛœİX™[ˆ	ÓÜÙÛÛ˜[	Ë]Z[ˆ	ğà[™İ[ÜÈHL0¬	ËXÛÛˆÛÜ›™\‘İÛ”šYÚÚ^™O^ÌM_KÏˆKˆÈ˜[YNˆ	Ø™^šY\‰È\ÈÛÛœİX™[ˆ	Ğ°ê^šY\‰Ë]Z[ˆ	Ğİ\˜\ÈİX]™\ÉËXÛÛˆÜ[™HÚ^™O^ÌM_KÏˆKˆÈ˜[YNˆ	Üİ˜ZYÚ	È\ÈÛÛœİX™[ˆ	Ô™XİÉË]Z[ˆ	Ñ\İ[˜ÚXHpë[š[XIËXÛÛˆZ[\ÈÚ^™O^ÌM_KÏˆK—NÂ‚˜ÛÛœİÔQQÓÔSÓ”ÈHËŒKKK‹KLK›X\
-˜[YHOˆ
-Âˆ˜[YKˆX™[ˆ	Ôİš[™Ê˜[YJKœ™\XÙJ	Ë‰Ë	Ë	Ê_påØˆ]Z[ˆ˜[YHHÈ	Ğğè[X\˜H[IÈˆ˜[YHOOHHÈ	ÕY[\È›Ü›X[	Èˆ	ĞXÙ[\˜YÉËˆXÛÛˆÚ\˜ÛQØ]YÙHÚ^™O^ÌM_KÏ‹ŸJJNÂ‚™^Ü[˜İ[ÛˆÜ˜\Š›ÜÎˆ›ÜÊHÂˆ™]\›ˆXY\ˆÛ\ÜÓ˜[YOHÜ˜\ˆ‚ˆ]ˆÛ\ÜÓ˜[YOHÜ˜\‹[Y‚ˆ˜]ˆÛ\ÜÓ˜[YOHÛÛ˜\‹YÜ›İ\š[K]ÛÛÈˆ\šXK[X™[H\˜Ú]›È‚ˆ]ÛˆÛÛXÚÏ^Ü›ÜË›Û“™]ßH]OH”›ŞYXİÈY]›È
-İ›
-ÓŠHš[T\ÌˆÚ^™O^ÌMŸKÏÜ[“Y]›ÏÜÜ[Ø]Û‚ˆ]ÛˆÛÛXÚÏ^Ü›ÜË›Û’[\ÜH]OHXœš\ˆÈ[\Ü\ˆ˜š]Ú\™H›Û\“Ü[ˆÚ^™O^ÌMŸKÏÜ[Xœš\ÜÜ[Ø]Û‚ˆ]ÛˆÛÛXÚÏ^Ü›ÜË›Û”Ø]™_H]OH‘İX\™\ˆ[ˆ\İH\ÜÜÚ]]›È
-İ›
-ÔÊHØ]™HÚ^™O^ÌMŸKÏÜ[‘İX\™\ÜÜ[Ø]Û‚ˆ]ÛˆÛÛXÚÏ^Ü›ÜË›Û‘^ÜH]OH‘^Ü\ˆ˜š]Ú\™HİÛ›ØYÚ^™O^ÌMŸKÏÜ[‘^Ü\ÜÜ[Ø]Û‚ˆ]ÛˆÛ\ÜÓ˜[YOH›Ù™›[™KXXİ[ÛˆˆÛÛXÚÏ^Ü›ÜË›Û“Ù™›[™_H]OH‘\ØØ\™Ø\ˆš]Ú\™HÜX›H\ÜÚ^™O^ÌMŸKÏÜ[“[ÙÈÙ™›[™OÜÜ[Ø]Û‚ˆÛ˜]‚ˆ˜]ˆÛ\ÜÓ˜[YOHÛÛ˜\‹YÜ›İ\\İÜK]ÛÛÈˆ\šXK[X™[H’\İÜšX[‚ˆ]ÛˆÛÛXÚÏ^Ü›ÜË›Û•[™ßH\ØX›Y^È\›ÜË˜Ø[•[™ßH]OH‘\ÚXÙ\ˆ[™ÌˆÚ^™O^ÌMŸKÏØ]Û‚ˆ]ÛˆÛÛXÚÏ^Ü›ÜË›Û”™YßH\ØX›Y^È\›ÜË˜Ø[”™YßH]OH”™ZXÙ\ˆ™YÌˆÚ^™O^ÌMŸKÏØ]Û‚ˆÛ˜]‚ˆÙ]‚‚ˆ]ˆÛ\ÜÓ˜[YOHÜ˜\‹XÙ[\ˆ‚ˆ]ˆÛ\ÜÓ˜[YOHœ›Ú™Xİ]]Hˆ]O^Ü›ÜËœ›Ú™Xİ˜[Y_O‚ˆÜ[ˆÛ\ÜÓ˜[YO^Ü›ÜË™\HÈ	Ù\KYİ	Èˆ	ÜØ]™YYİ	ßKÏÜ[Ü›ÜËœ›Ú™Xİ˜[Y_OÜÜ[‚ˆÙ]‚ˆ˜]ˆÛ\ÜÓ˜[YOHœÚ[][][Û‹XÛÛ[X[™ˆ\šXK[X™[HÛÛ›Ûš[˜Ú\[HÚ[][XÚpìÛˆ‚ˆÜ[ˆÛ\ÜÓ˜[YO^ØÚ[][][Û‹\İ]H	Ü›ÜËœ[›š[™ÈÈ	Ü[›š[™ÉÈˆ	ÉßXOKÏÜ›ÜËœ[›š[™ÈÈ	ÑSˆPTÒIÈˆ	ÑSˆUTĞIßOÜÜ[‚ˆ]ÛˆÛ\ÜÓ˜[YO^Ü›ÜËœ[›š[™ÈÈ	ÜİÜXXİ[Û‰Èˆ	Ü[‹XXİ[Û‰ßHÛÛXÚÏ^Ü›ÜË›Û”[ŸO‚ˆÜ›ÜËœ[›š[™ÈÈ]\ÙHÚ^™O^ÌMßKÏˆˆ^HÚ^™O^ÌMßKÏŸOÜ[Ü›ÜËœ[›š[™ÈÈ	Ô]\Ø\‰Èˆ	ÑZ™Xİ]\‰ßOÜÜ[‚ˆØ]Û‚ˆ]ÛˆÛ\ÜÓ˜[YOHœİ\XXİ[ÛˆˆÛÛXÚÏ^Ü›ÜË›Û”İ\H\ØX›Y^Ü›ÜËœ[›š[™ßH]OH]˜[˜\ˆ[˜H]\˜XÚpìÛˆ‚ˆİ\›ÜØ\™Ú^™O^ÌMŸKÏÜ[”\ÛÏÜÜ[‚ˆØ]Û‚ˆÛÛ˜\“Y[H˜[YO^Ü›ÜËœÜYYHÜ[ÛœÏ^ÔÔQQÓÔSÓ”ßHÛÚ[™ÙO^Ü›ÜË›Û”ÜYYHX™[H•™[ØÚYYHÚ[][XÚpìÛˆˆÛÛ\XİÏ‚ˆÛ˜]‚ˆÙ]‚‚ˆ]ˆÛ\ÜÓ˜[YOHÜ˜\‹\šYÚ‚ˆÙ][™ÜÓY[HÙ][™ÜÏ^Ü›ÜËœÙ][™ÜßH[YO^Ü›ÜË[Y_HÛ”Ù][™ÜÏ^Ü›ÜË›Û”Ù][™ÜßHÛ•[YO^Ü›ÜË›Û•[Y_KÏ‚ˆÙ]‚ˆÚXY\ÂŸB‚™[˜İ[ÛˆÙ][™ÜÓY[JÈÙ][™ÜË[YKÛ”Ù][™ÜËÛ•[YHNˆÂˆÙ][™ÜÎˆ›Ú™XİÙ][™ÜÎÂˆ[YNˆ[YNÂˆÛ”Ù][™ÜÊ]Úˆ\X[›Ú™XİÙ][™ÜÏŠNˆ›ÚYÂˆÛ•[YJ[YNˆ[YJNˆ›ÚYÂŸJHÂˆÛÛœİÛÜ[‹Ù]Ü[—O]\ÙTİ]J˜[ÙJNÂˆÛÛœİ›Ûİ]\ÙT™YS]‘[[Y[Š[
-NÂˆ\ÙQY™™Xİ
+const ROUTING_OPTIONS = [
+  { value: 'orthogonal' as const, label: 'Ortogonal', detail: 'Ãngulos de 90Â°', icon: <CornerDownRight size={15}/> },
+  { value: 'bezier' as const, label: 'BÃ©zier', detail: 'Curvas suaves', icon: <Spline size={15}/> },
+  { value: 'straight' as const, label: 'Recto', detail: 'Distancia mÃ­nima', icon: <Minus size={15}/> },
+];
 
+const SPEED_OPTIONS = [.25, .5, 1, 2, 5, 10].map(value => ({
+  value,
+  label: `${String(value).replace('.', ',')}Ã—`,
+  detail: value < 1 ? 'CÃ¡mara lenta' : value === 1 ? 'Tiempo normal' : 'Acelerado',
+  icon: <CircleGauge size={15}/>,
+}));
 
-OOÂˆYŠ[Ü[Š\™]\›ÂˆÛÛœİİ]ÚYOJ]™[”Ú[\‘]™[
-OOÚYŠ\›Ûİ˜İ\œ™[Ë˜ÛÛZ[œÊ]™[\™Ù]\È›ÙJJ\Ù]Ü[Š˜[ÙJNßNÂˆÛÛœİ\ØØ\OJ]™[’Ù^X›Ø\™]™[
-OOÚYŠ]™[šÙ^OOOIÑ\ØØ\IÊ\Ù]Ü[Š˜[ÙJNßNÂˆÚ[™İË˜Y]™[\İ[™\Š	ÜÚ[\™İÛ‰Ëİ]ÚYJNİÚ[™İË˜Y]™[\İ[™\Š	ÚÙ^YİÛ‰Ë\ØØ\JNÂˆ™]\›Š
-OOİÚ[™İËœ™[[İ™Q]™[\İ[™\Š	ÜÚ[\™İÛ‰Ëİ]ÚYJNİÚ[™İËœ™[[İ™Q]™[\İ[™\Š	ÚÙ^YİÛ‰Ë\ØØ\JNßNÂˆKÛÜ[—JNÂ‚ˆ™]\›ˆ]ˆÛ\ÜÓ˜[YOHœÙ][™ÜËXÛÛ›Ûˆ™Y^Ü›ÛİO‚ˆ]ÛˆÛ\ÜÓ˜[YO^ÛÜ[ÉÜÙ][™ÜË]šYÙÙ\ˆXİ]™IÎ‰ÜÙ][™ÜË]šYÙÙ\‰ßH\OH˜]ÛˆˆÛÛXÚÏ^Ê
-OOœÙ]Ü[Š˜[YOOˆ]˜[YJ_H\šXKZ\ÜÜ\H™X[ÙÈˆ\šXKY^[™Y^ÛÜ[ŸH\šXK[X™[HÛÛ™šYİ\˜XÚpìÛˆHš\İX[^˜XÚpìÛˆˆ]OHÛÛ™šYİ\˜XÚpìÛˆHš\İX[^˜XÚpìÛˆ‚ˆÙ][™ÜÌˆÚ^™O^ÌNKÏÜ[ˆÛ\ÜÓ˜[YO^ÜÙ][™ÜË˜[š[X]Pİ\œ™[ÉÜÙ][™ÜË[]™IÎ‰ÉßKÏ‚ˆØ]Û‚ˆÛÜ[‰‰ÙXİ[ÛˆÛ\ÜÓ˜[YOHœÙ][™ÜË\Üİ™\ˆˆ›ÛOH™X[ÙÈˆ\šXK[X™[HÛÛ™šYİ\˜XÚpìÛˆHš]Ú\™H‚ˆXY\Ü[Ù][™ÜÌˆÚ^™O^ÌM_KÏÓÓ‘’QÕTPÒpäÓÜÜ[ÛX[“QS–“ÈH’TÕPSVPÒpäÓÜÛX[ÚXY\‚ˆ]ˆÛ\ÜÓ˜[YOHœÙ][™ÜË]ÙÙÛ\È‚ˆÙÙÛT›İÈXÛÛ^ÏXİ]š]HÚ^™O^ÌM_KÏŸHX™[H[š[XXÚpìÛˆHÛÜœšY[Hˆ]Z[H”[ÛÜÈpìİš[\È[ˆÛÛ™XİÜ™\ÈXİ]›ÜÈˆÚXÚÙY^ÜÙ][™ÜË˜[š[X]Pİ\œ™[HÛÚ[™ÙO^ØÚXÚÙYO›Û”Ù][™ÜÊØ[š[X]Pİ\œ™[˜ÚXÚÙYJ_KÏ‚ˆÙÙÛT›İÈXÛÛ^ÏYÜÈÚ^™O^ÌM_KÏŸHX™[H•˜[Ü™\ÈÛØœ™HØX›\Èˆ]Z[H“]Y\İ˜HHXYÛš]YÙ[XØÚ[Û˜YHˆÚXÚÙY^ÜÙ][™ÜËœÚİÕ˜[Y\ßHÛÚ[™ÙO^ØÚXÚÙYO›Û”Ù][™ÜÊÜÚİÕ˜[Y\Î˜ÚXÚÙYJ_KÏ‚ˆÙÙÛT›İÈXÛÛ^ÏÜšYÖÈÚ^™O^ÌM_KÏŸHX™[HZ\İ\ˆHİXY°ëXİ[Hˆ]Z[H[[™XXÚpìÛˆ™XÚ\ØH[\Ü^˜\ˆˆÚXÚÙY^ÜÙ][™ÜËœÛ˜\ÑÜšYHÛÚ[™ÙO^ØÚXÚÙYO›Û”Ù][™ÜÊÜÛ˜\ÑÜšY˜ÚXÚÙYJ_KÏ‚ˆÙ]‚ˆÙ][™ÜÓÜ[ÛœÈ]OH“PQÓ’UQ’TÒP“HˆXÛÛ^Ï^YHÚ^™O^ÌLßKÏŸHÜ[ÛœÏ^ÔÒQÓSÓÔSÓ”ßH˜[YO^ÜÙ][™ÜËœÚYÛ˜[šY]ßHÛÚ[™ÙO^ÜÚYÛ˜[šY]ÏO›Û”Ù][™ÜÊÜÚYÛ˜[šY]ßJ_KÏ‚ˆÙ][™ÜÓÜ[ÛœÈ]OH•VQÈHĞP“TÈˆXÛÛ^Ï›İ]HÚ^™O^ÌLßKÏŸHÜ[ÛœÏ^Ô“ÕUS‘×ÓÔSÓ”ßH˜[YO^ÜÙ][™ÜËÚ\™T›İ][™ßHÛÚ[™ÙO^İÚ\™T›İ][™ÏO›Û”Ù][™ÜÊİÚ\™T›İ][™ßJ_KÏ‚ˆ]ˆÛ\ÜÓ˜[YOHœÙ][™ÜË\ÙXİ[Ûˆ‚ˆÏÜ[•SPOÜÜ[ÛX[ÕSQWÑQ’S’USÓ”Ë™š[™
-][OOš][KšYOO][YJOË›X™[OÜÛX[ÚÏ‚ˆ]ˆÛ\ÜÓ˜[YOHœÙ][™ÜË][YKYÜšYÕSQWÑQ’S’USÓ”Ë›X\
-Ü[ÛO]ÛˆÙ^O^ÛÜ[Û‹šYH\OH˜]ÛˆˆÛ\ÜÓ˜[YO^ÛÜ[Û‹šYOO][YOÉØXİ]™IÎ‰ÉßHÛÛXÚÏ^Ê
-OO›Û•[YJÜ[Û‹šY
-_H]O^ÛÜ[Û‹™\ØÜš\[ÛŸO‚ˆÜ[ˆÛ\ÜÓ˜[YOHœÙ][™ÜË][YK\İØ]ÚÛÜ[Û‹œ[]K›X\
-ÛÛÜOHÙ^O^ØÛÛÜŸHİ[O^ŞØ˜XÚÙÜ›İ[™˜ÛÛÜŸ_KÏŠ_OÜÜ[İ›Û™ÏÛÜ[Û‹œÚÜX™[OÜİ›Û™ÏÛÜ[Û‹šYOO][YI‰ÚXÚÈÚ^™O^ÌLŸKÏŸHˆØ]ÛŠ_OÙ]‚ˆÙ]‚ˆ›Ûİ\“H[š[XXÚpìÛˆ\İ0èHXİ]˜YHÜˆY™XİÈHHÛÛ™šYİ\˜XÚpìÛˆÙHÛÛœÙ\˜HÛÛˆ[›ŞYXİËÙ›Ûİ\‚ˆÜÙXİ[ÛŸBˆÙ]ÂŸB‚™[˜İ[ÛˆÙÙÛT›İÊÚXÛÛ‹X™[]Z[ÚXÚÙYÛÚ[™Ù_NÚXÛÛ”™XXİ›ÙNÛX™[œİš[™ÎÙ]Z[œİš[™ÎØÚXÚÙY˜›ÛÛX[ÛÛÚ[™ÙJ˜[YN˜›ÛÛX[ŠN›ÚYJ^Âˆ™]\›ˆ]Ûˆ\OH˜]ÛˆˆÛ\ÜÓ˜[YOHœÙ][™ÜË]ÙÙÛHˆ›ÛOHœİÚ]Úˆ\šXKXÚXÚÙY^ØÚXÚÙYHÛÛXÚÏ^Ê
-OO›ÛÚ[™ÙJXÚXÚÙY
-_O‚ˆÜ[ÚXÛÛŸOÜÜ[Ü[İ›Û™ÏÛX™[OÜİ›Û™ÏÛX[Ù]Z[OÜÛX[ÜÜ[HÛ\ÜÓ˜[YO^ØÚXÚÙYÉÛÛ‰Î‰ÉßO‹ÏÚO‚ˆØ]ÛÂŸB‚™[˜İ[ÛˆÙ][™ÜÓÜ[ÛœÏ^[™Èİš[™ÏŠİ]KXÛÛ‹Ü[ÛœË˜[YKÛÚ[™Ù_Nİ]Nœİš[™ÎÚXÛÛ”™XXİ›ÙNÛÜ[ÛœÎ“Y[SÜ[Û–×Nİ˜[YN•ÛÛÚ[™ÙJ˜[YN•
-N›ÚYJ^Âˆ™]\›ˆ]ˆÛ\ÜÓ˜[YOHœÙ][™ÜË\ÙXİ[ÛˆÏÜ[ÚXÛÛŸ^İ]_OÜÜ[ÚÏ]ˆÛ\ÜÓ˜[YOHœÙ][™ÜË[Ü[Û‹YÜšY‚ˆÛÜ[ÛœË›X\
-Ü[ÛO]ÛˆÙ^O^ÛÜ[Û‹˜[Y_H\OH˜]ÛˆˆÛ\ÜÓ˜[YO^ÛÜ[Û‹˜[YOOO]˜[YOÉØXİ]™IÎ‰ÉßHÛÛXÚÏ^Ê
-OO›ÛÚ[™ÙJÜ[Û‹˜[YJ_OÜ[ÛÜ[Û‹šXÛÛŸOÜÜ[İ›Û™ÏÛÜ[Û‹›X™[OÜİ›Û™ÏÛX[ÛÜ[Û‹™]Z[OÜÛX[ÛÜ[Û‹˜[YOOO]˜[YI‰ÚXÚÈÚ^™O^ÌLŸKÏŸOØ]ÛŠ_BˆÙ]Ù]ÂŸB‚š[\™˜XÙHY[SÜ[Û^[™Èİš[™È[X™\ˆÂˆ˜[YNˆÂˆX™[ˆİš[™ÎÂˆ]Z[ˆİš[™ÎÂˆXÛÛˆ™XXİ›ÙNÂŸB‚™[˜İ[ÛˆÛÛ˜\“Y[O^[™Èİš[™È[X™\ŠÈ˜[YKÜ[ÛœËÛÚ[™ÙKX™[šYÙÙ\’XÛÛ‹ÛÛ\XİH˜[ÙHNˆÂˆ˜[YNˆÂˆÜ[ÛœÎˆY[SÜ[Û–×NÂˆÛÚ[™ÙJ˜[YNˆ
-Nˆ›ÚYÂˆX™[ˆİš[™ÎÂˆšYÙÙ\’XÛÛÎˆ™XXİ›ÙNÂˆÛÛ\XİÎˆ›ÛÛX[ÂŸJHÂˆÛÛœİÛÜ[‹Ù]Ü[—HH\ÙTİ]J˜[ÙJNÂˆÛÛœİ›ÛİH\ÙT™YS]‘[[Y[Š[
-NÂˆÛÛœİXİ]™HHÜ[ÛœË™š[™
-Ü[ÛˆOˆÜ[Û‹˜[YHOOH˜[YJHÏÈÜ[ÛœÖÌNÂ‚ˆ\ÙQY™™Xİ
+export function Topbar(props: Props) {
+  return <header className="topbar">
+    <div className="topbar-left">
+      <nav className="toolbar-group file-tools" aria-label="Archivo">
+        <button onClick={props.onNew} title="Proyecto nuevo (Ctrl+N)"><FilePlus2 size={16}/><span>Nuevo</span></button>
+        <button onClick={props.onImport} title="Abrir o importar .bitwire"><FolderOpen size={16}/><span>Abrir</span></button>
+        <button onClick={props.onSave} title="Guardar en este dispositivo (Ctrl+S)"><Save size={16}/><span>Guardar</span></button>
+        <button onClick={props.onExport} title="Exportar .bitwire"><Download size={16}/><span>Exportar</span></button>
+        <button className="offline-action" onClick={props.onOffline} title="Descargar BitWire portable"><Laptop size={16}/><span>Modo offline</span></button>
+      </nav>
+      <nav className="toolbar-group history-tools" aria-label="Historial">
+        <button onClick={props.onUndo} disabled={!props.canUndo} title="Deshacer"><Undo2 size={16}/></button>
+        <button onClick={props.onRedo} disabled={!props.canRedo} title="Rehacer"><Redo2 size={16}/></button>
+      </nav>
+    </div>
 
+    <div className="topbar-center">
+      <div className="project-title" title={props.projectName}>
+        <span className={props.dirty ? 'dirty-dot' : 'saved-dot'}/><span>{props.projectName}</span>
+      </div>
+      <nav className="simulation-command" aria-label="Control principal de simulaciÃ³n">
+        <span className={`simulation-state ${props.running ? 'running' : ''}`}><i/>{props.running ? 'EN MARCHA' : 'EN PAUSA'}</span>
+        <button className={props.running ? 'stop-action' : 'run-action'} onClick={props.onRun}>
+          {props.running ? <Pause size={17}/> : <Play size={17}/>}<span>{props.running ? 'Pausar' : 'Ejecutar'}</span>
+        </button>
+        <button className="step-action" onClick={props.onStep} disabled={props.running} title="Avanzar una iteraciÃ³n">
+          <StepForward size={16}/><span>Paso</span>
+        </button>
+        <ToolbarMenu value={props.speed} options={SPEED_OPTIONS} onChange={props.onSpeed} label="Velocidad de simulaciÃ³n" compact/>
+      </nav>
+    </div>
 
-HOˆÂˆYˆ
-[Ü[ŠH™]\›ÂˆÛÛœİÛÜÙSİ]ÚYHH
-]™[ˆÚ[\‘]™[
-HOˆÈYˆ
-\›Ûİ˜İ\œ™[Ë˜ÛÛZ[œÊ]™[\™Ù]\È›ÙJJHÙ]Ü[Š˜[ÙJNÈNÂˆÛÛœİÛÜÙQ\ØØ\HH
-]™[ˆÙ^X›Ø\™]™[
-HOˆÈYˆ
-]™[šÙ^HOOH	Ñ\ØØ\IÊHÙ]Ü[Š˜[ÙJNÈNÂˆÚ[™İË˜Y]™[\İ[™\Š	ÜÚ[\™İÛ‰ËÛÜÙSİ]ÚYJNÂˆÚ[™İË˜Y]™[\İ[™\Š	ÚÙ^YİÛ‰ËÛÜÙQ\ØØ\JNÂˆ™]\›ˆ
+    <div className="topbar-right">
+      <SettingsMenu settings={props.settings} theme={props.theme} onSettings={props.onSettings} onTheme={props.onTheme}/>
+    </div>
+  </header>;
+}
 
-HOˆÈÚ[™İËœ™[[İ™Q]™[\İ[™\Š	ÜÚ[\™İÛ‰ËÛÜÙSİ]ÚYJNÈÚ[™İËœ™[[İ™Q]™[\İ[™\Š	ÚÙ^YİÛ‰ËÛÜÙQ\ØØ\JNÈNÂˆKÛÜ[—JNÂ‚ˆ™]\›ˆ]ˆÛ\ÜÓ˜[YO^ØÛÛ˜\‹[Y[H	ØÛÛ\XİÈ	ØÛÛ\Xİ	Èˆ	ÉßXH™Y^Ü›ÛİO‚ˆ]ÛˆÛ\ÜÓ˜[YO^ÛÜ[ˆÈ	İÛÛ˜\‹[Y[K]šYÙÙ\ˆXİ]™IÈˆ	İÛÛ˜\‹[Y[K]šYÙÙ\‰ßH\OH˜]ÛˆˆÛÛXÚÏ^Ê
-HOˆÙ]Ü[Š˜[YHOˆ]˜[YJ_H\šXKZ\ÜÜ\H›Y[Hˆ\šXKY^[™Y^ÛÜ[ŸH\šXK[X™[^Ø	ÛX™[Nˆ	ØXİ]™K›X™[XH]O^Ø	ÛX™[Nˆ	ØXİ]™K›X™[XO‚ˆİšYÙÙ\’XÛÛˆÏÈXİ]™KšXÛÛŸOÜ[ØXİ]™K›X™[OÜÜ[Ú]œ›Û‘İÛˆÚ^™O^ÌLŸKÏ‚ˆØ]Û‚ˆÛÜ[ˆ	‰ˆY[HÛ\ÜÓ˜[YOHÛÛ˜\‹\Üİ™\ˆˆ\šXK[X™[^ÛX™[O‚ˆXY\ÛX™[Õ\\Ø\ÙJ
-_OÚXY\‚ˆÛÜ[ÛœË›X\
-Ü[ÛˆOˆ]ÛˆÙ^O^ÛÜ[Û‹˜[Y_H\OH˜]ÛˆˆÛ\ÜÓ˜[YO^ÛÜ[Û‹˜[YHOOH˜[YHÈ	ØXİ]™IÈˆ	ÉßHÛÛXÚÏ^Ê
-HOˆÈÛÚ[™ÙJÜ[Û‹˜[YJNÈÙ]Ü[Š˜[ÙJNÈ_O‚ˆÜ[ÛÜ[Û‹šXÛÛŸOÜÜ[Ü[İ›Û™ÏÛÜ[Û‹›X™[OÜİ›Û™ÏÛX[ÛÜ[Û‹™]Z[OÜÛX[ÜÜ[ÛÜ[Û‹˜[YHOOH˜[YH	‰ˆKÏŸBˆØ]ÛŠ_BˆÛY[OŸBˆÙ]ÂŸB
+function SettingsMenu({ settings, theme, onSettings, onTheme }: {
+  settings: ProjectSettings;
+  theme: Theme;
+  onSettings(patch: Partial<ProjectSettings>): void;
+  onTheme(theme: Theme): void;
+}) {
+  const [open,setOpen]=useState(false);
+  const root=useRef<HTMLDivElement>(null);
+  useEffect(()=>{
+    if(!open)return;
+    const outside=(event:PointerEvent)=>{if(!root.current?.contains(event.target as Node))setOpen(false);};
+    const escape=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpen(false);};
+    window.addEventListener('pointerdown',outside);window.addEventListener('keydown',escape);
+    return()=>{window.removeEventListener('pointerdown',outside);window.removeEventListener('keydown',escape);};
+  },[open]);
+
+  return <div className="settings-control" ref={root}>
+    <button className={open?'settings-trigger active':'settings-trigger'} type="button" onClick={()=>setOpen(value=>!value)} aria-haspopup="dialog" aria-expanded={open} aria-label="ConfiguraciÃ³n de visualizaciÃ³n" title="ConfiguraciÃ³n de visualizaciÃ³n">
+      <Settings2 size={18}/><span className={settings.animateCurrent?'settings-live':''}/>
+    </button>
+    {open&&<section className="settings-popover" role="dialog" aria-label="ConfiguraciÃ³n de BitWire">
+      <header><span><Settings2 size={15}/>CONFIGURACIÃ“N</span><small>LIENZO Y VISUALIZACIÃ“N</small></header>
+      <div className="settings-toggles">
+        <ToggleRow icon={<Activity size={15}/>} label="AnimaciÃ³n de corriente" detail="Pulsos mÃ³viles en conductores activos" checked={settings.animateCurrent} onChange={checked=>onSettings({animateCurrent:checked})}/>
+        <ToggleRow icon={<Tags size={15}/>} label="Valores sobre cables" detail="Muestra la magnitud seleccionada" checked={settings.showValues} onChange={checked=>onSettings({showValues:checked})}/>
+        <ToggleRow icon={<Grid3X3 size={15}/>} label="Ajustar a cuadrÃ­cula" detail="AlineaciÃ³n precisa al desplazar" checked={settings.snapToGrid} onChange={checked=>onSettings({snapToGrid:checked})}/>
+      </div>
+      <SettingsOptions title="MAGNITUD VISIBLE" icon={<Eye size={13}/>} options={SIGNAL_OPTIONS} value={settings.signalView} onChange={signalView=>onSettings({signalView})}/>
+      <SettingsOptions title="TRAZADO DE CABLES" icon={<Route size={13}/>} options={ROUTING_OPTIONS} value={settings.wireRouting} onChange={wireRouting=>onSettings({wireRouting})}/>
+      <div className="settings-section">
+        <h3><span>TEMA</span><small>{THEME_DEFINITIONS.find(item=>item.id===theme)?.label}</small></h3>
+        <div className="settings-theme-grid">{THEME_DEFINITIONS.map(option=><button key={option.id} type="button" className={option.id===theme?'active':''} onClick={()=>onTheme(option.id)} title={option.description}>
+          <span className="settings-theme-swatch">{option.palette.map(color=><i key={color} style={{background:color}}/>)}</span><strong>{option.shortLabel}</strong>{option.id===theme&&<Check size={12}/>} 
+        </button>)}</div>
+      </div>
+      <footer>La animaciÃ³n estÃ¡ activada por defecto y la configuraciÃ³n se conserva con el proyecto.</footer>
+    </section>}
+  </div>;
+}
+
+function ToggleRow({icon,label,detail,checked,onChange}:{icon:ReactNode;label:string;detail:string;checked:boolean;onChange(value:boolean):void}){
+  return <button type="button" className="settings-toggle" role="switch" aria-checked={checked} onClick={()=>onChange(!checked)}>
+    <span>{icon}</span><span><strong>{label}</strong><small>{detail}</small></span><i className={checked?'on':''}><b/></i>
+  </button>;
+}
+
+function SettingsOptions<T extends string>({title,icon,options,value,onChange}:{title:string;icon:ReactNode;options:MenuOption<T>[];value:T;onChange(value:T):void}){
+  return <div className="settings-section"><h3><span>{icon}{title}</span></h3><div className="settings-option-grid">
+    {options.map(option=><button key={option.value} type="button" className={option.value===value?'active':''} onClick={()=>onChange(option.value)}><span>{option.icon}</span><strong>{option.label}</strong><small>{option.detail}</small>{option.value===value&&<Check size={12}/>}</button>)}
+  </div></div>;
+}
+
+interface MenuOption<T extends string | number> {
+  value: T;
+  label: string;
+  detail: string;
+  icon: ReactNode;
+}
+
+function ToolbarMenu<T extends string | number>({ value, options, onChange, label, triggerIcon, compact = false }: {
+  value: T;
+  options: MenuOption<T>[];
+  onChange(value: T): void;
+  label: string;
+  triggerIcon?: ReactNode;
+  compact?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  const active = options.find(option => option.value === value) ?? options[0];
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOutside = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) setOpen(false); };
+    const closeEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false); };
+    window.addEventListener('pointerdown', closeOutside);
+    window.addEventListener('keydown', closeEscape);
+    return () => { window.removeEventListener('pointerdown', closeOutside); window.removeEventListener('keydown', closeEscape); };
+  }, [open]);
+
+  return <div className={`toolbar-menu ${compact ? 'compact' : ''}`} ref={root}>
+    <button className={open ? 'toolbar-menu-trigger active' : 'toolbar-menu-trigger'} type="button" onClick={() => setOpen(value => !value)} aria-haspopup="menu" aria-expanded={open} aria-label={`${label}: ${active.label}`} title={`${label}: ${active.label}`}>
+      {triggerIcon ?? active.icon}<span>{active.label}</span><ChevronDown size={12}/>
+    </button>
+    {open && <menu className="toolbar-popover" aria-label={label}>
+      <header>{label.toUpperCase()}</header>
+      {options.map(option => <button key={option.value} type="button" className={option.value === value ? 'active' : ''} onClick={() => { onChange(option.value); setOpen(false); }}>
+        <span>{option.icon}</span><span><strong>{option.label}</strong><small>{option.detail}</small></span>{option.value === value && <i/>}
+      </button>)}
+    </menu>}
+  </div>;
+}
