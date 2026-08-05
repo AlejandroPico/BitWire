@@ -13,5 +13,6 @@ describe('descargas offline', () => {
     const result = recommendedDesktopDownload('Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'Win32');
     expect(result.recommended?.filename).toBe('BitWire-Windows-x64.exe');
     expect(desktopDownloads('arm64').find(item => item.platform === 'linux')?.filename).toBe('BitWire-Linux-arm64.AppImage');
+    expect(desktopDownloads('x64').find(item => item.platform === 'linux')?.filename).toBe('BitWire-Linux-x86_64.AppImage');
   });
 });

@@ -31,12 +31,19 @@ jobs:
           - os: windows-latest
             label: Windows portable
             command: npx electron-builder --win portable --x64 --arm64 --publish never
+            files: |
+              ui-app/release/BitWire-Windows-x64.exe
+              ui-app/release/BitWire-Windows-arm64.exe
           - os: macos-latest
             label: macOS universal
             command: npx electron-builder --mac zip --universal --publish never
+            files: ui-app/release/BitWire-macOS-universal.zip
           - os: ubuntu-latest
             label: Linux AppImage
             command: npx electron-builder --linux AppImage --x64 --arm64 --publish never
+            files: |
+              ui-app/release/BitWire-Linux-x86_64.AppImage
+              ui-app/release/BitWire-Linux-arm64.AppImage
     runs-on: ${{ matrix.os }}
     env:
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
@@ -67,7 +74,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: bitwire-${{ runner.os }}
-          path: ui-app/release/BitWire-*
+          path: ${{ matrix.files }}
           if-no-files-found: error
 
   release:
@@ -106,4 +113,26 @@ jobs:
 
             Los tres paquetes incluyen la interfaz, el catálogo y el motor de simulación.
           make_latest: true
-          files: downloads/BitWire-*
+          files: |
+            downloads/BitWire-Windows-x64.exe
+            downloads/BitWire-Windows-arm64.exe
+            downloads/BitWire-macOS-universal.zip
+            downloads/BitWire-Linux-x86_64.AppImage
+            downloads/BitWire-Linux-arm64.AppImage
+      - name: Remove non-user release assets
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const keep = new Set([
+              'BitWire-Windows-x64.exe',
+              'BitWire-Windows-arm64.exe',
+              'BitWire-macOS-universal.zip',
+              'BitWire-Linux-x86_64.AppImage',
+              'BitWire-Linux-arm64.AppImage',
+            ]);
+            const release = await github.rest.repos.getReleaseByTag({ owner: context.repo.owner, repo: context.repo.repo, tag: 'desktop-latest' });
+            for (const asset of release.data.assets) {
+              if (!keep.has(asset.name)) {
+                await github.rest.repos.deleteReleaseAsset({ owner: context.repo.owner, repo: context.repo.repo, asset_id: asset.id });
+              }
+            }

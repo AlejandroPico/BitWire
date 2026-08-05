@@ -26,7 +26,8 @@ export function detectDesktopArchitecture(userAgent = navigator.userAgent): Desk
 
 export function desktopDownloads(architecture: DesktopArchitecture = detectDesktopArchitecture()): DesktopDownload[] {
   const windowsFile = `BitWire-Windows-${architecture}.exe`;
-  const linuxFile = `BitWire-Linux-${architecture}.AppImage`;
+  const linuxArch = architecture === 'arm64' ? 'arm64' : 'x86_64';
+  const linuxFile = `BitWire-Linux-${linuxArch}.AppImage`;
   const macFile = 'BitWire-macOS-universal.zip';
   return [
     { platform: 'windows', architecture, label: `Windows ${architecture === 'arm64' ? 'ARM64' : '64 bits'}`, filename: windowsFile, note: 'Ejecutable portable .exe · no instala nada', url: `${RELEASE_ROOT}/${windowsFile}` },
