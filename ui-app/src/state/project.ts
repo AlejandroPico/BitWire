@@ -1,92 +1,168 @@
-˛∫(∑˙k°¯•zXß{ﬂ›zˇÁ∫YOzπ¢≤»®ù◊ßâÁZ[\‹ù\H»ö]⁄\ôTõ⁄ôX›€€\€ô[ù[ú›[òŸK[Ÿ[P\ôXKõ⁄ôX›Ÿ][ô‹À[YK⁄\ôHHúõ€H	Àãã€[Ÿ[›\\…Œ¬ö[\‹ù»–US—◊–ñW“QHúõ€H	Àããÿÿ][ŸÀÿÿ][Ÿ…Œ¬ö[\‹ù»€€\€ô[ù›€ô\ì[Ÿ[RYHúõ€H	Àãã€[Ÿ[€[Ÿ[Tÿ€‹IŒ¬Çò€€ú›õ›»H
+import type { BitWireProject, ComponentInstance, ModuleArea, ProjectSettings, Theme, Wire } from '../model/types';
+import { CATALOG_BY_ID } from '../catalog/catalog';
+import { componentOwnerModuleId } from '../model/moduleScope';
 
-HOàô]»]J
-Kù“T”‘›ö[ô 
-N¬ô^‹ù€€ú›ZYH
-ôYö^à›ö[ô HOà	‹ôYö^W…ÿ‹û\Àúò[ô€UURQ
+const now = () => new Date().toISOString();
+export const uid = (prefix: string) => `${prefix}_${crypto.randomUUID().slice(0, 8)}`;
 
-Kú€XŸJ
-_X¬Çô^‹ù€€ú›QêUS‘—USë‘Œàõ⁄ôX›Ÿ][ô‹»H¬à‹öY⁄^ôNàåà€ò\—‹öYàùYKà⁄\ôTõ›][ôŒà	€‹ùŸ€€ò[	Àà[YNà	ÿ]]…Àà⁄Y€ò[öY]Œà	›õ€YŸIÀà⁄›’ò[Y\ŒàùYKà[ö[X]P›\úô[ùàùYKüN¬Çô^‹ùù[ò›[€à‹ôX]R[ú›[òŸJYö[ö][€íYà›ö[ôÀàù[Xô\ãNàù[Xô\ãYHZY
-	€õŸI Kÿÿ[HHJNà€€\€ô[ù[ú›[òŸH¬à€€ú›Yö[ö][€àH–US—◊–ñW“QôŸ]
-Yö[ö][€íY
-N¬àYà
-YYö[ö][€äHõ›»ô]»\úõ‹ä€€\€ô[ùH\ÿ€€õÿ⁄YŒà	ŸYö[ö][€íYX
-N¬àô]\õà¬àYàYö[ö][€íYààKàõ›][€éààÿÿ[Kàõ‹\ùY\Œà»ããôYö[ö][€ãôYò][»Kà[òXõYàùYKàN¬üBÇò€€ú›⁄\ôHH
-Yà›ö[ôÀúõ€P€€\€ô[ùà›ö[ôÀúõ€T[éà›ö[ôÀ–€€\€ô[ùà›ö[ôÀ‘[éà›ö[ô Nà⁄\ôHOà
-¬àYúõ€Nà»€€\€ô[ùYàúõ€P€€\€ô[ù[íYàúõ€T[àKŒà»€€\€ô[ùYà–€€\€ô[ù[íYà‘[àKõ›][ôŒà	€‹ùŸ€€ò[	ÀüJN¬Çô^‹ùù[ò›[€à‹ôX]Q[[‘õ⁄ôX›
+export const DEFAULT_SETTINGS: ProjectSettings = {
+  gridSize: 20,
+  snapToGrid: true,
+  wireRouting: 'orthogonal',
+  theme: 'auto',
+  signalView: 'voltage',
+  showValues: true,
+  animateCurrent: true,
+};
 
-Nàö]⁄\ôTõ⁄ôX›¬à€€ú›‹ôX]Y]Hõ› 
-N¬à€€ú›€€\€ô[ùŒà€€\€ô[ù[ú›[òŸV◊HH¬à‹ôX]R[ú›[òŸJ	Ÿ◊‹€›\òŸIÀMMåLLL	‹€›\òŸW€XZ[â Kà‹ôX]R[ú›[òŸJ	‹›⁄]⁄‹‹›	ÀLÃåLLL	‹›⁄]⁄€XZ[â Kà‹ôX]R[ú›[òŸJ	‹ô\⁄\›‹âÀNLLL	‹ô\⁄\›‹ó€XZ[â Kà‹ôX]R[ú›[òŸJ	€[\	ÀNLLL	€[\€XZ[â Kà‹ôX]R[ú›[òŸJ	Ÿ‹õ›[ô	ÀÃ	Ÿ‹õ›[ô€XZ[â Kà‹ôX]R[ú›[òŸJ	€Ÿ⁄X◊⁄[ú]	ÀMLåÃ	€Ÿ⁄X◊ÿI Kà‹ôX]R[ú›[òŸJ	€Ÿ⁄X◊⁄[ú]	ÀMLåÃ	€Ÿ⁄X◊ÿâ Kà‹ôX]R[ú›[òŸJ	Ÿÿ]Wÿ[ô	ÀLNÕK	Ÿÿ]W€XZ[â Kà‹ôX]R[ú›[òŸJ	€Y	ÀLåÕK	€Y€Ÿ⁄X… Kà‹ôX]R[ú›[òŸJ	€‹ÿ⁄[‹ÿ€‹IÀÃ	‹ÿ€‹W€XZ[â KàN¬à€€\€ô[ùÀôö[ô
-»OàÀöYOOH	‹ô\⁄\›‹ó€XZ[â HKúõ‹\ùY\Àúô\⁄\›[òŸHHÃÃ¬à€€\€ô[ùÀôö[ô
-»OàÀöYOOH	€[\€XZ[â HKúõ‹\ùY\Àúò]Yõ€YŸHHN¬à€€\€ô[ùÀôö[ô
-»OàÀöYOOH	€Y€Ÿ⁄X… HKúõ‹\ùY\Àò€€‹àH	»ÃòôMÕ	Œ¬à€€ú›⁄\ô\Œà⁄\ôV◊HH¬à⁄\ôJ	›◊‹›Ÿ\âÀ	‹€›\òŸW€XZ[âÀ	‹‹…À	‹›⁄]⁄€XZ[âÀ	ÿI Kà⁄\ôJ	›◊ÿ€€ùõ€	À	‹›⁄]⁄€XZ[âÀ	ÿâÀ	‹ô\⁄\›‹ó€XZ[âÀ	ÿI Kà⁄\ôJ	›◊€ÿY	À	‹ô\⁄\›‹ó€XZ[âÀ	ÿâÀ	€[\€XZ[âÀ	ÿI Kà⁄\ôJ	›◊‹ô]\õâÀ	€[\€XZ[âÀ	ÿâÀ	€[Ÿ[W‹›Ÿ\âÀ	Ÿ€ô	 Kà⁄\ôJ	›◊Ÿ‹õ›[ô	À	‹€›\òŸW€XZ[âÀ	€ôY…À	€[Ÿ[W‹›Ÿ\âÀ	Ÿ€ô	 Kà⁄\ôJ	›◊Ÿ‹õ›[ôŸ^\õò[	À	€[Ÿ[W‹›Ÿ\âÀ	Ÿ€ô	À	Ÿ‹õ›[ô€XZ[âÀ	Ÿ€ô	 Kà⁄\ôJ	›◊ÿIÀ	€Ÿ⁄X◊ÿIÀ	€›]	À	€[Ÿ[WŸÿ]Wÿ€‹ôIÀ	ÿI Kà⁄\ôJ	›◊ÿW⁄[ù\õò[	À	€[Ÿ[WŸÿ]Wÿ€‹ôIÀ	ÿIÀ	Ÿÿ]W€XZ[âÀ	ÿI Kà⁄\ôJ	›◊ÿâÀ	€Ÿ⁄X◊ÿâÀ	€›]	À	€[Ÿ[WŸÿ]Wÿ€‹ôIÀ	ÿâ Kà⁄\ôJ	›◊ÿó⁄[ù\õò[	À	€[Ÿ[WŸÿ]Wÿ€‹ôIÀ	ÿâÀ	Ÿÿ]W€XZ[âÀ	ÿâ Kà⁄\ôJ	›◊Ÿÿ]W⁄[ù\õò[	À	Ÿÿ]W€XZ[âÀ	€›]	À	€[Ÿ[WŸÿ]Wÿ€‹ôIÀ	‹I Kà⁄\ôJ	›◊Ÿÿ]W€›]	À	€[Ÿ[WŸÿ]Wÿ€‹ôIÀ	‹IÀ	€Y€Ÿ⁄X…À	ÿI Kà⁄\ôJ	›◊€[Ÿ[W‹W⁄[ù\õò[	À	€[Ÿ[WŸÿ]Wÿ€‹ôIÀ	‹IÀ	€[Ÿ[W€Ÿ⁄X…À	‹I Kà⁄\ôJ	›◊€Y‹ô]\õâÀ	€Y€Ÿ⁄X…À	ÿâÀ	€[Ÿ[W€Ÿ⁄X…À	Ÿ€ô	 Kà⁄\ôJ	›◊€Ÿ⁄X◊Ÿ‹õ›[ôŸ^\õò[	À	€[Ÿ[W€Ÿ⁄X…À	Ÿ€ô	À	Ÿ‹õ›[ô€XZ[âÀ	Ÿ€ô	 Kà⁄\ôJ	›◊‹ÿ€‹IÀ	€[Ÿ[W€Ÿ⁄X…À	‹IÀ	‹ÿ€‹W€XZ[âÀ	ÿ⁄I KàN¬à€€ú›[Ÿ[\Œà[Ÿ[P\ôXV◊HH¬à»Yà	€[Ÿ[W‹›Ÿ\âÀò[YNà	—]\H[0ÍX›öXÿHHHâÀàMåLNàLMÃ⁄YàLZY⁄àåL€€‹éà	»ŸçXéMâÀY[Xô\íYŒà…‹€›\òŸW€XZ[âÀ	‹›⁄]⁄€XZ[âÀ	‹ô\⁄\›‹ó€XZ[âÀ	€[\€XZ[â◊K[òXõYàùYK€€\ŸYàò[ŸK[úŒà¬à»Yà	›ö[âÀò[YNà	’íSàUâÀ⁄[ôà	‘’—TâÀ€XZ[éà	‘’—TâÀ⁄YNà	€Yù	À‹⁄][€éàKÃÀõ€Z[ò[õ€YŸNàHKà»Yà	Ÿ€ô	Àò[YNà	—”ë	À⁄[ôà	—”ë	À€XZ[éà	‘’—TâÀ⁄YNà	€Yù	À‹⁄][€éàãÃÀõ€Z[ò[õ€YŸNàKà»Yà	›õ›]	Àò[YNà	’ì’U	À⁄[ôà	”’UU	À€XZ[éà	–SêS—…À⁄YNà	‹öY⁄	À‹⁄][€éàçKõ€Z[ò[õ€YŸNàHKàHKà»Yà	€[Ÿ[W€Ÿ⁄X…Àò[YNà	—[[‹›òY‹àSë	ÀàMNNàçL⁄YàLåZY⁄àÃå€€‹éà	»ÃòôMÕ	ÀY[Xô\íYŒà…€Ÿ⁄X◊ÿIÀ	€Ÿ⁄X◊ÿâÀ	Ÿÿ]W€XZ[âÀ	€Y€Ÿ⁄X…◊K[òXõYàùYK€€\ŸYàò[ŸK[úŒà¬à»Yà	ÿIÀò[YNà	–IÀ⁄[ôà	“SîU	À€XZ[éà	—Q“US	À⁄YNà	€Yù	À‹⁄][€éàKÃ»Kà»Yà	ÿâÀò[YNà	–âÀ⁄[ôà	“SîU	À€XZ[éà	—Q“US	À⁄YNà	€Yù	À‹⁄][€éàãÃ»Kà»Yà	‹IÀò[YNà	‘IÀ⁄[ôà	”’UU	À€XZ[éà	—Q“US	À⁄YNà	‹öY⁄	À‹⁄][€éàçHKà»Yà	Ÿ€ô	Àò[YNà	—”ë	À⁄[ôà	—”ë	À€XZ[éà	‘’—TâÀ⁄YNà	ÿõ›€IÀ‹⁄][€éàçKõ€Z[ò[õ€YŸNàKàHKà»Yà	€[Ÿ[WŸÿ]Wÿ€‹ôIÀò[YNà	”∞Óò€[»0ÏŸ⁄X€»Së	ÀàLçåNàÃ⁄YàÃåZY⁄àN€€‹éà	»ÕÿéŸôâÀY[Xô\íYŒà…Ÿÿ]W€XZ[â◊K[òXõYàùYK€€\ŸYàùYK\ô[ù[Ÿ[RYà	€[Ÿ[W€Ÿ⁄X…À[úŒà¬à»Yà	ÿIÀò[YNà	–IÀ⁄[ôà	“SîU	À€XZ[éà	—Q“US	À⁄YNà	€Yù	À‹⁄][€éàKÃ»Kà»Yà	ÿâÀò[YNà	–âÀ⁄[ôà	“SîU	À€XZ[éà	—Q“US	À⁄YNà	€Yù	À‹⁄][€éàãÃ»Kà»Yà	‹IÀò[YNà	‘IÀ⁄[ôà	”’UU	À€XZ[éà	—Q“US	À⁄YNà	‹öY⁄	À‹⁄][€éàçHKàHKàN¬àô]\õà¬àõ‹õX]à	ÿö]⁄\ôIÀô\ú⁄[€éàKYàZY
-	‹õ⁄ôX›	 Kò[YNà	”Xõ‹ò]‹ö[»[öX⁄X[	Àà\ÿ‹ö\[€éà	–⁄\ò›Z]»[0ÍX›öX€»Hõ‹]YH0ÏŸ⁄X€»H[[‹›òX⁄pÏ€ãâÀ‹ôX]Y]\]Y]à‹ôX]Y]à€€\€ô[ùÀ⁄\ô\À[Ÿ[\ÀŸ][ô‹Œà»ããëQêUS‘—USë‘»KàN¬üBÇô^‹ùù[ò›[€à‹ôX]Põ[ö‘õ⁄ôX›
-ò[YHH	–⁄\ò›Z]»⁄[à0Î][… Nàö]⁄\ôTõ⁄ôX›¬à€€ú›‹ôX]Y]Hõ› 
-N¬àô]\õà¬àõ‹õX]à	ÿö]⁄\ôIÀô\ú⁄[€éàKYàZY
-	‹õ⁄ôX›	 Kò[YK\ÿ‹ö\[€éà	…Àà‹ôX]Y]\]Y]à‹ôX]Y]€€\€ô[ùŒà◊K⁄\ô\Œà◊K[Ÿ[\Œà◊KŸ][ô‹Œà»ããëQêUS‘—USë‘»KàN¬üBÇô^‹ùù[ò›[€à€€ôTõ⁄ôX›
-õ⁄ôX›àö]⁄\ôTõ⁄ôX›
-Nàö]⁄\ôTõ⁄ôX›¬àô]\õà›ùX›\ôY€€ôJõ⁄ôX›
-N¬üBÇã äà\Xÿ]\»€€\€ô[ù»[ôŸY\»]ô\ûH€‹H[àHÿ[YHY\ò\ò⁄Xÿ[ÿ[ùò\»\»]»€›\òŸKà
-ã¬ô^‹ùù[ò›[€à\Xÿ]P€€\€ô[ù àõ⁄ôX›àö]⁄\ôTõ⁄ôX›àŸ[X›YYŒàôXY€õH›ö[ô÷◊KàXZŸRYà
-ôYö^à›ö[ô HOà›ö[ô»HZYäNà›ö[ô÷◊H¬à€€ú›Ÿ[X›YHô]»Ÿ]
-Ÿ[X›YY N¬à€€ú›€›\òŸ\»Hõ⁄ôX›ò€€\€ô[ùÀôö[\ä€€\€ô[ùOàŸ[X›Yö\ €€\€ô[ùöY
-JN¬à€€ú››€ô\ú»Hô]»X\
-€›\òŸ\ÀõX\
-€€\€ô[ùOàÿ€€\€ô[ùöY€€\€ô[ù›€ô\ì[Ÿ[RY
-õ⁄ôX›€€\€ô[ùöY
-WJJN¬à€€ú›YX\Hô]»X\
-€›\òŸ\ÀõX\
-€€\€ô[ùOàÿ€€\€ô[ùöYXZŸRY
-	€õŸI WJJN¬à€€ú›€‹Y\»H€›\òŸ\ÀõX\
-€€\€ô[ùOà
-¬àããú›ùX›\ôY€€ôJ€€\€ô[ù
-KàYàYX\ôŸ]
-€€\€ô[ùöY
-HKàà€€\€ô[ùû
-»àNà€€\€ô[ùûH
-»àJJN¬à€€ú›⁄\ô\»Hõ⁄ôX›ù⁄\ô\¬àôö[\ä€€õôX›[€àOàYX\ö\ €€õôX›[€ãôúõ€Kò€€\€ô[ùY
-H	âàYX\ö\ €€õôX›[€ãùÀò€€\€ô[ùY
-JBàõX\
-€€õôX›[€àOà
-¬àããú›ùX›\ôY€€ôJ€€õôX›[€äKàYàXZŸRY
-	›⁄\ôI Kàúõ€Nà»ããò€€õôX›[€ãôúõ€K€€\€ô[ùYàYX\ôŸ]
-€€õôX›[€ãôúõ€Kò€€\€ô[ùY
-HHKàŒà»ããò€€õôX›[€ãùÀ€€\€ô[ùYàYX\ôŸ]
-€€õôX›[€ãùÀò€€\€ô[ùY
-HHKàJJN¬Çàõ⁄ôX›ò€€\€ô[ùÀú\⁄
-ããò€‹Y\ N¬àõ⁄ôX›ù⁄\ô\Àú\⁄
-ããù⁄\ô\ N¬àõ‹à
-€€ú›€›\òŸHŸà€›\òŸ\ H¬à€€ú››€ô\íYH›€ô\úÀôŸ]
-€›\òŸKöY
-N¬à€€ú›\Xÿ]RYHYX\ôŸ]
-€›\òŸKöY
-HN¬àYà
-›€ô\íY
-Hõ⁄ôX›õ[Ÿ[\Àôö[ô
-[Ÿ[HOà[Ÿ[KöYOOH›€ô\íY
-OÀõY[Xô\íYÀú\⁄
-\Xÿ]RY
-N¬àBàô]\õà€‹Y\ÀõX\
-€€\€ô[ùOà€€\€ô[ùöY
-N¬üBÇô^‹ùù[ò›[€àò[Y]Tõ⁄ôX›
-[ú]à[ö€õ›€äNàö]⁄\ôTõ⁄ôX›¬àYà
-Z[ú]\[Ÿà[ú]OOH	€ÿöôX›	 Hõ›»ô]»\úõ‹ä	—[\ò⁄]õ»õ»€€ùY[ôH[àõﬁYX›»∞Ë[YÀâ N¬à€€ú›ÿ[ôY]HH[ú]\»\ùX[ö]⁄\ôTõ⁄ôX›é¬àYà
-ÿ[ôY]Kôõ‹õX]OOH	ÿö]⁄\ôI»ÿ[ôY]Kùô\ú⁄[€àOOHJHõ›»ô]»\úõ‹ä	’ô\ú⁄pÏ€àH\ò⁄]õ»òö]⁄\ôH[ò€€\]XõKâ N¬àYà
-P\úò^Kö\–\úò^Jÿ[ôY]Kò€€\€ô[ù HP\úò^Kö\–\úò^Jÿ[ôY]Kù⁄\ô\ JHõ›»ô]»\úõ‹ä	—[‹òYõ»[⁄\ò›Z]»\›0ËH[ò€€\]Àâ N¬àÿ[ôY]Kõ[Ÿ[\»œœH◊N¬à€€ú›Y»Hô]»Ÿ]
-Àããòÿ[ôY]Kò€€\€ô[ùÀõX\
-][HOà][KöY
-Kããòÿ[ôY]Kõ[Ÿ[\ÀõX\
-][HOà][KöY
-WJN¬àõ‹à
-€€ú›€€õôX›[€àŸàÿ[ôY]Kù⁄\ô\ H¬àYà
-ZYÀö\ €€õôX›[€ãôúõ€Kò€€\€ô[ùY
-HZYÀö\ €€õôX›[€ãùÀò€€\€ô[ùY
-JH¬àõ›»ô]»\úõ‹ä[ÿXõH	ÿ€€õôX›[€ãöYH\[ùHH[à€€\€ô[ùH[ô^\›[ùKò
-N¬àBàBà€€ú›õ⁄ôX›Hÿ[ôY]H\»ö]⁄\ôTõ⁄ôX›¬àõ⁄ôX›úŸ][ô‹»H»ããëQêUS‘—USë‘Àããäÿ[ôY]KúŸ][ô‹»œ»ﬂJHN¬àÀ»õ‹ùÿ\ôX€€\]XõHZY‹ò][€àŸàõ⁄ôX›»ÿ]ôYûHHö\ú›XõX»ùZ[Çàõ‹à
-€€ú›€€\€ô[ùŸàõ⁄ôX›ò€€\€ô[ù H€€\€ô[ùúÿÿ[HHù[Xô\ä€€\€ô[ùúÿÿ[JHN¬àõ‹à
-€€ú›[Ÿ[HŸàõ⁄ôX›õ[Ÿ[\ H¬à[Ÿ[Kò€€\ŸYœœHò[ŸN¬à[Ÿ[Kú[ú»œœH◊N¬àBàõ‹à
-€€ú›€€õôX›[€àŸàõ⁄ôX›ù⁄\ô\ H€€õôX›[€ãò€€ùõ€⁄[ù»œœH◊N¬àYà
-õ⁄ôX›úŸ][ô‹Àù[YHOOH
-	Ÿ\ö…»\»[YJJHõ⁄ôX›úŸ][ô‹Àù[YHH	€öY⁄	Œ¬àYà
-õ⁄ôX›úŸ][ô‹Àù[YHOOH
-	€Y⁄	»\»[YJJHõ⁄ôX›úŸ][ô‹Àù[YHH	€[‹õö[ô…Œ¬àô]\õàõ⁄ôX›¬üB
+export function createInstance(definitionId: string, x: number, y: number, id = uid('node'), scale = 1): ComponentInstance {
+  const definition = CATALOG_BY_ID.get(definitionId);
+  if (!definition) throw new Error(`Componente desconocido: ${definitionId}`);
+  return {
+    id,
+    definitionId,
+    x,
+    y,
+    rotation: 0,
+    scale,
+    properties: { ...definition.defaults },
+    enabled: true,
+  };
+}
+
+const wire = (id: string, fromComponent: string, fromPin: string, toComponent: string, toPin: string): Wire => ({
+  id, from: { componentId: fromComponent, pinId: fromPin }, to: { componentId: toComponent, pinId: toPin }, routing: 'orthogonal',
+});
+
+export function createDemoProject(): BitWireProject {
+  const createdAt = now();
+  const components: ComponentInstance[] = [
+    createInstance('dc_source', -560, -110, 'source_main'),
+    createInstance('switch_spst', -320, -110, 'switch_main'),
+    createInstance('resistor', -80, -110, 'resistor_main'),
+    createInstance('lamp', 180, -110, 'lamp_main'),
+    createInstance('ground', 440, 30, 'ground_main'),
+    createInstance('logic_input', -520, 300, 'logic_a'),
+    createInstance('logic_input', -520, 430, 'logic_b'),
+    createInstance('gate_and', -180, 345, 'gate_main'),
+    createInstance('led', 120, 345, 'led_logic'),
+    createInstance('oscilloscope', 400, 300, 'scope_main'),
+  ];
+  components.find(c => c.id === 'resistor_main')!.properties.resistance = 330;
+  components.find(c => c.id === 'lamp_main')!.properties.ratedVoltage = 5;
+  components.find(c => c.id === 'led_logic')!.properties.color = '#2be4c4';
+  const wires: Wire[] = [
+    wire('w_power', 'source_main', 'pos', 'switch_main', 'a'),
+    wire('w_control', 'switch_main', 'b', 'resistor_main', 'a'),
+    wire('w_load', 'resistor_main', 'b', 'lamp_main', 'a'),
+    wire('w_return', 'lamp_main', 'b', 'module_power', 'gnd'),
+    wire('w_ground', 'source_main', 'neg', 'module_power', 'gnd'),
+    wire('w_ground_external', 'module_power', 'gnd', 'ground_main', 'gnd'),
+    wire('w_a', 'logic_a', 'out', 'module_gate_core', 'a'),
+    wire('w_a_internal', 'module_gate_core', 'a', 'gate_main', 'a'),
+    wire('w_b', 'logic_b', 'out', 'module_gate_core', 'b'),
+    wire('w_b_internal', 'module_gate_core', 'b', 'gate_main', 'b'),
+    wire('w_gate_internal', 'gate_main', 'out', 'module_gate_core', 'q'),
+    wire('w_gate_out', 'module_gate_core', 'q', 'led_logic', 'a'),
+    wire('w_module_q_internal', 'module_gate_core', 'q', 'module_logic', 'q'),
+    wire('w_led_return', 'led_logic', 'b', 'module_logic', 'gnd'),
+    wire('w_logic_ground_external', 'module_logic', 'gnd', 'ground_main', 'gnd'),
+    wire('w_scope', 'module_logic', 'q', 'scope_main', 'ch1'),
+  ];
+  const modules: ModuleArea[] = [
+    { id: 'module_power', name: 'Etapa el√©ctrica de 5 V', x: -610, y: -170, width: 900, height: 210, color: '#f5b942', memberIds: ['source_main','switch_main','resistor_main','lamp_main'], enabled: true, collapsed: false, pins: [
+      { id: 'vin', name: 'VIN 5V', kind: 'POWER', domain: 'POWER', side: 'left', position: 1/3, nominalVoltage: 5 },
+      { id: 'gnd', name: 'GND', kind: 'GND', domain: 'POWER', side: 'left', position: 2/3, nominalVoltage: 0 },
+      { id: 'vout', name: 'VOUT', kind: 'OUTPUT', domain: 'ANALOG', side: 'right', position: .5, nominalVoltage: 5 },
+    ] },
+    { id: 'module_logic', name: 'Demostrador AND', x: -580, y: 250, width: 920, height: 320, color: '#2be4c4', memberIds: ['logic_a','logic_b','gate_main','led_logic'], enabled: true, collapsed: false, pins: [
+      { id: 'a', name: 'A', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: 1/3 },
+      { id: 'b', name: 'B', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: 2/3 },
+      { id: 'q', name: 'Q', kind: 'OUTPUT', domain: 'DIGITAL', side: 'right', position: .5 },
+      { id: 'gnd', name: 'GND', kind: 'GND', domain: 'POWER', side: 'bottom', position: .5, nominalVoltage: 0 },
+    ] },
+    { id: 'module_gate_core', name: 'N√∫cleo l√≥gico AND', x: -260, y: 300, width: 320, height: 180, color: '#7b8cff', memberIds: ['gate_main'], enabled: true, collapsed: true, parentModuleId: 'module_logic', pins: [
+      { id: 'a', name: 'A', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: 1/3 },
+      { id: 'b', name: 'B', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: 2/3 },
+      { id: 'q', name: 'Q', kind: 'OUTPUT', domain: 'DIGITAL', side: 'right', position: .5 },
+    ] },
+  ];
+  return {
+    format: 'bitwire', version: 1, id: uid('project'), name: 'Laboratorio inicial',
+    description: 'Circuito el√©ctrico y bloque l√≥gico de demostraci√≥n.', createdAt, updatedAt: createdAt,
+    components, wires, modules, settings: { ...DEFAULT_SETTINGS },
+  };
+}
+
+export function createBlankProject(name = 'Circuito sin t√≠tulo'): BitWireProject {
+  const createdAt = now();
+  return {
+    format: 'bitwire', version: 1, id: uid('project'), name, description: '',
+    createdAt, updatedAt: createdAt, components: [], wires: [], modules: [], settings: { ...DEFAULT_SETTINGS },
+  };
+}
+
+export function cloneProject(project: BitWireProject): BitWireProject {
+  return structuredClone(project);
+}
+
+/** Duplicates components and keeps every copy in the same hierarchical canvas as its source. */
+export function duplicateComponents(
+  project: BitWireProject,
+  selectedIds: readonly string[],
+  makeId: (prefix: string) => string = uid,
+): string[] {
+  const selected = new Set(selectedIds);
+  const sources = project.components.filter(component => selected.has(component.id));
+  const owners = new Map(sources.map(component => [component.id, componentOwnerModuleId(project, component.id)]));
+  const idMap = new Map(sources.map(component => [component.id, makeId('node')]));
+  const copies = sources.map(component => ({
+    ...structuredClone(component),
+    id: idMap.get(component.id)!,
+    x: component.x + 40,
+    y: component.y + 40,
+  }));
+  const wires = project.wires
+    .filter(connection => idMap.has(connection.from.componentId) && idMap.has(connection.to.componentId))
+    .map(connection => ({
+      ...structuredClone(connection),
+      id: makeId('wire'),
+      from: { ...connection.from, componentId: idMap.get(connection.from.componentId)! },
+      to: { ...connection.to, componentId: idMap.get(connection.to.componentId)! },
+    }));
+
+  project.components.push(...copies);
+  project.wires.push(...wires);
+  for (const source of sources) {
+    const ownerId = owners.get(source.id);
+    const duplicateId = idMap.get(source.id)!;
+    if (ownerId) project.modules.find(module => module.id === ownerId)?.memberIds.push(duplicateId);
+  }
+  return copies.map(component => component.id);
+}
+
+export function validateProject(input: unknown): BitWireProject {
+  if (!input || typeof input !== 'object') throw new Error('El archivo no contiene un proyecto v√°lido.');
+  const candidate = input as Partial<BitWireProject>;
+  if (candidate.format !== 'bitwire' || candidate.version !== 1) throw new Error('Versi√≥n de archivo .bitwire incompatible.');
+  if (!Array.isArray(candidate.components) || !Array.isArray(candidate.wires)) throw new Error('El grafo del circuito est√° incompleto.');
+  candidate.modules ??= [];
+  const ids = new Set([...candidate.components.map(item => item.id), ...candidate.modules.map(item => item.id)]);
+  for (const connection of candidate.wires) {
+    if (!ids.has(connection.from.componentId) || !ids.has(connection.to.componentId)) {
+      throw new Error(`El cable ${connection.id} apunta a un componente inexistente.`);
+    }
+  }
+  const project = candidate as BitWireProject;
+  project.settings = { ...DEFAULT_SETTINGS, ...(candidate.settings ?? {}) };
+  // Forward-compatible migration of projects saved by the first public build.
+  for (const component of project.components) component.scale = Number(component.scale) || 1;
+  for (const module of project.modules) {
+    module.collapsed ??= false;
+    module.pins ??= [];
+  }
+  for (const connection of project.wires) connection.controlPoints ??= [];
+  if (project.settings.theme === ('dark' as Theme)) project.settings.theme = 'night';
+  if (project.settings.theme === ('light' as Theme)) project.settings.theme = 'morning';
+  return project;
+}
