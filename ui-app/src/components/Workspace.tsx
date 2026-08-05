@@ -53,6 +53,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
   const [viewport, setViewportState] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
   const [interaction, setInteraction] = useState<Interaction>(null);
   const interactionRef = useRef<Interaction>(null);
+  const modulePressRef = useRef<{ id:string; at:number }|undefined>(undefined);
   const [pendingPin, setPendingPin] = useState<PinRef>();
   const [selectedWireId, setSelectedWireId] = useState<string>();
   const [pointerWorld, setPointerWorld] = useState<Point>({ x: 0, y: 0 });
@@ -314,10 +315,10 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
   const onModuleDown = (event: React.PointerEvent<SVGGElement>, module: ModuleArea) => {
     event.stopPropagation();
     if (event.button === 2) return;
+    const now=performance.now(),previous=modulePressRef.current;
+    modulePressRef.current={id:module.id,at:now};
+    if(previous?.id===module.id&&now-previous.at<360){setCurrentInteraction(null);navigateToModule(module.id);return;}
     onSelected([]); onSelectedModule(module.id); setSelectedWireId(undefined);
-    // Navigate on the second pointer press itself. SVG pointer capture can
-    // otherwise swallow the later synthetic double-click event.
-    if (event.detail > 1) { navigateToModule(module.id); return; }
     if (tool !== 'select' || activeModuleId === module.id) return;
     const world = screenToWorld(localPoint(event), viewport);
     setCurrentInteraction({ type: 'module-drag', start: world, origin: { x: module.x, y: module.y }, moduleId: module.id, recorded: false });
