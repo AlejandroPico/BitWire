@@ -1,37 +1,25 @@
-þº(·úk¡ø¥zX§{ßÝzÿçºYOz¹¢²È¨×§‰çZ[\ÜÈ\ØÜšX™K^XÝ]Hœ›ÛH	Ýš]\Ý	ÎÂš[\ÜÈÜ™X]P›[šÔ›Ú™XÝÜ™X]Q[[Ô›Ú™XÝ\XØ]PÛÛ\Û™[Ë˜[Y]T›Ú™XÝHœ›ÛH	Ë‹Ü›Ú™XÝ	ÎÂ‚™\ØÜšX™J	Ü›Ú™XÝÝ]H[\œÉË
+import { describe,expect,it } from 'vitest';
+import { createBlankProject,createDemoProject,duplicateComponents,validateProject } from './project';
 
-OOžÂˆ]
-	Ù[˜X›\ÈÝ\œ™[[š[X][ÛˆžHY˜][[™ZYÜ˜]\ÈÛ\ˆ›Ú™XÝÉË
+describe('project state helpers',()=>{
+  it('enables current animation by default and migrates older projects',()=>{
+    expect(createBlankProject().settings.animateCurrent).toBe(true);
+    const legacy=structuredClone(createBlankProject()) as any;
+    delete legacy.settings.animateCurrent;
+    expect(validateProject(legacy).settings.animateCurrent).toBe(true);
+  });
 
-OOžÂˆ^XÝ
-Ü™X]P›[šÔ›Ú™XÝ
+  it('duplicates a component inside its current encapsulation',()=>{
+    const project=createDemoProject();
+    let counter=0;
+    const [duplicateId]=duplicateComponents(project,['gate_main'],prefix=>`${prefix}_copy_${counter++}`);
+    expect(project.modules.find(module=>module.id==='module_gate_core')?.memberIds).toContain(duplicateId);
+    expect(project.components.find(component=>component.id===duplicateId)?.x).toBe(-140);
+  });
 
-KœÙ][™ÜË˜[š[X]PÝ\œ™[
-KÐ™JYJNÂˆÛÛœÝYØXÞO\ÝXÝ\™YÛÛ™JÜ™X]P›[šÔ›Ú™XÝ
-
-JH\È[žNÂˆ[]HYØXÞKœÙ][™ÜË˜[š[X]PÝ\œ™[Âˆ^XÝ
-˜[Y]T›Ú™XÝ
-YØXÞJKœÙ][™ÜË˜[š[X]PÝ\œ™[
-KÐ™JYJNÂˆJNÂ‚ˆ]
-	Ù\XØ]\ÈHÛÛ\Û™[[œÚYH]ÈÝ\œ™[[˜Ø\Ý[][Û‰Ë
-
-OOžÂˆÛÛœÝ›Ú™XÝXÜ™X]Q[[Ô›Ú™XÝ
-
-NÂˆ]ÛÝ[\LÂˆÛÛœÝÙ\XØ]RYOY\XØ]PÛÛ\Û™[Ê›Ú™XÝÉÙØ]WÛXZ[‰×K™Yš^O˜	Ü™Yš^WØÛÜWÉØÛÝ[\ŠÊßX
-NÂˆ^XÝ
-›Ú™XÝ›[Ù[\Ë™š[™
-[Ù[OO›[Ù[KšYOOIÛ[Ù[WÙØ]WØÛÜ™IÊOË›Y[X™\’YÊKÐÛÛZ[Š\XØ]RY
-NÂˆ^XÝ
-›Ú™XÝ˜ÛÛ\Û™[Ë™š[™
-ÛÛ\Û™[O˜ÛÛ\Û™[šYOOY\XØ]RY
-OËž
-KÐ™JLM
-NÂˆJNÂ‚ˆ]
-	ÚÙY\ÈH›ÛÝ[]™[\XØ]H]H›ÛÝ	Ë
-
-OOžÂˆÛÛœÝ›Ú™XÝXÜ™X]Q[[Ô›Ú™XÝ
-
-NÂˆÛÛœÝÙ\XØ]RYOY\XØ]PÛÛ\Û™[Ê›Ú™XÝÉÙÜ›Ý[™ÛXZ[‰×K™Yš^O˜	Ü™Yš^WÜ›ÛÝØÛÜX
-NÂˆ^XÝ
-›Ú™XÝ›[Ù[\Ë™]™\žJ[Ù[OOˆ[[Ù[K›Y[X™\’YËš[˜ÛY\Ê\XØ]RY
-JJKÐ™JYJNÂˆJNÂŸJNÂ
+  it('keeps a root-level duplicate at the root',()=>{
+    const project=createDemoProject();
+    const [duplicateId]=duplicateComponents(project,['ground_main'],prefix=>`${prefix}_root_copy`);
+    expect(project.modules.every(module=>!module.memberIds.includes(duplicateId))).toBe(true);
+  });
+});
