@@ -1,236 +1,239 @@
-şº(·úk¡ø¥zX§{ßİzÿçºYOz¹¢²È¨×§‰çZ[\ÜÈĞUSÑ×Ğ–WÒQHœ›ÛH	Ë‹‹ØØ][ÙËØØ][ÙÉÎÂš[\ÜÈ™\ÜXİÓ[Ù[P›İ[™\šY\ÈHœ›ÛH	Ë‹‹Û[Ù[Û[Ù[TØÛÜIÎÂš[\Ü\HÂˆš]Ú\™T›Ú™XİÛÛ\Û™[[œİ[˜ÙKÛÛ\Û™[ÚYÛ˜[ÙÚXÕ˜[YKˆÚ[][][Û”Û˜\ÚİÚ\™TÚYÛ˜[ŸHœ›ÛH	Ë‹‹Û[Ù[İ\\ÉÎÂš[\ÜÈSTWÔÒQÓSHœ›ÛH	Ë‹‹Û[Ù[İ\\ÉÎÂ‚˜ÛÛœİÛÛ™TÚYÛ˜[H
-ÚYÛ˜[ˆ\X[Ú\™TÚYÛ˜[ˆHßJNˆÚ\™TÚYÛ˜[Oˆ
-È‹‹‘STWÔÒQÓS‹‹œÚYÛ˜[JNÂ˜ÛÛœİÙ^SÙˆH
-ÛÛ\Û™[Yˆİš[™Ë[’Yˆİš[™ÊHOˆ	ØÛÛ\Û™[YN‰Ü[’YXÂ‚™[˜İ[Ûˆ]
-˜[YNˆÚ\™TÚYÛ˜[[™Yš[™Y
-NˆÙÚXÕ˜[YHÂˆYˆ
-]˜[YH˜[YK›ÙÚXÈOOH	Ö	È˜[YK›ÙÚXÈOOH	Ö‰ÊH™]\›ˆ	Ö	ÎÂˆ™]\›ˆ˜[YK›ÙÚXÎÂŸB‚™[˜İ[ÛˆÙÚXÔÚYÛ˜[
-˜[YNˆÙÚXÕ˜[YKYÚ›ÛYÙHHJNˆÚ\™TÚYÛ˜[Âˆ™]\›ˆÛÛ™TÚYÛ˜[
-ÂˆÙÚXÎˆ˜[YKˆ›ÛYÙNˆ˜[YHOOHHÈYÚ›ÛYÙHˆˆXİ]™Nˆ˜[YHOOH˜[YHOOHKˆ›Ø][™Îˆ˜[YHOOH	Ö	È˜[YHOOH	Ö‰Ëˆİ\œ™[ˆ˜[YHOOHHÈŒˆˆˆJNÂŸB‚™[˜İ[ÛˆØ]T™\İ[
-[Ù[ˆİš[™Ë[œ]ÎˆÙÚXÕ˜[YV×JNˆÙÚXÕ˜[YHÂˆYˆ
-[œ]ËœÛÛYJ˜[YHOˆ˜[YHOOH	Ö	È˜[YHOOH	Ö‰ÊJH™]\›ˆ	Ö	ÎÂˆÛÛœİš]ÈH[œ]È\È\œ˜^OOÂˆİÚ]Ú
-[Ù[
-HÂˆØ\ÙH	Ø[™	Îˆ™]\›ˆš]Ë™]™\J›ÛÛX[ŠHÈHˆÂˆØ\ÙH	Û˜[™	Îˆ™]\›ˆš]Ë™]™\J›ÛÛX[ŠHÈˆNÂˆØ\ÙH	ÛÜ‰Îˆ™]\›ˆš]ËœÛÛYJ›ÛÛX[ŠHÈHˆÂˆØ\ÙH	Û›Ü‰Îˆ™]\›ˆš]ËœÛÛYJ›ÛÛX[ŠHÈˆNÂˆØ\ÙH	ŞÜ‰Îˆ™]\›ˆš]Ë™š[\Š›ÛÛX[ŠK›[™İ	HˆÈHˆÂˆØ\ÙH	Ş›Ü‰Îˆ™]\›ˆš]Ë™š[\Š›ÛÛX[ŠK›[™İ	HˆÈˆNÂˆØ\ÙH	Û›İ	Îˆ™]\›ˆš]ÖÌHÈˆNÂˆY˜][ˆ™]\›ˆ	Ö	ÎÂˆBŸB‚™[˜İ[Ûˆ]˜[X]PÛÛ\Û™[
-ˆÛÛ\Û™[ˆÛÛ\Û™[[œİ[˜ÙKˆ[œ]Îˆ™XÛÜ™İš[™ËÚ\™TÚYÛ˜[‹ˆ[YNˆ[X™\‹ŠNˆ™XÛÜ™İš[™ËÚ\™TÚYÛ˜[ˆÂˆÛÛœİYš[š][ÛˆHĞUSÑ×Ğ–WÒQ™Ù]
-ÛÛ\Û™[™Yš[š][Û’Y
-NÂˆYˆ
-YYš[š][ÛˆXÛÛ\Û™[™[˜X›Y
-H™]\›ˆßNÂˆÛÛœİ›ÜÈHÈ‹‹™Yš[š][Û‹™Y˜][Ë‹‹˜ÛÛ\Û™[œ›Ü\Y\ÈNÂˆÛÛœİİ]]ˆ™XÛÜ™İš[™ËÚ\™TÚYÛ˜[ˆHßNÂˆÛÛœİ›ÛYÙRYÚH[X™\Š›ÜË›ÛYÙRYÚÏÈJNÂˆÛÛœİ[Ù[HYš[š][Û‹›[Ù[Â‚ˆYˆ
-[Ù[OOH	ÜÛİ\˜ÙWÙÉÊHÂˆÛÛœİ›ÛYÙHH[X™\Š›ÜË›ÛYÙHÏÈJNÂˆİ]]œÜÈHÛÛ™TÚYÛ˜[
-ÈÙÚXÎˆ›ÛYÙHH‹HÈHˆ›ÛYÙKİ\œ™[ˆŒKXİ]™NˆYK›Ø][™Îˆ˜[ÙHJNÂˆİ]]›™YÈHÛÛ™TÚYÛ˜[
-ÈÙÚXÎˆ›ÛYÙNˆXİ]™NˆYK›Ø][™Îˆ˜[ÙHJNÂˆH[ÙHYˆ
-[Ù[OOH	ÜÛİ\˜ÙWØXÉÊHÂˆÛÛœİXZÈH[X™\Š›ÜË›ÛYÙHÏÈLŠH
-ˆX]”ÔT•ÂˆÛÛœİ›ÛYÙHHXZÈ
-ˆX]œÚ[Š[YH
-ˆX]”H
-ˆˆ
-ˆ[X™\Š›ÜË™œ™\]Y[˜ŞHÏÈL
-JNÂˆİ]]œÜÈHÛÛ™TÚYÛ˜[
-ÈÙÚXÎˆ›ÛYÙHH‹HÈHˆ›ÛYÙKİ\œ™[ˆX]˜XœÊ›ÛYÙJHÈLXİ]™NˆYK›Ø][™Îˆ˜[ÙHJNÂˆİ]]›™YÈHÛÛ™TÚYÛ˜[
-ÈÙÚXÎˆ›ÛYÙNˆXİ]™NˆYK›Ø][™Îˆ˜[ÙHJNÂˆH[ÙHYˆ
-[Ù[OOH	ÙÜ›İ[™	ÊHÂˆİ]]™Û™HÛÛ™TÚYÛ˜[
-ÈÙÚXÎˆ›ÛYÙNˆXİ]™NˆYK›Ø][™Îˆ˜[ÙHJNÂˆH[ÙHYˆ
-[Ù[OOH	ÛÙÚX×Ú[œ]	ÊHÂˆİ]]›İ]HÙÚXÔÚYÛ˜[
-[X™\Š›ÜËœİ]JHÈHˆ›ÛYÙRYÚ
-NÂˆH[ÙHYˆ
-[Ù[OOH	ØÛØÚÉÊHÂˆÛÛœİœ™\]Y[˜ŞHHX]›X^
-ŒK[X™\Š›ÜË™œ™\]Y[˜ŞHÏÈJJNÂˆÛÛœİ]HHX]›X^
-KX]›Z[ŠNK[X™\Š›ÜË™]PŞXÛHÏÈL
-JJHÈLÂˆİ]]›İ]HÙÚXÔÚYÛ˜[
+import { CATALOG_BY_ID } from '../catalog/catalog';
+import { respectsModuleBoundaries } from '../model/moduleScope';
+import type {
+  BitWireProject, ComponentInstance, ComponentSignal, LogicValue,
+  SimulationSnapshot, WireSignal,
+} from '../model/types';
+import { EMPTY_SIGNAL } from '../model/types';
 
-[YH
-ˆœ™\]Y[˜ŞJH	HH]HÈHˆ›ÛYÙRYÚ
-NÂˆH[ÙHYˆ
-ÉØ[™	Ë	ÛÜ‰Ë	Û›İ	Ë	Û˜[™	Ë	Û›Ü‰Ë	ŞÜ‰Ë	Ş›Ü‰×Kš[˜ÛY\Ê[Ù[
-JHÂˆÛÛœİYÈHYš[š][Û‹œ[œË™š[\Š[ˆOˆ[‹šÚ[™OOH	ÒS”U	ÊK›X\
-[ˆOˆ[‹šY
-NÂˆİ]]›İ]HÙÚXÔÚYÛ˜[
-Ø]T™\İ[
-[Ù[YË›X\
-YOˆ]
-[œ]ÖÚYJJJK›ÛYÙRYÚ
-NÂˆH[ÙHYˆ
-[Ù[OOH	Û]^	ÊHÂˆÛÛœİÙ[XİYH]
-[œ]ËœÙ[
-HOOHHÈ[œ]Ë˜ˆˆ[œ]Ë˜NÂˆİ]]›İ]HÙ[XİYÈÈ‹‹œÙ[XİYHˆÙÚXÔÚYÛ˜[
-	Ö	Ë›ÛYÙRYÚ
-NÂˆH[ÙHYˆ
-[Ù[OOH	Ù™‰ÊHÂˆÛÛœİ[š]X[H[X™\Š›ÜËš[š]X[İ]HÏÈ
-HÈHˆÂˆÛÛœİHH[œ]Ë™	‰ˆ]
-[œ]Ë˜ÛÊHOOHHÈ]
-[œ]Ë™
-Hˆ[š]X[Âˆİ]]œHHÙÚXÔÚYÛ˜[
-K›ÛYÙRYÚ
-NÂˆİ]]›œHHÙÚXÔÚYÛ˜[
-HOOHHÈˆK›ÛYÙRYÚ
-NÂˆH[ÙHYˆ
-[Ù[OOH	ØÛÛ\\˜]Ü‰ÊHÂˆÛÛœİ™\İ[H
-[œ]Ëœ\ÏË›ÛYÙHÏÈ
-Hˆ
-[œ]Ë›Z[\ÏË›ÛYÙHÏÈ
-HÈHˆÂˆİ]]›İ]HÙÚXÔÚYÛ˜[
-™\İ[[X™\Š›ÜËšYÚ›ÛYÙHÏÈJJNÂˆH[ÙHYˆ
-[Ù[OOH	ÜİÚ]Ú	ÊHÂˆYˆ
-›ÛÛX[Š›ÜË˜ÛÜÙY
-JHÂˆYˆ
-[œ]Ë˜JHİ]]˜ˆHÈ‹‹š[œ]Ë˜HNÂˆYˆ
-[œ]Ë˜ŠHİ]]˜HHÈ‹‹š[œ]Ë˜ˆNÂˆBˆH[ÙHYˆ
-ÉÜ™\Ú\İÜ‰Ë	ØØ\XÚ]Ü‰Ë	Ú[™XİÜ‰Ë	Ù\ÙIË	ØÛÛ›™XİÜ‰×Kš[˜ÛY\Ê[Ù[
-JHÂˆYˆ
-[Ù[OOH	Ù\ÙIÈ	‰ˆ›ÛÛX[Š›ÜË˜›İÛŠJH™]\›ˆßNÂˆYˆ
-[œ]Ë˜JHİ]]˜ˆHÈ‹‹š[œ]Ë˜HNÂˆYˆ
-[œ]Ë˜ŠHİ]]˜HHÈ‹‹š[œ]Ë˜ˆNÂˆYˆ
-[œ]ËœJHİ]]œˆHÈ‹‹š[œ]ËœHNÂˆYˆ
-[œ]ËœŠHİ]]œHHÈ‹‹š[œ]ËœˆNÂˆH[ÙHYˆ
-ÉÙ[ÙIË	Ş™[™\‰Ë	ÛY	Ë	Û[\	Ë	Û[İÜ‰Ë	Ø^™\‰×Kš[˜ÛY\Ê[Ù[
-JHÂˆËÈØYÈÛÛœİ[YHH™]]]\İ›İ™Z]™H\ÈYX[›ÛYÙHÛİ\˜Ù\ÈÛˆH™]\›ˆ™]‚ˆËÈZ\ˆš\İX[Xİ]š]H\È\š]™Yœ›ÛHH[œ]™[İË‚ˆH[ÙHYˆ
-[Ù[OOH	ÛÜ[\	ÊHÂˆÛÛœİİ\HH[X™\Š›ÜËœİ\HÏÈLŠNÂˆÛÛœİ›ÛYÙHHX]›X^
-\İ\KX]›Z[Šİ\Kˆ
+const cloneSignal = (signal: Partial<WireSignal> = {}): WireSignal => ({ ...EMPTY_SIGNAL, ...signal });
+const keyOf = (componentId: string, pinId: string) => `${componentId}:${pinId}`;
 
-[œ]Ëœ\ÏË›ÛYÙHÏÈ
-HH
-[œ]Ë›Z[\ÏË›ÛYÙHÏÈ
-JH
-ˆ[X™\Š›ÜË™ØZ[ˆÏÈL
-JJNÂˆİ]]›İ]HÛÛ™TÚYÛ˜[
-È›ÛYÙKÙÚXÎˆ›ÛYÙHH‹HÈHˆXİ]™NˆYK›Ø][™Îˆ˜[ÙKİ\œ™[ˆX]˜XœÊ›ÛYÙJHÈLJNÂˆBˆ™]\›ˆİ]]ÂŸB‚™^Ü[˜İ[Ûˆ]˜[X]PÚ\˜İZ]
-›Ú™Xİˆš]Ú\™T›Ú™Xİ[YHHXÚÈH
-NˆÚ[][][Û”Û˜\ÚİÂˆÛÛœİ[™Ú[ÚYÛ˜[ÈH™]ÈX\İš[™ËÚ\™TÚYÛ˜[Š
-NÂˆÛÛœİÛÛ\Û™[ÚYÛ˜[Îˆ™XÛÜ™İš[™ËÛÛ\Û™[ÚYÛ˜[ˆHßNÂˆÛÛœİ˜[YÚ\™\Ï\›Ú™XİÚ\™\Ë™š[\ŠÚ\™OOœ™\ÜXİÓ[Ù[P›İ[™\šY\Ê›Ú™XİÚ\™JJNÂˆÛÛœİ[˜[YÚ\™\Ï\›Ú™XİÚ\™\Ë™š[\ŠÚ\™OOˆ\™\ÜXİÓ[Ù[P›İ[™\šY\Ê›Ú™XİÚ\™JJNÂ‚ˆÛÛœİÛÛ›™XİYÈH™]ÈX\İš[™Ëİš[™Ö×OŠ
-NÂˆ›Üˆ
-ÛÛœİÚ\™HÙˆ˜[YÚ\™\ÊHÂˆÛÛœİœ›ÛHHÙ^SÙŠÚ\™K™œ›ÛK˜ÛÛ\Û™[YÚ\™K™œ›ÛKœ[’Y
-NÂˆÛÛœİÈHÙ^SÙŠÚ\™KË˜ÛÛ\Û™[YÚ\™KËœ[’Y
-NÂˆÛÛ›™XİYËœÙ]
-œ›ÛKË‹‹ŠÛÛ›™XİYË™Ù]
-œ›ÛJHÏÈ×JK×JNÂˆÛÛ›™XİYËœÙ]
-ËË‹‹ŠÛÛ›™XİYË™Ù]
-ÊHÏÈ×JKœ›ÛWJNÂˆB‚ˆÛÛœİÚYÛ˜[Û“™]H
-İ\ˆİš[™ÊNˆÚ\™TÚYÛ˜[[™Yš[™YOˆÂˆÛÛœİ]Y]YHHÜİ\Kš\Ú]YH™]ÈÙ]İš[™ÏŠ
-NÂˆ]˜[˜XÚÎˆÚ\™TÚYÛ˜[[™Yš[™YÂˆÚ[H
-]Y]YK›[™İ
-HÂˆÛÛœİ[™Ú[H]Y]YKœÚY
+function truth(value: WireSignal | undefined): LogicValue {
+  if (!value || value.logic === 'X' || value.logic === 'Z') return 'X';
+  return value.logic;
+}
 
-HNÂˆYˆ
-š\Ú]Yš\Ê[™Ú[
-JHÛÛ[YNÂˆš\Ú]Y˜Y
-[™Ú[
-NÂˆÛÛœİ˜[YHH[™Ú[ÚYÛ˜[Ë™Ù]
-[™Ú[
-NÂˆYˆ
-˜[YOË˜Xİ]™H	‰ˆX]˜XœÊ˜[YK›ÛYÙJHˆŒJH™]\›ˆ˜[YNÂˆYˆ
-˜[YOË˜Xİ]™JH˜[˜XÚÈH˜[YNÂˆ[ÙHYˆ
-˜[YH	‰ˆY˜[˜XÚÊH˜[˜XÚÈH˜[YNÂˆ›Üˆ
-ÛÛœİY\ˆÙˆÛÛ›™XİYË™Ù]
-[™Ú[
-HÏÈ×JH]Y]YKœ\Ú
-Y\ŠNÂˆBˆ™]\›ˆ˜[˜XÚÎÂˆNÂ‚ˆ›Üˆ
-]\ÜÈHÈ\ÜÈX]›X^
-‹›Ú™Xİ˜ÛÛ\Û™[Ë›[™İ
-ˆŠNÈ\ÜÈ
-ÏHJHÂˆ]Ú[™ÙYH˜[ÙNÂˆ›Üˆ
-ÛÛœİÛÛ\Û™[Ùˆ›Ú™Xİ˜ÛÛ\Û™[ÊHÂˆÛÛœİYš[š][ÛˆHĞUSÑ×Ğ–WÒQ™Ù]
-ÛÛ\Û™[™Yš[š][Û’Y
-NÂˆYˆ
-YYš[š][ÛŠHÛÛ[YNÂˆÛÛœİ[œ]Îˆ™XÛÜ™İš[™ËÚ\™TÚYÛ˜[ˆHßNÂˆ›Üˆ
-ÛÛœİ[‘YˆÙˆYš[š][Û‹œ[œÊHÂˆÛÛœİ[™Ú[HÙ^SÙŠÛÛ\Û™[šY[‘Y‹šY
-NÂˆÛÛœİÚYÛ˜[HÚYÛ˜[Û“™]
-[™Ú[
-NÂˆYˆ
-ÚYÛ˜[
-H[œ]ÖÜ[‘Y‹šYHHÚYÛ˜[ÂˆBˆÛÛœİİ]]ÈH]˜[X]PÛÛ\Û™[
-ÛÛ\Û™[[œ]Ë[YJNÂˆ]Xİ]™HH˜[ÙNÂˆ]İÙ\ˆHÂˆ›Üˆ
-ÛÛœİÜ[’YÚYÛ˜[HÙˆØš™Xİ™[šY\Êİ]]ÊJHÂˆÛÛœİ[™Ú[HÙ^SÙŠÛÛ\Û™[šY[’Y
-NÂˆÛÛœİ™]š[İ\ÈH[™Ú[ÚYÛ˜[Ë™Ù]
-[™Ú[
-NÂˆYˆ
-\™]š[İ\È™]š[İ\Ë›ÙÚXÈOOHÚYÛ˜[›ÙÚXÈX]˜XœÊ™]š[İ\Ë›ÛYÙHHÚYÛ˜[›ÛYÙJHˆYKNJHÚ[™ÙYHYNÂˆ[™Ú[ÚYÛ˜[ËœÙ]
-[™Ú[ÚYÛ˜[
-NÂˆXİ]™HHÚYÛ˜[˜Xİ]™H	‰ˆX]˜XœÊÚYÛ˜[›ÛYÙJHˆŒNÂˆİÙ\ˆ
-ÏHX]˜XœÊÚYÛ˜[›ÛYÙH
-ˆÚYÛ˜[˜İ\œ™[
-NÂˆBˆYˆ
-ÉÙ[ÙIË	Ş™[™\‰Ë	ÛY	Ë	Û[\	Ë	Û[İÜ‰Ë	Ø^™\‰×Kš[˜ÛY\ÊYš[š][Û‹›[Ù[
-JHÂˆÛÛœİ[œ]HØš™Xİ˜[Y\Ê[œ]ÊK™š[™
-ÚYÛ˜[OˆÚYÛ˜[˜Xİ]™H	‰ˆX]˜XœÊÚYÛ˜[›ÛYÙJHˆŒJNÂˆYˆ
-[œ]
-HÈXİ]™HHYNÈİÙ\ˆHX]˜XœÊ[œ]›ÛYÙH
-ˆX]›X^
-[œ]˜İ\œ™[ŒŠJNÈBˆBˆÛÛœİ\Ü^R[œ]ÏYYš[š][Û‹œŞ[X›ÛOOIÙ\Ü^MÉßYš[š][Û‹œŞ[X›ÛOOIÙ\Ü^M	ßYš[š][Û‹œŞ[X›ÛOOIÛX]š^	ßYš[š][Û‹œŞ[X›ÛOOIØ˜\™Ü˜\	ÎÂˆYŠ\Ü^R[œ]Ê^ÂˆXİ]™OSØš™Xİ˜[Y\Ê[œ]ÊKœÛÛYJÚYÛ˜[OœÚYÛ˜[˜Xİ]™I‰œÚYÛ˜[›ÙÚXÏOOLJNÂˆİÙ\SØš™Xİ˜[Y\Ê[œ]ÊK™š[\ŠÚYÛ˜[OœÚYÛ˜[˜Xİ]™I‰œÚYÛ˜[›ÙÚXÏOOLJK›[™İ
-‹ŒNÂˆBˆÛÛ\Û™[ÚYÛ˜[ÖØÛÛ\Û™[šYHHÈ[œ]Ëİ]]ËXİ]™KİÙ\ˆNÂˆBˆYˆ
-XÚ[™ÙY
-Hœ™XZÎÂˆB‚ˆÛÛœİÚ\™TÚYÛ˜[Îˆ™XÛÜ™İš[™ËÚ\™TÚYÛ˜[ˆHßNÂˆÛÛœİØ\›š[™ÜÎˆİš[™Ö×HH[˜[YÚ\™\Ë›X\
-Ú\™OO˜ØX›H	İÚ\™K›X™[ÏÈÚ\™KšYHZ\ÛYÎˆ]˜]šY\ØH[ˆ[˜Ø\İ[YÈÚ[ˆ][X
-NÂˆ›Üˆ
-ÛÛœİÚ\™HÙˆ[˜[YÚ\™\ÊHÚ\™TÚYÛ˜[ÖİÚ\™KšYOXÛÛ™TÚYÛ˜[
+function logicSignal(value: LogicValue, highVoltage = 5): WireSignal {
+  return cloneSignal({
+    logic: value,
+    voltage: value === 1 ? highVoltage : 0,
+    active: value === 0 || value === 1,
+    floating: value === 'X' || value === 'Z',
+    current: value === 1 ? .002 : 0,
+  });
+}
 
-NÂ‚ˆËÈH™]\›ˆÛÛ™XİÜˆÚ]È]ˆHYš[š][Û‹]]Ø[ˆİ[Ø\œHHØ[YBˆËÈİ\œ™[\ÈH]™HÚYHÙˆHÛÜÙYÚ\˜İZ]ˆ\š]™HÜÙH™]\›ˆ™]Èœ›ÛBˆËÈ[™\™Ú^™YØYÈ[œİXYÙˆZ\İZÚ[™È™\›Èİ[X[›Üˆ[ˆ[˜Xİ]™HØX›K‚ˆÛÛœİØY[Ù[Ï[™]ÈÙ]
-ÉÙ[ÙIË	Ş™[™\‰Ë	ÛY	Ë	Û[\	Ë	Û[İÜ‰Ë	Ø^™\‰×JNÂˆÛÛœİ™]\›İ\œ™[H™]ÈX\İš[™Ë[X™\Š
-NÂˆÛÛœİ›ØÚÙY™]\›‘[™Ú[Ï[™]ÈÙ]İš[™ÏŠ
-NÂˆ›ÜŠÛÛœİÛÛ\Û™[Ùˆ›Ú™Xİ˜ÛÛ\Û™[Ê^ÂˆÛÛœİYš[š][ÛPĞUSÑ×Ğ–WÒQ™Ù]
-ÛÛ\Û™[™Yš[š][Û’Y
-NÂˆÛÛœİİ]OXÛÛ\Û™[ÚYÛ˜[ÖØÛÛ\Û™[šYNÂˆYŠYYš[š][ÛŸ[ØY[Ù[Ëš\ÊYš[š][Û‹›[Ù[
-_\İ]_İ]K˜Xİ]™JXÛÛ[YNÂˆ›ÜŠÛÛœİÜ[’YÚYÛ˜[HÙˆØš™Xİ™[šY\Êİ]Kš[œ]ÏÏŞßJJ^ÂˆYŠÚYÛ˜[˜Xİ]™I‰“X]˜XœÊÚYÛ˜[›ÛYÙJOKŒJX›ØÚÙY™]\›‘[™Ú[Ë˜Y
-Ù^SÙŠÛÛ\Û™[šY[’Y
-JNÂˆBˆBˆÛÛœİX\šÔ™]\›“™]H
-İ\œİš[™Ëİ\œ™[›[X™\ŠHOˆÂˆÛÛœİ]Y]YOVÜİ\Kš\Ú]Y[™]ÈÙ]İš[™ÏŠ
-NÂˆÚ[J]Y]YK›[™İ
-^ÂˆÛÛœİ[™Ú[\]Y]YKœÚY
+function gateResult(model: string, inputs: LogicValue[]): LogicValue {
+  if (inputs.some(value => value === 'X' || value === 'Z')) return 'X';
+  const bits = inputs as Array<0 | 1>;
+  switch (model) {
+    case 'and': return bits.every(Boolean) ? 1 : 0;
+    case 'nand': return bits.every(Boolean) ? 0 : 1;
+    case 'or': return bits.some(Boolean) ? 1 : 0;
+    case 'nor': return bits.some(Boolean) ? 0 : 1;
+    case 'xor': return bits.filter(Boolean).length % 2 ? 1 : 0;
+    case 'xnor': return bits.filter(Boolean).length % 2 ? 0 : 1;
+    case 'not': return bits[0] ? 0 : 1;
+    default: return 'X';
+  }
+}
 
-HNÂˆYŠš\Ú]Yš\Ê[™Ú[
-JXÛÛ[YNÂˆš\Ú]Y˜Y
-[™Ú[
-NÂˆYŠ›ØÚÙY™]\›‘[™Ú[Ëš\Ê[™Ú[
-I‰™[™Ú[OO\İ\
-XÛÛ[YNÂˆ™]\›İ\œ™[œÙ]
-[™Ú[X]›X^
-™]\›İ\œ™[™Ù]
-[™Ú[
-OÏÌİ\œ™[
-JNÂˆ›ÜŠÛÛœİY\ˆÙˆÛÛ›™XİYË™Ù]
-[™Ú[
-OÏÖ×J\]Y]YKœ\Ú
-Y\ŠNÂˆBˆNÂˆ›ÜŠÛÛœİÛÛ\Û™[Ùˆ›Ú™Xİ˜ÛÛ\Û™[Ê^ÂˆÛÛœİYš[š][ÛPĞUSÑ×Ğ–WÒQ™Ù]
-ÛÛ\Û™[™Yš[š][Û’Y
-NÂˆÛÛœİİ]OXÛÛ\Û™[ÚYÛ˜[ÖØÛÛ\Û™[šYNÂˆYŠYYš[š][ÛŸ[ØY[Ù[Ëš\ÊYš[š][Û‹›[Ù[
-_\İ]_\İ]K˜Xİ]™JXÛÛ[YNÂˆÛÛœİ[œ]Ï\İ]Kš[œ]ÏÏŞßNÂˆÛÛœİš]™OSØš™Xİ˜[Y\Ê[œ]ÊK™š[™
-ÚYÛ˜[OœÚYÛ˜[˜Xİ]™I‰“X]˜XœÊÚYÛ˜[›ÛYÙJO‹ŒJNÂˆYŠYš]™JXÛÛ[YNÂˆÛÛœİ[\\˜YÙOSX]›X^
-X]˜XœÊš]™K˜İ\œ™[
-KŒŠNÂˆ›ÜŠÛÛœİÜ[’YÚYÛ˜[HÙˆØš™Xİ™[šY\Ê[œ]ÊJ^ÂˆYŠÚYÛ˜[˜Xİ]™I‰“X]˜XœÊÚYÛ˜[›ÛYÙJOKŒJ[X\šÔ™]\›“™]
-Ù^SÙŠÛÛ\Û™[šY[’Y
-K[\\˜YÙJNÂˆBˆB‚ˆ›Üˆ
-ÛÛœİÚ\™HÙˆ˜[YÚ\™\ÊHÂˆÛÛœİYHÚYÛ˜[Û“™]
-Ù^SÙŠÚ\™K™œ›ÛK˜ÛÛ\Û™[YÚ\™K™œ›ÛKœ[’Y
-JNÂˆÛÛœİšYÚHÚYÛ˜[Û“™]
-Ù^SÙŠÚ\™KË˜ÛÛ\Û™[YÚ\™KËœ[’Y
-JNÂˆÛÛœİÚYÛ˜[HYË˜Xİ]™HÈYˆšYÚË˜Xİ]™HÈšYÚˆYÏÈšYÚÏÈÛÛ™TÚYÛ˜[
+function evaluateComponent(
+  component: ComponentInstance,
+  inputs: Record<string, WireSignal>,
+  time: number,
+): Record<string, WireSignal> {
+  const definition = CATALOG_BY_ID.get(component.definitionId);
+  if (!definition || !component.enabled) return {};
+  const props = { ...definition.defaults, ...component.properties };
+  const output: Record<string, WireSignal> = {};
+  const voltageHigh = Number(props.voltageHigh ?? 5);
+  const model = definition.model;
 
-NÂˆÛÛœİ\İ[˜][ÛˆH›Ú™Xİ˜ÛÛ\Û™[Ë™š[™
-ÈOˆËšYOOHÚ\™KË˜ÛÛ\Û™[Y
-NÂˆÛÛœİ\İ[˜][Û‘YˆH\İ[˜][Ûˆ	‰ˆĞUSÑ×Ğ–WÒQ™Ù]
-\İ[˜][Û‹™Yš[š][Û’Y
-NÂˆÛÛœİÛİ\˜ÙHH›Ú™Xİ˜ÛÛ\Û™[Ë™š[™
-ÈOˆËšYOOHÚ\™K™œ›ÛK˜ÛÛ\Û™[Y
-NÂˆÛÛœİÛİ\˜ÙQYˆHÛİ\˜ÙH	‰ˆĞUSÑ×Ğ–WÒQ™Ù]
-Ûİ\˜ÙK™Yš[š][Û’Y
-NÂˆÛÛœİ\ÑYÚ][HÛİ\˜ÙQYËœ[œË™š[™
-[ˆOˆ[‹šYOOHÚ\™K™œ›ÛKœ[’Y
-OË™ÛXZ[ˆOOH	ÑQÒUS	Âˆ\İ[˜][Û‘YËœ[œË™š[™
-[ˆOˆ[‹šYOOHÚ\™KËœ[’Y
-OË™ÛXZ[ˆOOH	ÑQÒUS	ÎÂˆÛÛœİ™\Ú\İ[˜ÙHH\İ[˜][Û‘YË›[Ù[OOH	Ü™\Ú\İÜ‰ÂˆÈX]›X^
-ŒK[X™\Š\İ[˜][ÛËœ›Ü\Y\Ëœ™\Ú\İ[˜ÙHÏÈ\İ[˜][Û‘Y‹™Y˜][Ëœ™\Ú\İ[˜ÙHÏÈL
-JBˆˆLÂˆÛÛœİœ›ÛT™]\›\™]\›İ\œ™[™Ù]
-Ù^SÙŠÚ\™K™œ›ÛK˜ÛÛ\Û™[YÚ\™K™œ›ÛKœ[’Y
-JOÏÌÂˆÛÛœİÔ™]\›\™]\›İ\œ™[™Ù]
-Ù^SÙŠÚ\™KË˜ÛÛ\Û™[YÚ\™KËœ[’Y
-JOÏÌÂˆÛÛœİ™]\›[\\˜YÙOYœ›ÛT™]\›Œ	‰Ô™]\›ŒÓX]›X^
-œ›ÛT™]\›‹Ô™]\›ŠNŒÂˆÛÛœİXİ]™HHÚYÛ˜[˜Xİ]™H	‰ˆ
-\ÑYÚ][X]˜XœÊÚYÛ˜[›ÛYÙJHˆŒH™]\›[\\˜YÙHˆ
-NÂˆÛÛœİ›ÜØ\™[\\˜YÙOSX]›X^
-X]˜XœÊÚYÛ˜[˜İ\œ™[
-KX]˜XœÊÚYÛ˜[›ÛYÙJKÜ™\Ú\İ[˜ÙJNÂˆÚ\™TÚYÛ˜[ÖİÚ\™KšYHHÈ‹‹œÚYÛ˜[Xİ]™Kİ\œ™[ˆXİ]™HÈX]›X^
-™]\›[\\˜YÙK›ÜØ\™[\\˜YÙJHˆNÂˆYˆ
-[Y	‰ˆ\šYÚ
-HØ\›š[™ÜËœ\Ú
-ØX›H	İÚ\™K›X™[ÏÈÚ\™KšYHÚ[ˆÙpìX[Yš[šYX
-NÂˆB‚ˆ™]\›ˆÈXÚË[YKÚ\™TÚYÛ˜[ËÛÛ\Û™[ÚYÛ˜[ËØ\›š[™ÜÎˆØ\›š[™ÜËœÛXÙJ
-HNÂŸB
+  if (model === 'source_dc') {
+    const voltage = Number(props.voltage ?? 5);
+    output.pos = cloneSignal({ logic: voltage >= 2.5 ? 1 : 0, voltage, current: .01, active: true, floating: false });
+    output.neg = cloneSignal({ logic: 0, voltage: 0, active: true, floating: false });
+  } else if (model === 'source_ac') {
+    const peak = Number(props.voltage ?? 12) * Math.SQRT2;
+    const voltage = peak * Math.sin(time * Math.PI * 2 * Number(props.frequency ?? 50));
+    output.pos = cloneSignal({ logic: voltage >= 2.5 ? 1 : 0, voltage, current: Math.abs(voltage) / 1000, active: true, floating: false });
+    output.neg = cloneSignal({ logic: 0, voltage: 0, active: true, floating: false });
+  } else if (model === 'ground') {
+    output.gnd = cloneSignal({ logic: 0, voltage: 0, active: true, floating: false });
+  } else if (model === 'logic_input') {
+    output.out = logicSignal(Number(props.state) ? 1 : 0, voltageHigh);
+  } else if (model === 'clock') {
+    const frequency = Math.max(.001, Number(props.frequency ?? 1));
+    const duty = Math.max(1, Math.min(99, Number(props.dutyCycle ?? 50))) / 100;
+    output.out = logicSignal((time * frequency) % 1 < duty ? 1 : 0, voltageHigh);
+  } else if (['and','or','not','nand','nor','xor','xnor'].includes(model)) {
+    const ids = definition.pins.filter(pin => pin.kind === 'INPUT').map(pin => pin.id);
+    output.out = logicSignal(gateResult(model, ids.map(id => truth(inputs[id]))), voltageHigh);
+  } else if (model === 'mux') {
+    const selected = truth(inputs.sel) === 1 ? inputs.b : inputs.a;
+    output.out = selected ? { ...selected } : logicSignal('X', voltageHigh);
+  } else if (model === 'dff') {
+    const initial = Number(props.initialState ?? 0) ? 1 : 0;
+    const q = inputs.d && truth(inputs.clk) === 1 ? truth(inputs.d) : initial;
+    output.q = logicSignal(q, voltageHigh);
+    output.nq = logicSignal(q === 1 ? 0 : 1, voltageHigh);
+  } else if (model === 'comparator') {
+    const result = (inputs.plus?.voltage ?? 0) > (inputs.minus?.voltage ?? 0) ? 1 : 0;
+    output.out = logicSignal(result, Number(props.highVoltage ?? 5));
+  } else if (model === 'switch') {
+    if (Boolean(props.closed)) {
+      if (inputs.a) output.b = { ...inputs.a };
+      if (inputs.b) output.a = { ...inputs.b };
+    }
+  } else if (['resistor','capacitor','inductor','fuse','connector'].includes(model)) {
+    if (model === 'fuse' && Boolean(props.blown)) return {};
+    if (inputs.a) output.b = { ...inputs.a };
+    if (inputs.b) output.a = { ...inputs.b };
+    if (inputs.p1) output.p2 = { ...inputs.p1 };
+    if (inputs.p2) output.p1 = { ...inputs.p2 };
+  } else if (['diode','zener','led','lamp','motor','buzzer'].includes(model)) {
+    // Loads consume a net but must not behave as ideal voltage sources on the return net.
+    // Their visual activity is derived from the input below.
+  } else if (model === 'opamp') {
+    const supply = Number(props.supply ?? 12);
+    const voltage = Math.max(-supply, Math.min(supply,
+      ((inputs.plus?.voltage ?? 0) - (inputs.minus?.voltage ?? 0)) * Number(props.gain ?? 100000)));
+    output.out = cloneSignal({ voltage, logic: voltage >= 2.5 ? 1 : 0, active: true, floating: false, current: Math.abs(voltage) / 10000 });
+  }
+  return output;
+}
+
+export function evaluateCircuit(project: BitWireProject, time = 0, tick = 0): SimulationSnapshot {
+  const endpointSignals = new Map<string, WireSignal>();
+  const componentSignals: Record<string, ComponentSignal> = {};
+  const validWires=project.wires.filter(wire=>respectsModuleBoundaries(project,wire));
+  const invalidWires=project.wires.filter(wire=>!respectsModuleBoundaries(project,wire));
+
+  const connectedTo = new Map<string, string[]>();
+  for (const wire of validWires) {
+    const from = keyOf(wire.from.componentId, wire.from.pinId);
+    const to = keyOf(wire.to.componentId, wire.to.pinId);
+    connectedTo.set(from, [...(connectedTo.get(from) ?? []), to]);
+    connectedTo.set(to, [...(connectedTo.get(to) ?? []), from]);
+  }
+
+  const signalOnNet = (start: string): WireSignal | undefined => {
+    const queue = [start], visited = new Set<string>();
+    let fallback: WireSignal | undefined;
+    while (queue.length) {
+      const endpoint = queue.shift()!;
+      if (visited.has(endpoint)) continue;
+      visited.add(endpoint);
+      const value = endpointSignals.get(endpoint);
+      if (value?.active && Math.abs(value.voltage) > .001) return value;
+      if (value?.active) fallback = value;
+      else if (value && !fallback) fallback = value;
+      for (const peer of connectedTo.get(endpoint) ?? []) queue.push(peer);
+    }
+    return fallback;
+  };
+
+  for (let pass = 0; pass < Math.max(6, project.components.length * 2); pass += 1) {
+    let changed = false;
+    for (const component of project.components) {
+      const definition = CATALOG_BY_ID.get(component.definitionId);
+      if (!definition) continue;
+      const inputs: Record<string, WireSignal> = {};
+      for (const pinDef of definition.pins) {
+        const endpoint = keyOf(component.id, pinDef.id);
+        const signal = signalOnNet(endpoint);
+        if (signal) inputs[pinDef.id] = signal;
+      }
+      const outputs = evaluateComponent(component, inputs, time);
+      let active = false;
+      let power = 0;
+      for (const [pinId, signal] of Object.entries(outputs)) {
+        const endpoint = keyOf(component.id, pinId);
+        const previous = endpointSignals.get(endpoint);
+        if (!previous || previous.logic !== signal.logic || Math.abs(previous.voltage - signal.voltage) > 1e-9) changed = true;
+        endpointSignals.set(endpoint, signal);
+        active ||= signal.active && Math.abs(signal.voltage) > .001;
+        power += Math.abs(signal.voltage * signal.current);
+      }
+      if (['diode','zener','led','lamp','motor','buzzer'].includes(definition.model)) {
+        const input = Object.values(inputs).find(signal => signal.active && Math.abs(signal.voltage) > .001);
+        if (input) { active = true; power = Math.abs(input.voltage * Math.max(input.current,.002)); }
+      }
+      const displayInputs=definition.symbol==='display7'||definition.symbol==='display4'||definition.symbol==='matrix8'||definition.symbol==='bargraph';
+      if(displayInputs){
+        active=Object.values(inputs).some(signal=>signal.active&&signal.logic===1);
+        power=Object.values(inputs).filter(signal=>signal.active&&signal.logic===1).length*.01;
+      }
+      componentSignals[component.id] = { inputs, outputs, active, power };
+    }
+    if (!changed) break;
+  }
+
+  const wireSignals: Record<string, WireSignal> = {};
+  const warnings: string[] = invalidWires.map(wire=>`Cable ${wire.label ?? wire.id} aislado: atraviesa un encapsulado sin patilla`);
+  for (const wire of invalidWires) wireSignals[wire.id]=cloneSignal();
+
+  // A return conductor sits at 0 V by definition, but it can still carry the same
+  // current as the live side of a closed circuit. Derive those return nets from
+  // energized loads instead of mistaking zero potential for an inactive cable.
+  const loadModels=new Set(['diode','zener','led','lamp','motor','buzzer']);
+  const returnCurrent = new Map<string, number>();
+  const blockedReturnEndpoints=new Set<string>();
+  for(const component of project.components){
+    const definition=CATALOG_BY_ID.get(component.definitionId);
+    const state=componentSignals[component.id];
+    if(!definition||!loadModels.has(definition.model)||!state||state.active)continue;
+    for(const [pinId,signal] of Object.entries(state.inputs??{})){
+      if(signal.active&&Math.abs(signal.voltage)<=.001)blockedReturnEndpoints.add(keyOf(component.id,pinId));
+    }
+  }
+  const markReturnNet = (start:string,current:number) => {
+    const queue=[start],visited=new Set<string>();
+    while(queue.length){
+      const endpoint=queue.shift()!;
+      if(visited.has(endpoint))continue;
+      visited.add(endpoint);
+      if(blockedReturnEndpoints.has(endpoint)&&endpoint!==start)continue;
+      returnCurrent.set(endpoint,Math.max(returnCurrent.get(endpoint)??0,current));
+      for(const peer of connectedTo.get(endpoint)??[])queue.push(peer);
+    }
+  };
+  for(const component of project.components){
+    const definition=CATALOG_BY_ID.get(component.definitionId);
+    const state=componentSignals[component.id];
+    if(!definition||!loadModels.has(definition.model)||!state||!state.active)continue;
+    const inputs=state.inputs??{};
+    const drive=Object.values(inputs).find(signal=>signal.active&&Math.abs(signal.voltage)>.001);
+    if(!drive)continue;
+    const amperage=Math.max(Math.abs(drive.current),.002);
+    for(const [pinId,signal] of Object.entries(inputs)){
+      if(signal.active&&Math.abs(signal.voltage)<=.001)markReturnNet(keyOf(component.id,pinId),amperage);
+    }
+  }
+
+  for (const wire of validWires) {
+    const left = signalOnNet(keyOf(wire.from.componentId, wire.from.pinId));
+    const right = signalOnNet(keyOf(wire.to.componentId, wire.to.pinId));
+    const signal = left?.active ? left : right?.active ? right : left ?? right ?? cloneSignal();
+    const destination = project.components.find(c => c.id === wire.to.componentId);
+    const destinationDef = destination && CATALOG_BY_ID.get(destination.definitionId);
+    const source = project.components.find(c => c.id === wire.from.componentId);
+    const sourceDef = source && CATALOG_BY_ID.get(source.definitionId);
+    const isDigital = sourceDef?.pins.find(pin => pin.id === wire.from.pinId)?.domain === 'DIGITAL'
+      || destinationDef?.pins.find(pin => pin.id === wire.to.pinId)?.domain === 'DIGITAL';
+    const resistance = destinationDef?.model === 'resistor'
+      ? Math.max(.001, Number(destination?.properties.resistance ?? destinationDef.defaults.resistance ?? 1000))
+      : 1000;
+    const fromReturn=returnCurrent.get(keyOf(wire.from.componentId,wire.from.pinId))??0;
+    const toReturn=returnCurrent.get(keyOf(wire.to.componentId,wire.to.pinId))??0;
+    const returnAmperage=fromReturn>0&&toReturn>0?Math.max(fromReturn,toReturn):0;
+    const active = signal.active && (isDigital || Math.abs(signal.voltage) > .001 || returnAmperage > 0);
+    const forwardAmperage=Math.max(Math.abs(signal.current),Math.abs(signal.voltage)/resistance);
+    wireSignals[wire.id] = { ...signal, active, current: active ? Math.max(returnAmperage,forwardAmperage) : 0 };
+    if (!left && !right) warnings.push(`Cable ${wire.label ?? wire.id} sin seÃ±al definida`);
+  }
+
+  return { tick, time, wireSignals, componentSignals, warnings: warnings.slice(0, 8) };
+}
