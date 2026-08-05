@@ -1,4 +1,7 @@
-import { Crosshair, Maximize, Minus, Plus, Route, Scan, Trash2, X } from 'lucide-react';
+import {
+  Box, Crosshair, Hand, Maximize, Minus, MousePointer2, Plus, Route, Scan,
+  Trash2, Waypoints, X,
+} from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CATALOG_BY_ID } from '../catalog/catalog';
 import { fitBounds, screenToWorld, zoomAt } from '../canvas/ViewportMatrix';
@@ -416,6 +419,13 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
       </g>
     </svg>
     <nav className="workspace-breadcrumb" aria-label="Ruta del lienzo"><button onClick={() => navigateToModule()}>PROYECTO</button><b>/</b><button onClick={() => navigateToModule()}>{project.name}</button>{ancestors.map((module,index)=><span className="breadcrumb-level" key={module.id}><b>/</b><button className={index===ancestors.length-1?'current':''} style={{color:module.color}} onClick={()=>navigateToModule(module.id)}>{module.name}{index===ancestors.length-1?' · LIENZO INTERNO':''}</button></span>)}{!activeModule && selectedModule && <span className="breadcrumb-level"><b>/</b><span style={{color:selectedModule.color}}>{selectedModule.name}</span></span>}</nav>
+    <nav className="canvas-tool-palette" aria-label="Herramientas del lienzo">
+      <span>HERRAMIENTAS</span>
+      <button className={tool==='select'?'active':''} onClick={()=>onTool('select')} title="Seleccionar (V)" aria-label="Seleccionar"><MousePointer2 size={17}/></button>
+      <button className={tool==='wire'?'active':''} onClick={()=>onTool('wire')} title="Cablear (W)" aria-label="Cablear"><Waypoints size={17}/></button>
+      <button className={tool==='pan'?'active':''} onClick={()=>onTool('pan')} title="Desplazar (H)" aria-label="Desplazar"><Hand size={17}/></button>
+      <button className={tool==='module'?'active':''} onClick={()=>onTool('module')} title="Crear encapsulado" aria-label="Crear encapsulado"><Box size={17}/></button>
+    </nav>
     {activeModule && <ModulePortDocks module={activeModule} onPin={pin=>connectPin({componentId:activeModule.id,pinId:pin.id})}/>} 
     <div className="lod-indicator"><Scan size={15}/><div><span>LOD {lod.level}</span><strong>{lod.name}</strong></div><small>{lod.detail}</small></div>
     {pendingPin && <div className="wire-hint"><WayPointIcon/>Selecciona otro terminal para completar el cable<button onClick={() => setPendingPin(undefined)}><X size={14}/></button></div>}

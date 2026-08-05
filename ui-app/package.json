@@ -2,11 +2,17 @@
   "name": "bitwire-ui",
   "private": true,
   "version": "0.1.0",
+  "description": "Laboratorio vectorial multiescala para circuitos eléctricos, electrónicos y digitales.",
+  "author": "Alejandro Pico Perez",
+  "main": "desktop/main.cjs",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "prebuild": "npm run prepare:assets",
     "build": "tsc -b && vite build",
+    "build:desktop": "npm run prepare:assets && tsc -b && vite build --base=./",
+    "desktop": "npm run build:desktop && electron .",
+    "desktop:dist": "npm run build:desktop && electron-builder --publish never",
     "test": "vitest run",
     "preview": "vite preview",
     "prepare:assets": "node -e \"require('fs').copyFileSync('node_modules/sql.js/dist/sql-wasm.wasm','public/sql-wasm.wasm')\""
@@ -20,11 +26,69 @@
     "vite": "latest"
   },
   "devDependencies": {
+    "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@types/node": "latest",
     "@types/sql.js": "latest",
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.3",
     "typescript": "latest",
     "vitest": "latest"
+  },
+  "build": {
+    "appId": "io.github.alejandropico.bitwire",
+    "productName": "BitWire",
+    "asar": true,
+    "files": [
+      "dist/**/*",
+      "desktop/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../LICENSE",
+        "to": "LICENSE.txt"
+      }
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "artifactName": "BitWire-Windows-${arch}.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "artifactName": "BitWire-macOS-${arch}.${ext}",
+      "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "artifactName": "BitWire-Linux-${arch}.${ext}",
+      "category": "Development"
+    }
   }
 }

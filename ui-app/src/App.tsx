@@ -1,11 +1,13 @@
-import { CheckCircle2, CircleAlert, HelpCircle, X } from 'lucide-react';
+import { CheckCircle2, CircleAlert, HelpCircle, Info, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AboutDialog } from './components/AboutDialog';
 import { CatalogPanel } from './components/CatalogPanel';
 import { ContextMenu, type ContextAction, type ContextTarget } from './components/ContextMenu';
 import { HelpGuide } from './components/HelpGuide';
 import { Inspector } from './components/Inspector';
 import { InstrumentWindow, type InstrumentWindowState } from './components/InstrumentWindow';
 import { InstrumentTray } from './components/Oscilloscope';
+import { OfflineDialog } from './components/OfflineDialog';
 import { Topbar } from './components/Topbar';
 import { Workspace } from './components/Workspace';
 import { EMBEDDED_CATALOG, verifyCatalogDatabase } from './catalog/catalog';
@@ -39,6 +41,8 @@ export default function App() {
   const [savedRevision, setSavedRevision] = useState(initial.updatedAt);
   const [toast, setToast] = useState<{ type: 'ok' | 'error'; message: string }>();
   const [helpOpen, setHelpOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [offlineOpen, setOfflineOpen] = useState(false);
   const [contextTarget, setContextTarget] = useState<ContextTarget>();
   const [instrumentWindows, setInstrumentWindows] = useState<InstrumentWindowState[]>([]);
   const [theme, setTheme] = useState<Theme>(loadThemePreference);
@@ -258,11 +262,11 @@ export default function App() {
 
   return <div className={`app-shell theme-${resolvedTheme}`} data-theme-mode={theme}>
     <div className={`editor-grid ${catalogCollapsed ? 'left-collapsed' : ''} ${inspectorCollapsed ? 'right-collapsed' : ''} ${instrumentsCollapsed ? 'bottom-collapsed' : ''}`}>
-      <Topbar projectName={project.name} tool={tool} running={running} speed={speed} routing={project.settings.wireRouting} signalView={project.settings.signalView} canUndo={canUndo} canRedo={canRedo} dirty={savedRevision !== project.updatedAt}
+      <Topbar projectName={project.name} running={running} speed={speed} routing={project.settings.wireRouting} signalView={project.settings.signalView} canUndo={canUndo} canRedo={canRedo} dirty={savedRevision !== project.updatedAt}
       theme={theme} onTheme={changeTheme}
-      onTool={setTool} onRun={() => setRunning(value => !value)} onStep={() => workerRef.current?.postMessage({ type: 'step' })} onSpeed={setSpeed}
+      onRun={() => setRunning(value => !value)} onStep={() => workerRef.current?.postMessage({ type: 'step' })} onSpeed={setSpeed}
       onRouting={routing => update(draft => { draft.settings.wireRouting = routing; })} onSignalView={signalView => update(draft => { draft.settings.signalView = signalView; })}
-      onNew={newProject} onSave={save} onImport={() => importRef.current?.click()} onExport={() => exportProject(project)} onUndo={undo} onRedo={redo}/>
+      onNew={newProject} onSave={save} onImport={() => importRef.current?.click()} onExport={() => exportProject(project)} onOffline={()=>setOfflineOpen(true)} onUndo={undo} onRedo={redo}/>
       <CatalogPanel collapsed={catalogCollapsed} database={database} onToggle={() => setCatalogCollapsed(value => !value)} onAdd={addDefinition} modules={moduleLibrary} onInsertModule={insertModule} onImportModule={()=>moduleImportRef.current?.click()} onDeleteModule={id=>setModuleLibrary(deleteSavedModule(id))}/>
       <Workspace project={project} resolvedTheme={resolvedTheme} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} running={running} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>setInspectorCollapsed(false)} onContextTarget={setContextTarget}/>
       <Inspector project={project} selected={selected} collapsed={inspectorCollapsed} onToggle={() => setInspectorCollapsed(value => !value)} selectedModule={selectedModule}
@@ -276,6 +280,7 @@ export default function App() {
         <div><span>{project.components.length} componentes</span><span>{project.wires.length} redes</span><span>{selected.length ? `${selected.length} seleccionados` : 'Sin selección'}</span></div>
         <div className="status-actions">
           <span className="theme-status">TEMA · {themeDefinition(theme).shortLabel.toUpperCase()}</span>
+          <button onClick={() => setAboutOpen(true)}><Info size={14}/>Acerca de</button>
           <button onClick={() => setHelpOpen(true)}><HelpCircle size={14}/>Guía</button>
           <span className={activeWarnings ? 'warning-count active' : 'warning-count'}><CircleAlert size={13}/>{activeWarnings}</span>
         </div>
@@ -286,6 +291,8 @@ export default function App() {
     <input ref={importRef} type="file" accept=".bitwire,.json,application/json" hidden onChange={event => { void doImport(event.target.files?.[0]); event.currentTarget.value = ''; }}/>
     <input ref={moduleImportRef} type="file" accept=".bitwire-module,.json,application/json" hidden onChange={event=>{void doImportModule(event.target.files?.[0]);event.currentTarget.value='';}}/>
     {toast && <div className={`toast ${toast.type}`}>{toast.type === 'ok' ? <CheckCircle2 size={18}/> : <CircleAlert size={18}/>}<span>{toast.message}</span><button onClick={() => setToast(undefined)}><X size={15}/></button></div>}
-    {helpOpen && <HelpGuide onClose={() => setHelpOpen(false)}/>}
+    {helpOpen && <HelpGuide onClose={() => setHelpOpen(false)}/>} 
+    {aboutOpen && <AboutDialog onClose={()=>setAboutOpen(false)} onOffline={()=>setOfflineOpen(true)}/>} 
+    {offlineOpen && <OfflineDialog onClose={()=>setOfflineOpen(false)}/>} 
   </div>;
 }

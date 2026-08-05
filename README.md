@@ -12,11 +12,12 @@ La primera versión funcional incluye un plano SVG de profundidad semántica, ca
 - Catálogo de **219 componentes** repartidos entre electricidad, semiconductores, RF, analógica, potencia, sensores, lógica, memorias, comunicaciones, audio, visualización e instrumentación.
 - Símbolos SVG nativos: no se utilizan bitmaps para los elementos del circuito.
 - Inserción mediante arrastre o doble clic, movimiento con ajuste a rejilla, selección múltiple, duplicado, giro, bloqueo y borrado seguro de conexiones.
+- Paleta vertical integrada en el lienzo para seleccionar, cablear, desplazar y crear encapsulados sin cargar la cabecera.
 - Cableado terminal a terminal con rutas ortogonales, Bézier o rectas.
 - Edición manual de cables: arrastre directo, nodos mediante doble clic, asas desplazables y cambio de ruta por conexión.
-- Motor de simulación en `Web Worker` con ejecución, pausa, paso y velocidades de `0,25×` a `10×`.
+- Control central de simulación con jerarquía visual propia: ejecución, pausa, paso y velocidades de `0,25×` a `10×` sobre un motor aislado en `Web Worker`.
 - Propagación de fuentes CC/CA, interruptores, cargas, pasivos, entradas digitales, reloj y puertas AND, OR, NOT, NAND, NOR, XOR y XNOR.
-- Visualización sobre el cable de tensión, corriente, potencia o estado lógico.
+- Visualización sobre el cable de tensión, corriente, potencia o estado lógico mediante menús propios de superficie completa, sin depender de pequeños selectores nativos.
 - Accionamiento directo de interruptores y entradas binarias desde el plano.
 - Banco de instrumentación multivista y persistente: osciloscopio, analizador lógico, multímetro, monitor de potencia, analizador de espectro y frecuencímetro; cualquier combinación puede mostrarse u ocultarse.
 - Captura independiente por aparato: cada osciloscopio, sonda o analizador lee únicamente las redes conectadas a sus propios terminales.
@@ -33,6 +34,9 @@ La primera versión funcional incluye un plano SVG de profundidad semántica, ca
 - Diez temas integrales y persistentes: automático por hora local, mañana, tarde, noche, BitWire clásico, plano azul con interfaz de madera, laboratorio, terminal, pizarra y pergamino.
 - Control rápido de aspecto: clic en el icono para recorrer `Automático → Mañana → Tarde → Noche`; `Alt + clic` abre el selector visual completo.
 - Deshacer/rehacer, guardado local, importación y exportación `.bitwire`.
+- Ventana «Acerca de» con autoría, enlaces al repositorio y al portfolio.
+- Aplicación de escritorio portable basada en Electron: `.exe` para Windows, aplicación universal para macOS y AppImage para Linux, generadas automáticamente desde `main`.
+- Selector «Modo offline» que detecta el sistema operativo y ofrece el paquete autocontenido correcto, sin instalación, consola ni dependencias de desarrollo.
 - Proyecto inicial con un circuito eléctrico de 5 V y un demostrador lógico AND.
 
 ## Arquitectura
@@ -48,7 +52,8 @@ BitWire/
 │   ├── src/engine/          Simulación determinista + Web Worker
 │   ├── src/model/           Contrato de proyecto y señales
 │   ├── src/state/           Historial y creación de grafos
-│   └── src/utils/           Persistencia e intercambio .bitwire
+│   ├── src/utils/           Persistencia e intercambio .bitwire
+│   └── desktop/             Ventana nativa y política segura de enlaces externos
 └── .github/workflows/       Validación y despliegue automático a Pages
 ```
 
@@ -75,19 +80,29 @@ npm test
 npm run build
 ```
 
+Abrir la aplicación de escritorio durante el desarrollo:
+
+```bash
+cd ui-app
+npm run desktop
+```
+
+Los paquetes finales no se compilan en el ordenador del usuario. El flujo `Build portable desktop apps` produce previamente cada binario autocontenido y los publica en la versión `desktop-latest` de GitHub Releases.
+
 ## Controles
 
 | Acción | Control |
 |---|---|
-| Seleccionar | `V` |
-| Cablear | `W` y clic en dos terminales |
-| Desplazar | `H`, botón central o `Espacio` + arrastre |
+| Seleccionar | paleta vertical del lienzo o `V` |
+| Cablear | paleta vertical, o `W`, y clic en dos terminales |
+| Desplazar | paleta vertical, `H`, botón central o `Espacio` + arrastre |
 | Selección múltiple | `Mayús` + clic o recuadro |
 | Encapsular | herramienta de módulo + recuadro |
 | Zoom semántico | rueda del ratón; el doble clic selecciona y abre el inspector lateral |
 | Menú del objeto | botón derecho sobre componente, cable, encapsulado o lienzo |
 | Interfaz de instrumento | botón derecho → `Abrir interfaz del instrumento` |
 | Cambiar tema | clic en el icono de aspecto; `Alt` + clic abre el menú completo |
+| Descargar la aplicación | `Modo offline` después de `Exportar` |
 | Eliminar | `Supr` |
 | Guardar | `Ctrl+S` |
 | Deshacer / rehacer | `Ctrl+Z` / `Ctrl+Y` |

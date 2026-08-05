@@ -29,6 +29,8 @@ jobs:
           python-version: '3.12'
       - name: Install dependencies
         working-directory: ui-app
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
         run: npm ci
       - name: Compile component catalog
         run: python catalog/generate_db.py --output ui-app/public/catalog.db
@@ -52,4 +54,3 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-
