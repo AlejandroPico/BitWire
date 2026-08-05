@@ -36,8 +36,8 @@ export function pinsFor(profile: string): PinDefinition[] {
   if (profile === 'chip8') return Array.from({ length: 8 }, (_, n) => { const i = n + 1; return pin(`p${i}`,String(i),'BIDIRECTIONAL','MIXED',i <= 4 ? 0 : 1,(i <= 4 ? i : i - 4) / 5); });
   if (profile === 'dff') return [pin('d','D','INPUT','DIGITAL',0,.3),pin('clk','CLK','INPUT','DIGITAL',0,.7),pin('q','Q','OUTPUT','DIGITAL',1,.3),pin('nq','Q̅','OUTPUT','DIGITAL',1,.7)];
   if (profile === 'mux') return [pin('a','A','INPUT','DIGITAL',0,.25),pin('b','B','INPUT','DIGITAL',0,.55),pin('sel','S','INPUT','DIGITAL',0,.82),pin('out','Q','OUTPUT','DIGITAL',1,.5)];
-  if (profile === 'display7') return [...'abcdefg'].map((name, i) => pin(name,name.toUpperCase(),'INPUT','DIGITAL',0,(i + 1) / 9));
-  if (profile === 'display4') return [...'abcdefg'].map((name,i)=>pin(name,name.toUpperCase(),'INPUT','DIGITAL',0,(i+1)/9)).concat(Array.from({length:4},(_,i)=>pin(`digit${i+1}`,`D${i+1}`,'INPUT','DIGITAL',1,(i+1)/5)));
+  if (profile === 'display7') return [...'abcdefg'].map((name, i) => pin(name,name.toUpperCase(),'INPUT','DIGITAL',0,(i + 1) / 8));
+  if (profile === 'display4') return [...'abcdefg'].map((name,i)=>pin(name,name.toUpperCase(),'INPUT','DIGITAL',0,(i+1)/8)).concat(Array.from({length:4},(_,i)=>pin(`digit${i+1}`,`D${i+1}`,'INPUT','DIGITAL',1,(i+1)/5)));
   if (profile === 'lcd16x2') return Array.from({length:8},(_,i)=>pin(`d${i}`,`D${i}`,'INPUT','DIGITAL',0,(i+1)/10)).concat([pin('rs','RS','INPUT','DIGITAL',1,.25),pin('enable','E','INPUT','DIGITAL',1,.45),pin('vcc','VCC','VCC','POWER',1,.65),pin('gnd','GND','GND','POWER',1,.82)]);
   if (profile === 'matrix8') return Array.from({length:8},(_,i)=>pin(`row${i}`,`R${i}`,'INPUT','DIGITAL',0,(i+1)/9)).concat(Array.from({length:8},(_,i)=>pin(`col${i}`,`C${i}`,'INPUT','DIGITAL',1,(i+1)/9)));
   if (profile === 'bargraph10') return Array.from({length:10},(_,i)=>pin(`s${i+1}`,String(i+1),'INPUT','DIGITAL',0,(i+1)/11));
@@ -51,22 +51,24 @@ export function pinsFor(profile: string): PinDefinition[] {
   return profiles.analog2;
 }
 
-export const EMBEDDED_CATALOG: ComponentDefinition[] = ([...(rawCatalog as RawComponent[]),...(expandedCatalog as RawComponent[])]).map(item => ({
-  id: item.id,
-  name: item.name,
-  category: item.category,
-  family: item.family,
-  description: item.description,
-  tags: item.tags,
-  model: item.model,
-  symbol: item.symbol,
-  width: ['oscilloscope','analyzer','multimeter','spectrum','power_monitor','frequency_counter'].includes(item.symbol) ? 210 : 160,
-  height: ['oscilloscope','analyzer','multimeter','spectrum','power_monitor','frequency_counter'].includes(item.symbol) ? 120 : 80,
-  pins: pinsFor(item.profile),
-  defaults: item.defaults,
-  customGui: item.customGui,
-  internal: item.internal,
-}));
+function symbolSize(symbol:string):{width:number;height:number}{
+  const displays:Record<string,{width:number;height:number}>={
+    display7:{width:190,height:126},display4:{width:260,height:126},lcd16x2:{width:240,height:132},
+    matrix8:{width:210,height:150},bargraph:{width:230,height:170},
+  };
+  if(displays[symbol])return displays[symbol];
+  if(['oscilloscope','analyzer','multimeter','spectrum','power_monitor','frequency_counter'].includes(symbol))return{width:210,height:120};
+  return{width:160,height:80};
+}
+
+export const EMBEDDED_CATALOG: ComponentDefinition[] = ([...(rawCatalog as RawComponent[]),...(expandedCatalog as RawComponent[])]).map(item => {
+  const size=symbolSize(item.symbol);
+  return {
+    id:item.id,name:item.name,category:item.category,family:item.family,description:item.description,tags:item.tags,
+    model:item.model,symbol:item.symbol,width:size.width,height:size.height,pins:pinsFor(item.profile),defaults:item.defaults,
+    customGui:item.customGui,internal:item.internal,
+  };
+});
 
 export const CATALOG_BY_ID = new Map(EMBEDDED_CATALOG.map(item => [item.id, item]));
 

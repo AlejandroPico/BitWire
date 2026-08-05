@@ -32,6 +32,54 @@ export function routePreview(from: Point, to: Point): string {
   return `M ${from.x} ${from.y} L ${midX} ${from.y} L ${midX} ${to.y} L ${to.x} ${to.y}`;
 }
 
+/** Returns the half-length point of the path actually rendered on screen. */
+export function wireLabelPoint(from: Point, to: Point, routing: Wire['routing'], controlPoints: Point[] = []): Point {
+  const points = sampledRoute(from,to,routing,controlPoints);
+  if(points.length<2)return from;
+  const lengths=points.slice(1).map((point,index)=>Math.hypot(point.x-points[index].x,point.y-points[index].y));
+  const target=lengths.reduce((sum,length)=>sum+length,0)/2;
+  let travelled=0;
+  for(let index=0;index<lengths.length;index+=1){
+    const length=lengths[index];
+    if(travelled+length>=target){
+      const ratio=length?((target-travelled)/length):0;
+      return {x:points[index].x+(points[index+1].x-points[index].x)*ratio,y:points[index].y+(points[index+1].y-points[index].y)*ratio};
+    }
+    travelled+=length;
+  }
+  return points.at(-1) ?? to;
+}
+
+function sampledRoute(from:Point,to:Point,routing:Wire['routing'],controlPoints:Point[]):Point[] {
+  if(routing==='straight')return [from,...controlPoints,to];
+  if(routing==='orthogonal'){
+    const result=[from];let cursor=from;
+    for(const point of [...controlPoints,to]){
+      if(Math.abs(point.x-cursor.x)>=Math.abs(point.y-cursor.y))result.push({x:point.x,y:cursor.y});
+      else result.push({x:cursor.x,y:point.y});
+      result.push(point);cursor=point;
+    }
+    return compactPoints(result);
+  }
+  if(controlPoints.length===1)return sampleQuadratic(from,controlPoints[0],to);
+  if(controlPoints.length>1){
+    const result:Point[]=[from];let start=from;
+    for(let index=0;index<controlPoints.length-1;index+=1){
+      const control=controlPoints[index],next=controlPoints[index+1];
+      const end={x:(control.x+next.x)/2,y:(control.y+next.y)/2};
+      result.push(...sampleQuadratic(start,control,end).slice(1));start=end;
+    }
+    result.push(...sampleQuadratic(start,controlPoints.at(-1)!,to).slice(1));
+    return result;
+  }
+  const distance=Math.abs(to.x-from.x),bend=Math.max(48,distance*.45);
+  return sampleCubic(from,{x:from.x+bend,y:from.y},{x:to.x-bend,y:to.y},to);
+}
+
+function sampleQuadratic(a:Point,c:Point,b:Point,steps=24):Point[]{return Array.from({length:steps+1},(_,index)=>{const t=index/steps,u=1-t;return{x:u*u*a.x+2*u*t*c.x+t*t*b.x,y:u*u*a.y+2*u*t*c.y+t*t*b.y};});}
+function sampleCubic(a:Point,c1:Point,c2:Point,b:Point,steps=32):Point[]{return Array.from({length:steps+1},(_,index)=>{const t=index/steps,u=1-t;return{x:u*u*u*a.x+3*u*u*t*c1.x+3*u*t*t*c2.x+t*t*t*b.x,y:u*u*u*a.y+3*u*u*t*c1.y+3*u*t*t*c2.y+t*t*t*b.y};});}
+function compactPoints(points:Point[]):Point[]{return points.filter((point,index)=>!index||point.x!==points[index-1].x||point.y!==points[index-1].y);}
+
 function polyline(points: Point[]): string {
   return points.map((point, index) => `${index ? 'L' : 'M'} ${point.x} ${point.y}`).join(' ');
 }

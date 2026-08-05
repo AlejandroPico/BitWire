@@ -161,7 +161,12 @@ export function evaluateCircuit(project: BitWireProject, time = 0, tick = 0): Si
         const input = Object.values(inputs).find(signal => signal.active && Math.abs(signal.voltage) > .001);
         if (input) { active = true; power = Math.abs(input.voltage * Math.max(input.current,.002)); }
       }
-      componentSignals[component.id] = { outputs, active, power };
+      const displayInputs=definition.symbol==='display7'||definition.symbol==='display4'||definition.symbol==='matrix8'||definition.symbol==='bargraph';
+      if(displayInputs){
+        active=Object.values(inputs).some(signal=>signal.active&&signal.logic===1);
+        power=Object.values(inputs).filter(signal=>signal.active&&signal.logic===1).length*.01;
+      }
+      componentSignals[component.id] = { inputs, outputs, active, power };
     }
     if (!changed) break;
   }

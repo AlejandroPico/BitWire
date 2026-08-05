@@ -322,18 +322,23 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .dial { fill: #182930; stroke: #79909a; stroke-width: 1; vector-effect: non-scaling-stroke; }
 .instrument-name { fill: #8099a4; font: 600 6px "IBM Plex Mono", monospace; letter-spacing: .1em; }
 .display-body { fill: #140a0d; }
-.display-segment { fill: none; stroke: var(--red); stroke-width: 7; stroke-linecap: square; opacity: .8; }
+.display-segment { fill: none; stroke: #5b2029; stroke-width: 6; stroke-linecap: square; opacity: .48; vector-effect: non-scaling-stroke; transition: stroke .12s ease,opacity .12s ease,filter .12s ease; }
+.display-segment.on { stroke: #ff4965; opacity: 1; filter: url(#signalGlow); }
+.display-segment.off,.digit-disabled .display-segment { stroke: #4a1c24; opacity: .34; filter: none; }
+.display-decimal { fill: #4a1c24; opacity: .4; }.display-decimal.on { fill: #ff4965; opacity: 1; filter: url(#signalGlow); }
 .lcd-frame,.matrix-frame,.bargraph-frame { fill: #101b20; stroke: var(--canvas-line); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .lcd-screen { fill: #5b7438; stroke: #a2b96b; stroke-width: 1; vector-effect: non-scaling-stroke; }.lcd-text { fill: #17230e; font: 600 8px "IBM Plex Mono",monospace; }
-.matrix-dot { fill: #482026; stroke: #742d38; stroke-width: .5; }.matrix-dot.on { fill: #ff4965; filter: url(#signalGlow); }
-.bargraph-led { fill: #342225; stroke: #6d343d; stroke-width: .7; }.bargraph-led.on { fill: var(--red); }
+.matrix-dot { fill: #482026; stroke: #742d38; stroke-width: .5; vector-effect:non-scaling-stroke; transition:fill .12s ease; }.matrix-dot.on { fill: #ff4965; filter: url(#signalGlow); }
+.bargraph-led { fill: #342225; stroke: #6d343d; stroke-width: .7; vector-effect:non-scaling-stroke; transition:fill .12s ease; }.bargraph-led.on { fill: var(--red); filter:url(#signalGlow); }
 .macro-symbol rect { fill: var(--component-fill); stroke: var(--canvas-line); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .macro-symbol text { fill: var(--canvas-text); font: 600 11px Inter, sans-serif; }
 .pin { fill: var(--canvas-bg); stroke: #9db1ba; stroke-width: 2; vector-effect: non-scaling-stroke; pointer-events: none; }
 .pin.digital { stroke: var(--cyan); }.pin.power { stroke: var(--amber); }.pin.analog { stroke: var(--blue); }
 .pin-hit { fill: transparent; stroke: transparent; cursor: crosshair; }
+.pin.dense { stroke-width:1.4; }
 .pin-group:hover .pin { fill: var(--cyan); stroke: #eafffb; }
 .pin-label { fill: var(--canvas-text); font: 600 7px "IBM Plex Mono", monospace; pointer-events: none; }
+.pin-label.dense { font-size:6px; dominant-baseline:middle; }
 .quick-toggle { cursor: pointer; }
 .quick-toggle rect { fill: #132832; stroke: #4d6974; stroke-width: 1; vector-effect: non-scaling-stroke; }
 .quick-toggle circle { fill: var(--cyan); transition: cx .15s ease; }

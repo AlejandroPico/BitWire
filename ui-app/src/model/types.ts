@@ -136,6 +136,8 @@ export interface WireSignal {
 }
 
 export interface ComponentSignal {
+  /** Signals currently resolved at every physical input pin. */
+  inputs?: Record<string, WireSignal>;
   outputs: Record<string, WireSignal>;
   active: boolean;
   power: number;

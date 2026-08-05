@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CATALOG_BY_ID } from '../catalog/catalog';
 import { fitBounds, screenToWorld, zoomAt } from '../canvas/ViewportMatrix';
 import { lodForScale } from '../canvas/LODManager';
-import { nearestSegmentIndex, routePreview, routeWire } from '../canvas/WireRouter';
+import { nearestSegmentIndex, routePreview, routeWire, wireLabelPoint } from '../canvas/WireRouter';
 import { CircuitSymbol } from './CircuitSymbol';
 import type { ContextTarget } from './ContextMenu';
 import { ModulePreview } from './ModulePreview';
@@ -395,7 +395,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
           if (!from || !to) return null;
           const signal = snapshot?.wireSignals[wire.id];
           const value = formatSignal(signal, project.settings.signalView);
-          const mid = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
+          const mid = wireLabelPoint(from,to,wire.routing,wire.controlPoints);
           const wirePath = routeWire(from, to, wire.routing, wire.controlPoints);
           return <g key={wire.id} className={`wire ${signal?.active ? 'active' : ''} logic-${signal?.logic ?? 'z'} ${running ? 'running' : ''}`}>
             <path className="wire-hit" d={wirePath} onPointerDown={event => onWireDown(event,wire,from,to)} onDoubleClick={event => addWireNode(event,wire,from,to)} onContextMenu={event=>{event.preventDefault();event.stopPropagation();setSelectedWireId(wire.id);onContextTarget({kind:'wire',id:wire.id,x:event.clientX,y:event.clientY});}}/>

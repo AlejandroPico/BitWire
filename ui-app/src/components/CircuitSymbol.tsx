@@ -32,7 +32,7 @@ export function CircuitSymbol({ component, definition, selected, lod, signal, on
   >
     <rect className="component-hitbox" x="-8" y="-8" width={w + 16} height={h + 16}/>
     {lod === 0 ? <MacroSymbol definition={definition}/> : <>
-      {!gateInternal && !semiconductorInternal && <g className="symbol-artwork">{symbolArtwork(definition, component, active)}</g>}
+      {!gateInternal && !semiconductorInternal && <g className="symbol-artwork">{symbolArtwork(definition, component, signal)}</g>}
       {gateInternal && (lod >= 4 ? <GateCmosNetwork definition={definition}/> : <GateInternalNetwork definition={definition}/>)} 
       {semiconductorInternal && <SemiconductorInternal definition={definition} lod={lod}/>} 
       <text className="symbol-title" x={w / 2} y={h + 20} textAnchor="middle">{definition.name}</text>
@@ -44,10 +44,14 @@ export function CircuitSymbol({ component, definition, selected, lod, signal, on
     {definition.pins.map(pin => {
       const x = pin.x * w;
       const y = pin.y * h;
+      const dense=definition.pins.length>=7;
+      const vertical=pin.x===0||pin.x===1;
+      const labelX=x+(pin.x===0?(dense?8:10):pin.x===1?(dense?-8:-10):0);
+      const labelY=vertical?y+2.5:pin.y===0?y+10:y-7;
       return <g className="pin-group" key={pin.id}>
-        {lod >= 2 && <text className="pin-label" x={x + (pin.x === 0 ? 10 : pin.x === 1 ? -10 : 0)} y={y - 8} textAnchor={pin.x === 0 ? 'start' : pin.x === 1 ? 'end' : 'middle'}>{pin.name}</text>}
-        <circle className={`pin ${pin.domain.toLowerCase()}`} cx={x} cy={y} r={lod >= 2 ? 5 : 4}/>
-        <circle className="pin-hit" cx={x} cy={y} r="13" onPointerDown={event => onPin(event, component, pin)}/>
+        {lod >= 2 && <text className={`pin-label ${dense?'dense':''}`} x={labelX} y={labelY} textAnchor={pin.x === 0 ? 'start' : pin.x === 1 ? 'end' : 'middle'}>{pin.name}</text>}
+        <circle className={`pin ${pin.domain.toLowerCase()} ${dense?'dense':''}`} cx={x} cy={y} r={dense?3.2:lod >= 2 ? 5 : 4}/>
+        <circle className={`pin-hit ${dense?'dense':''}`} cx={x} cy={y} r={dense?6:13} onPointerDown={event => onPin(event, component, pin)}/>
       </g>;
     })}
     {(definition.model === 'switch' || definition.model === 'logic_input') && lod >= 1 && <g className="quick-toggle" onPointerDown={event => { event.stopPropagation(); onQuickToggle(component); }} transform={`translate(${w / 2 - 16} ${h - 21})`}>
@@ -60,10 +64,11 @@ function MacroSymbol({ definition }: { definition: ComponentDefinition }) {
   return <g className="macro-symbol"><rect width={definition.width} height={definition.height}/><text x={definition.width / 2} y={definition.height / 2 + 5} textAnchor="middle">{definition.name}</text></g>;
 }
 
-function symbolArtwork(definition: ComponentDefinition, component: ComponentInstance, active: boolean): ReactNode {
+function symbolArtwork(definition: ComponentDefinition, component: ComponentInstance, signal?: ComponentSignal): ReactNode {
   const w = definition.width;
   const h = definition.height;
   const s = definition.symbol;
+  const active=Boolean(signal?.active);
   if (s === 'resistor' || s === 'potentiometer') return <>
     <path className="lead" d={`M0 ${h/2}H28 M132 ${h/2}H${w}`}/><path className="symbol-line" d={`M28 ${h/2}l10 -18 14 36 14 -36 14 36 14 -36 14 36 14 -36 10 18`}/>
     {s === 'potentiometer' && <path className="symbol-line" d="M80 5v22m0 0-8-9m8 9 8-9"/>}
@@ -88,11 +93,11 @@ function symbolArtwork(definition: ComponentDefinition, component: ComponentInst
   if (s === 'igbt_n' || s === 'igbt_p') return <IgbtSymbol type={s}/>;
   if (s === 'opamp' || s === 'comparator') return <><path className="symbol-body" d="M35 8v64l88-32z"/><path className="lead" d={`M0 28H35 M0 52H35 M123 40H${w}`}/><text className="op-sign" x="45" y="31">+</text><text className="op-sign" x="45" y="57">−</text></>;
   if (['oscilloscope','analyzer','multimeter','spectrum','power_monitor','frequency_counter'].includes(s)) return <InstrumentSymbol definition={definition}/>;
-  if (s === 'display7') return <DisplaySymbol/>;
-  if (s === 'display4') return <FourDigitDisplay/>;
-  if (s === 'lcd16x2') return <LcdDisplay/>;
-  if (s === 'matrix8') return <DotMatrixDisplay/>;
-  if (s === 'bargraph') return <BargraphDisplay/>;
+  if (s === 'display7') return <SevenSegmentDisplay width={w} height={h} inputs={signal?.inputs} common={String(component.properties.common??'cathode')}/>;
+  if (s === 'display4') return <FourDigitDisplay width={w} height={h} inputs={signal?.inputs} common={String(component.properties.common??'cathode')}/>;
+  if (s === 'lcd16x2') return <LcdDisplay width={w} height={h} text={String(component.properties.text??'BITWIRE READY')}/>;
+  if (s === 'matrix8') return <DotMatrixDisplay width={w} height={h} inputs={signal?.inputs}/>;
+  if (s === 'bargraph') return <BargraphDisplay width={w} height={h} inputs={signal?.inputs}/>;
   if (s === 'chip' || s === 'dff' || s === 'mux') return <ChipSymbol definition={definition}/>;
   if (s === 'motor') return <><path className="lead" d={`M0 40H42 M118 40H${w}`}/><circle className="symbol-body" cx="80" cy="40" r="36"/><text className="logic-value" x="80" y="51" textAnchor="middle">M</text></>;
   if (s === 'transformer') return <><path className="symbol-line" d="M68 13v54M92 13v54M20 24h25c25 0 25 32 0 32H20M140 24h-25c-25 0-25 32 0 32h25"/></>;
@@ -134,25 +139,40 @@ function ChipSymbol({ definition }: { definition: ComponentDefinition }) {
   return <><rect className="chip-body" x="23" y="5" width={w - 46} height={h - 10}/>{[18,32,48,62].map((y, i) => <g key={y}><path className="lead" d={`M0 ${y}h23M${w-23} ${y}h23`}/><circle className="chip-pad" cx="30" cy={y} r="2"/><circle className="chip-pad" cx={w-30} cy={y} r="2"/></g>)}<circle className="chip-notch" cx={w/2} cy="5" r="7"/><text className="chip-name" x={w/2} y={h/2+5} textAnchor="middle">{definition.name}</text></>;
 }
 
-function DisplaySymbol() {
-  const segments = ['M58 14h44','M108 20v20','M108 48v18','M58 71h44','M52 48v18','M52 20v20','M58 43h44'];
-  return <><rect className="display-body" x="38" y="4" width="84" height="72"/>{segments.map((d,i)=><path key={i} className="display-segment" d={d}/>)}</>;
+const SEGMENTS=['a','b','c','d','e','f','g'] as const;
+const SEGMENT_PATHS=['M8 6H32','M35 9V36','M35 44V71','M8 74H32','M5 44V71','M5 9V36','M8 40H32'];
+function inputOn(inputs:ComponentSignal['inputs'],id:string,common='cathode'){
+  const logic=inputs?.[id]?.logic;
+  return common==='anode'?logic===0:logic===1;
 }
-
-function FourDigitDisplay() {
-  return <><rect className="display-body" x="14" y="5" width="132" height="70"/>{[0,1,2,3].map(index => <g key={index} transform={`translate(${18+index*32} 10) scale(.34 .72)`}><DisplaySymbol/></g>)}<circle className="display-segment" cx="139" cy="65" r="3"/></>;
+function SevenSegmentGlyph({inputs,common='cathode'}:{inputs?:ComponentSignal['inputs'];common?:string}){
+  return <g className="seven-segment-glyph">{SEGMENT_PATHS.map((d,index)=><path key={SEGMENTS[index]} data-segment={SEGMENTS[index].toUpperCase()} className={`display-segment ${inputOn(inputs,SEGMENTS[index],common)?'on':'off'}`} d={d}/>)}</g>;
 }
-
-function LcdDisplay() {
-  return <><rect className="lcd-frame" x="10" y="7" width="140" height="66"/><rect className="lcd-screen" x="20" y="16" width="120" height="46"/><text className="lcd-text" x="27" y="35">BITWIRE 16×2</text><text className="lcd-text" x="27" y="52">READY_</text></>;
+function SevenSegmentDisplay({width,height,inputs,common}:{width:number;height:number;inputs?:ComponentSignal['inputs'];common:string}){
+  const body={x:42,y:8,width:width-84,height:height-16};
+  const sx=(body.width-24)/40,sy=(body.height-18)/80;
+  return <><rect className="display-body" {...body}/><g transform={`translate(${body.x+12} ${body.y+9}) scale(${sx} ${sy})`}><SevenSegmentGlyph inputs={inputs} common={common}/></g></>;
 }
-
-function DotMatrixDisplay() {
-  return <><rect className="matrix-frame" x="36" y="4" width="88" height="72"/>{Array.from({length:64},(_,index) => { const x=index%8, y=Math.floor(index/8); const on=[1,2,3,8,12,16,20,24,25,26,27,32,36,40,44,49,50,51].includes(index); return <circle key={index} className={on?'matrix-dot on':'matrix-dot'} cx={43+x*10.5} cy={11+y*8.4} r="2.4"/>; })}</>;
+function FourDigitDisplay({width,height,inputs,common}:{width:number;height:number;inputs?:ComponentSignal['inputs'];common:string}){
+  const body={x:34,y:8,width:width-68,height:height-16};
+  const gap=7,digitWidth=(body.width-24-gap*3)/4,digitHeight=body.height-18;
+  return <><rect className="display-body" {...body}/>{[0,1,2,3].map(index=>{
+    const enabled=inputOn(inputs,`digit${index+1}`,'cathode');
+    return <g key={index} className={enabled?'digit-enabled':'digit-disabled'} transform={`translate(${body.x+12+index*(digitWidth+gap)} ${body.y+9}) scale(${digitWidth/40} ${digitHeight/80})`}><SevenSegmentGlyph inputs={enabled?inputs:undefined} common={common}/></g>;
+  })}<circle className={`display-decimal ${inputOn(inputs,'dp',common)?'on':''}`} cx={body.x+body.width-7} cy={body.y+body.height-10} r="2.6"/></>;
 }
-
-function BargraphDisplay() {
-  return <><rect className="bargraph-frame" x="18" y="16" width="124" height="48"/>{Array.from({length:10},(_,index)=><rect key={index} className={index<6?'bargraph-led on':'bargraph-led'} x={24+index*11.5} y="23" width="7" height="34"/>)}</>;
+function LcdDisplay({width,height,text}:{width:number;height:number;text:string}){
+  const line=(text||'BITWIRE READY').slice(0,16).padEnd(16,' ');
+  return <><rect className="lcd-frame" x="24" y="10" width={width-48} height={height-20}/><rect className="lcd-screen" x="36" y="23" width={width-72} height={height-46}/><text className="lcd-text" x="44" y={height/2-6}>{line}</text><text className="lcd-text" x="44" y={height/2+16}>READY_</text></>;
+}
+function DotMatrixDisplay({width,height,inputs}:{width:number;height:number;inputs?:ComponentSignal['inputs']}){
+  const frame={x:34,y:8,width:width-68,height:height-16},gap=Math.min((frame.width-24)/7,(frame.height-24)/7),radius=Math.max(2.2,gap*.25);
+  const startX=width/2-gap*3.5,startY=height/2-gap*3.5;
+  return <><rect className="matrix-frame" {...frame}/>{Array.from({length:64},(_,index)=>{const col=index%8,row=Math.floor(index/8);const on=inputOn(inputs,`row${row}`)&&inputOn(inputs,`col${col}`);return <circle key={index} data-row={row} data-col={col} className={on?'matrix-dot on':'matrix-dot'} cx={startX+col*gap} cy={startY+row*gap} r={radius}/>;})}</>;
+}
+function BargraphDisplay({width,height,inputs}:{width:number;height:number;inputs?:ComponentSignal['inputs']}){
+  const frame={x:36,y:12,width:width-72,height:height-24},gap=5,ledHeight=(frame.height-20-gap*9)/10;
+  return <><rect className="bargraph-frame" {...frame}/>{Array.from({length:10},(_,index)=><rect key={index} data-segment={index+1} className={inputOn(inputs,`s${index+1}`)?'bargraph-led on':'bargraph-led'} x={frame.x+12} y={frame.y+10+index*(ledHeight+gap)} width={frame.width-24} height={ledHeight}/>)}</>;
 }
 
 function InternalNetwork({ definition }: { definition: ComponentDefinition }) {

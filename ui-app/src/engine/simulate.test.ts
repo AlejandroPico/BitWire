@@ -58,4 +58,20 @@ describe('BitWire simulation core', () => {
     project.components.find(item=>item.id==='c')!.properties.state=0;
     expect(evaluateCircuit(project).componentSignals.gate.outputs.out.logic).toBe(0);
   });
+
+  it('exposes the resolved inputs of LED displays to their visual model',()=>{
+    const project=createBlankProject('Display inputs');
+    const sourceA=createInstance('logic_input',0,0,'source_a');
+    const sourceB=createInstance('logic_input',0,100,'source_b');
+    sourceB.properties.state=0;
+    project.components.push(sourceA,sourceB,createInstance('seven_segment',300,0,'display'));
+    project.wires.push(
+      {id:'segment_a',from:{componentId:'source_a',pinId:'out'},to:{componentId:'display',pinId:'a'},routing:'straight'},
+      {id:'segment_b',from:{componentId:'source_b',pinId:'out'},to:{componentId:'display',pinId:'b'},routing:'straight'},
+    );
+    const display=evaluateCircuit(project).componentSignals.display;
+    expect(display.inputs?.a.logic).toBe(1);
+    expect(display.inputs?.b.logic).toBe(0);
+    expect(display.active).toBe(true);
+  });
 });

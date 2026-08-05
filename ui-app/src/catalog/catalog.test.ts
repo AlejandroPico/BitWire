@@ -14,4 +14,15 @@ describe('expanded component catalog', () => {
     expect(count('Sensores')).toBeGreaterThanOrEqual(20);
     expect(count('Gestión de potencia')).toBeGreaterThanOrEqual(15);
   });
+
+  it('gives dense displays enough physical room for distinct terminals',()=>{
+    const ids=['seven_segment','display_7seg_4','matrix_8x8','bargraph_10'];
+    for(const id of ids){
+      const display=EMBEDDED_CATALOG.find(item=>item.id===id)!;
+      expect(display.height).toBeGreaterThanOrEqual(126);
+      const left=display.pins.filter(pin=>pin.x===0).sort((a,b)=>a.y-b.y);
+      const minimum=Math.min(...left.slice(1).map((pin,index)=>(pin.y-left[index].y)*display.height));
+      expect(minimum).toBeGreaterThan(12);
+    }
+  });
 });
