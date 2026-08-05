@@ -1,490 +1,646 @@
-import {
-  Box, Crosshair, Hand, Maximize, Minus, MousePointer2, Plus, Route, Scan,
-  Trash2, Waypoints, X,
-} from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CATALOG_BY_ID } from '../catalog/catalog';
-import { fitBounds, screenToWorld, zoomAt } from '../canvas/ViewportMatrix';
-import { lodForScale } from '../canvas/LODManager';
-import { nearestSegmentIndex, routePreview, routeWire, wireLabelPoint } from '../canvas/WireRouter';
-import { CircuitSymbol } from './CircuitSymbol';
-import type { ContextTarget } from './ContextMenu';
-import { ModulePreview } from './ModulePreview';
-import { canvasScope } from '../model/moduleScope';
-import type {
-  BitWireProject, ComponentInstance, ModuleArea, PinDefinition, PinRef, Point,
-  ModulePin, PropertyValue, SimulationSnapshot, Theme, ToolMode, ViewportState, Wire, WireSignal,
-} from '../model/types';
-import { createInstance, uid } from '../state/project';
+şº(·úk¡ø¥zX§{ßİzÿçºYOz¹¢²È¨×§‰çZ[\ÜÂˆ›ŞÜ›ÜÜÚZ\‹[™X^[Z^™KZ[\Ë[İ\ÙTÚ[\Œ‹\Ë›İ]KØØ[‹ˆ˜\Ú‹Ø^\Ú[ËŸHœ›ÛH	ÛXÚYK\™XXİ	ÎÂš[\ÜÈ\ÙPØ[˜XÚË\ÙQY™™Xİ\ÙSY[[Ë\ÙT™Y‹\ÙTİ]HHœ›ÛH	Ü™XXİ	ÎÂš[\ÜÈĞUSÑ×Ğ–WÒQHœ›ÛH	Ë‹‹ØØ][ÙËØØ][ÙÉÎÂš[\ÜÈš]›İ[™ËØÜ™Y[•ÕÛÜ››ÛÛP]Hœ›ÛH	Ë‹‹ØØ[˜\ËÕšY]ÜÜX]š^	ÎÂš[\ÜÈÙ›Ü”ØØ[HHœ›ÛH	Ë‹‹ØØ[˜\ËÓÑX[˜YÙ\‰ÎÂš[\ÜÈ™X\™\İÙYÛY[[™^›İ]T™]šY]Ë›İ]UÚ\™KÚ\™SX™[Ú[Hœ›ÛH	Ë‹‹ØØ[˜\ËÕÚ\™T›İ]\‰ÎÂš[\ÜÈÚ\˜İZ]Ş[X›ÛHœ›ÛH	Ë‹ĞÚ\˜İZ]Ş[X›Û	ÎÂš[\Ü\HÈÛÛ^\™Ù]Hœ›ÛH	Ë‹ĞÛÛ^Y[IÎÂš[\ÜÈ[Ù[T™]šY]ÈHœ›ÛH	Ë‹Ó[Ù[T™]šY]ÉÎÂš[\ÜÈØ[˜\ÔØÛÜHHœ›ÛH	Ë‹‹Û[Ù[Û[Ù[TØÛÜIÎÂš[\Ü\HÂˆš]Ú\™T›Ú™XİÛÛ\Û™[[œİ[˜ÙK[Ù[P\™XK[‘Yš[š][Û‹[”™Y‹Ú[ˆ[Ù[T[‹›Ü\U˜[YKÚ[][][Û”Û˜\Úİ[YKÛÛ[ÙKšY]ÜÜİ]KÚ\™KÚ\™TÚYÛ˜[ŸHœ›ÛH	Ë‹‹Û[Ù[İ\\ÉÎÂš[\ÜÈÜ™X]R[œİ[˜ÙKZYHœ›ÛH	Ë‹‹Üİ]KÜ›Ú™Xİ	ÎÂ‚\H\]HH
+™XÚ\Nˆ
+˜Yˆš]Ú\™T›Ú™Xİ
+HOˆ›ÚY™XÛÜ™Îˆ›ÛÛX[ŠHOˆ›ÚYÂ‚š[\™˜XÙH›ÜÈÂˆ›Ú™Xİˆš]Ú\™T›Ú™XİÂˆ™\ÛÛ™Y[YNˆ^ÛYO[YK	Ø]]ÉÏÂˆ\]Nˆ\]NÂˆÙ[XİYˆİš[™Ö×NÂˆÛ”Ù[XİY
+YÎˆİš[™Ö×JNˆ›ÚYÂˆÙ[XİY[Ù[RYÎˆİš[™ÎÂˆÛ”Ù[XİY[Ù[JYÎˆİš[™ÊNˆ›ÚYÂˆÛÛˆÛÛ[ÙNÂˆÛ•ÛÛ
+ÛÛˆÛÛ[ÙJNˆ›ÚYÂˆÛ˜\ÚİÎˆÚ[][][Û”Û˜\ÚİÂˆ[›š[™Îˆ›ÛÛX[ÂˆÛ•šY]ÜÜ
+šY]ÜÜˆšY]ÜÜİ]JNˆ›ÚYÂˆXİ]™S[Ù[RYÎˆİš[™ÎÂˆÛXİ]™S[Ù[JYÎˆİš[™ÊNˆ›ÚYÂˆÛ“Ü[’[œÜXİÜŠ
+Nˆ›ÚYÂˆÛÛÛ^\™Ù]
+\™Ù]ÛÛ^\™Ù]
+N›ÚYÂŸB‚\H[\˜Xİ[ÛˆBˆÈ\Nˆ	Ü[‰ÎÈİ\ˆÚ[ÈÜšYÚ[ˆšY]ÜÜİ]HBˆÈ\Nˆ	Ù˜YÉÎÈİ\ˆÚ[ÈÜšYÚ[œÎˆX\İš[™ËÚ[È™XÛÜ™Yˆ›ÛÛX[ˆBˆÈ\Nˆ	Û[Ù[KY˜YÉÎÈİ\ˆÚ[ÈÜšYÚ[ˆÚ[È[Ù[RYˆİš[™ÎÈ™XÛÜ™Yˆ›ÛÛX[ˆBˆÈ\Nˆ	Û[Ù[K\™\Ú^™IÎÈİ\ˆÚ[ÈÜšYÚ[ˆÈˆ[X™\ÈNˆ[X™\ÈÚYˆ[X™\ÈZYÚˆ[X™\ˆNÈ[Ù[RYˆİš[™ÎÈ[™Nˆİš[™ÎÈ™XÛÜ™Yˆ›ÛÛX[ˆBˆÈ\Nˆ	İÚ\™K\[™[™ÉÎÈÚ\™RYˆİš[™ÎÈ[™^ˆ[X™\ÈÚ[ˆÚ[Èİ\ØÜ™Y[ˆÚ[BˆÈ\Nˆ	İÚ\™K[›ÙIÎÈÚ\™RYˆİš[™ÎÈ[™^ˆ[X™\È™XÛÜ™Yˆ›ÛÛX[ˆBˆÈ\Nˆ	ÛX\œ]YYIÈ	Û[Ù[IÎÈİ\ˆÚ[Èİ\œ™[ˆÚ[Bˆ[Â‚™^Ü[˜İ[ÛˆÛÜšÜÜXÙJÈ›Ú™Xİ™\ÛÛ™Y[YK\]KÙ[XİYÛ”Ù[XİYÙ[XİY[Ù[RYÛ”Ù[XİY[Ù[KÛÛÛ•ÛÛÛ˜\Úİ[›š[™ËÛ•šY]ÜÜXİ]™S[Ù[RYÛXİ]™S[Ù[KÛ“Ü[’[œÜXİÜ‹ÛÛÛ^\™Ù]Nˆ›ÜÊHÂˆÛÛœİİ™Ô™YˆH\ÙT™YÕ‘ÔÕ‘Ñ[[Y[Š[
+NÂˆÛÛœİİšY]ÜÜÙ]šY]ÜÜİ]WHH\ÙTİ]OšY]ÜÜİ]OŠÈˆLNˆÌØØ[NˆÎJNÂˆÛÛœİÚ[\˜Xİ[Û‹Ù][\˜Xİ[Û—HH\ÙTİ]O[\˜Xİ[ÛŠ[
+NÂˆÛÛœİ[\˜Xİ[Û”™YˆH\ÙT™Y[\˜Xİ[ÛŠ[
+NÂˆÛÛœİ[Ù[T™\ÜÔ™YˆH\ÙT™YÈYœİš[™ÎÈ]›[X™\ˆ_[™Yš[™YŠ[™Yš[™Y
+NÂˆÛÛœİÜ[™[™Ô[‹Ù][™[™Ô[—HH\ÙTİ]O[”™YŠ
+NÂˆÛÛœİÜÙ[XİYÚ\™RYÙ]Ù[XİYÚ\™RYHH\ÙTİ]Oİš[™ÏŠ
+NÂˆÛÛœİÜÚ[\•ÛÜ›Ù]Ú[\•ÛÜ›HH\ÙTİ]OÚ[ŠÈˆNˆJNÂˆÛÛœİÜÜXÙR[Ù]ÜXÙR[HH\ÙTİ]J˜[ÙJNÂˆÛÛœİÙHÙ›Ü”ØØ[JšY]ÜÜœØØ[JNÂˆÛÛœİÙ[XİY[Ù[HH›Ú™Xİ›[Ù[\Ë™š[™
+[Ù[HOˆ[Ù[KšYOOHÙ[XİY[Ù[RY
+NÂˆÛÛœİXİ]™S[Ù[HH›Ú™Xİ›[Ù[\Ë™š[™
+[Ù[HOˆ[Ù[KšYOOHXİ]™S[Ù[RY
+NÂˆÛÛœİØÛÜHH\ÙSY[[Ê
 
-type Update = (recipe: (draft: BitWireProject) => void, record?: boolean) => void;
+HOˆØ[˜\ÔØÛÜJ›Ú™XİXİ]™S[Ù[RY
+KÜ›Ú™XİXİ]™S[Ù[RYJNÂˆÛÛœİÚ[[Ù[\ÈHØÛÜK›[Ù[\ÎÂˆÛÛœİ[˜Ù\İÜœÈH\ÙSY[[Ê
 
-interface Props {
-  project: BitWireProject;
-  resolvedTheme: Exclude<Theme, 'auto'>;
-  update: Update;
-  selected: string[];
-  onSelected(ids: string[]): void;
-  selectedModuleId?: string;
-  onSelectedModule(id?: string): void;
-  tool: ToolMode;
-  onTool(tool: ToolMode): void;
-  snapshot?: SimulationSnapshot;
-  running: boolean;
-  onViewport(viewport: ViewportState): void;
-  activeModuleId?: string;
-  onActiveModule(id?: string): void;
-  onOpenInspector(): void;
-  onContextTarget(target:ContextTarget):void;
-}
+HOˆÂˆÛÛœİ]ˆ[Ù[P\™XV×HH×NÂˆ]İ\œÛÜˆHXİ]™S[Ù[NÂˆÛÛœİš\Ú]YH™]ÈÙ]İš[™ÏŠ
+NÂˆÚ[H
+İ\œÛÜˆ	‰ˆ]š\Ú]Yš\Êİ\œÛÜ‹šY
+JHÈš\Ú]Y˜Y
+İ\œÛÜ‹šY
+NÈ][œÚY
+İ\œÛÜŠNÈİ\œÛÜˆH›Ú™Xİ›[Ù[\Ë™š[™
+[Ù[HOˆ[Ù[KšYOOHİ\œÛÜËœ\™[[Ù[RY
+NÈBˆ™]\›ˆ]ÂˆKØXİ]™S[Ù[K›Ú™Xİ›[Ù[\×JNÂˆÛÛœİš\ÚX›PÛÛ\Û™[ÈHØÛÜK˜ÛÛ\Û™[ÎÂˆÛÛœİš\ÚX›UÚ\™\ÈHØÛÜKÚ\™\ÎÂ‚ˆÛÛœİÙ]İ\œ™[[\˜Xİ[ÛˆH\ÙPØ[˜XÚÊ
+˜[YNˆ[\˜Xİ[ÛŠHOˆÂˆ[\˜Xİ[Û”™Y‹˜İ\œ™[H˜[YNÂˆÙ][\˜Xİ[ÛŠ˜[YJNÂˆK×JNÂ‚ˆÛÛœİÙ]šY]ÜÜH\ÙPØ[˜XÚÊ
+™^ˆšY]ÜÜİ]H
 
-type Interaction =
-  | { type: 'pan'; start: Point; origin: ViewportState }
-  | { type: 'drag'; start: Point; origins: Map<string, Point>; recorded: boolean }
-  | { type: 'module-drag'; start: Point; origin: Point; moduleId: string; recorded: boolean }
-  | { type: 'module-resize'; start: Point; origin: { x: number; y: number; width: number; height: number }; moduleId: string; handle: string; recorded: boolean }
-  | { type: 'wire-pending'; wireId: string; index: number; point: Point; startScreen: Point }
-  | { type: 'wire-node'; wireId: string; index: number; recorded: boolean }
-  | { type: 'marquee' | 'module'; start: Point; current: Point }
-  | null;
+İ\œ™[ˆšY]ÜÜİ]JHOˆšY]ÜÜİ]JJHOˆÂˆÙ]šY]ÜÜİ]Jİ\œ™[OˆÂˆÛÛœİ˜[YHH\[Ùˆ™^OOH	Ù[˜İ[Û‰ÈÈ™^
+İ\œ™[
+Hˆ™^ÂˆÛ•šY]ÜÜ
+˜[YJNÂˆ™]\›ˆ˜[YNÂˆJNÂˆKÛÛ•šY]ÜÜJNÂ‚ˆ\ÙQY™™Xİ
 
-export function Workspace({ project, resolvedTheme, update, selected, onSelected, selectedModuleId, onSelectedModule, tool, onTool, snapshot, running, onViewport, activeModuleId, onActiveModule, onOpenInspector, onContextTarget }: Props) {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const [viewport, setViewportState] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
-  const [interaction, setInteraction] = useState<Interaction>(null);
-  const interactionRef = useRef<Interaction>(null);
-  const modulePressRef = useRef<{ id:string; at:number }|undefined>(undefined);
-  const [pendingPin, setPendingPin] = useState<PinRef>();
-  const [selectedWireId, setSelectedWireId] = useState<string>();
-  const [pointerWorld, setPointerWorld] = useState<Point>({ x: 0, y: 0 });
-  const [spaceHeld, setSpaceHeld] = useState(false);
-  const lod = lodForScale(viewport.scale);
-  const selectedModule = project.modules.find(module => module.id === selectedModuleId);
-  const activeModule = project.modules.find(module => module.id === activeModuleId);
-  const scope = useMemo(() => canvasScope(project,activeModuleId),[project,activeModuleId]);
-  const childModules = scope.modules;
-  const ancestors = useMemo(() => {
-    const path: ModuleArea[] = [];
-    let cursor = activeModule;
-    const visited = new Set<string>();
-    while (cursor && !visited.has(cursor.id)) { visited.add(cursor.id); path.unshift(cursor); cursor = project.modules.find(module => module.id === cursor?.parentModuleId); }
-    return path;
-  }, [activeModule, project.modules]);
-  const visibleComponents = scope.components;
-  const visibleWires = scope.wires;
 
-  const setCurrentInteraction = useCallback((value: Interaction) => {
-    interactionRef.current = value;
-    setInteraction(value);
-  }, []);
+HOˆÂˆÛÛœİİÛˆH
+]™[ˆÙ^X›Ø\™]™[
+HOˆÈYˆ
+]™[˜ÛÙHOOH	ÔÜXÙIÈ	‰ˆZ\Õ\[™Ê]™[\™Ù]
+JHÈ]™[œ™]™[Y˜][
 
-  const setViewport = useCallback((next: ViewportState | ((current: ViewportState) => ViewportState)) => {
-    setViewportState(current => {
-      const value = typeof next === 'function' ? next(current) : next;
-      onViewport(value);
-      return value;
-    });
-  }, [onViewport]);
+NÈÙ]ÜXÙR[
+YJNÈHNÂˆÛÛœİ\H
+]™[ˆÙ^X›Ø\™]™[
+HOˆÈYˆ
+]™[˜ÛÙHOOH	ÔÜXÙIÊHÙ]ÜXÙR[
+˜[ÙJNÈNÂˆÚ[™İË˜Y]™[\İ[™\Š	ÚÙ^YİÛ‰ËİÛŠNÈÚ[™İË˜Y]™[\İ[™\Š	ÚÙ^]\	Ë\
+NÂˆ™]\›ˆ
 
-  useEffect(() => {
-    const down = (event: KeyboardEvent) => { if (event.code === 'Space' && !isTyping(event.target)) { event.preventDefault(); setSpaceHeld(true); } };
-    const up = (event: KeyboardEvent) => { if (event.code === 'Space') setSpaceHeld(false); };
-    window.addEventListener('keydown', down); window.addEventListener('keyup', up);
-    return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); };
-  }, []);
+HOˆÈÚ[™İËœ™[[İ™Q]™[\İ[™\Š	ÚÙ^YİÛ‰ËİÛŠNÈÚ[™İËœ™[[İ™Q]™[\İ[™\Š	ÚÙ^]\	Ë\
+NÈNÂˆK×JNÂ‚ˆÛÛœİØØ[Ú[H
+]™[ˆÈÛY[ˆ[X™\ÈÛY[Nˆ[X™\ˆJHOˆÂˆÛÛœİ™XİHİ™Ô™Y‹˜İ\œ™[K™Ù]›İ[™[™ĞÛY[™Xİ
 
-  const localPoint = (event: { clientX: number; clientY: number }) => {
-    const rect = svgRef.current!.getBoundingClientRect();
-    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
-  };
+NÂˆ™]\›ˆÈˆ]™[˜ÛY[H™Xİ›YNˆ]™[˜ÛY[HH™XİÜNÂˆNÂ‚ˆÛÛœİ[•ÛÜ›H\ÙPØ[˜XÚÊ
+™Yˆ[”™YŠNˆÚ[[™Yš[™YOˆÂˆÛÛœİÛÛ\Û™[H›Ú™Xİ˜ÛÛ\Û™[Ë™š[™
+][HOˆ][KšYOOH™Y‹˜ÛÛ\Û™[Y
+NÂˆÛÛœİYš[š][ÛˆHÛÛ\Û™[	‰ˆĞUSÑ×Ğ–WÒQ™Ù]
+ÛÛ\Û™[™Yš[š][Û’Y
+NÂˆÛÛœİ[ˆHYš[š][ÛËœ[œË™š[™
+][HOˆ][KšYOOH™Y‹œ[’Y
+NÂˆYˆ
+XÛÛ\Û™[YYš[š][Ûˆ\[ŠHÂˆÛÛœİ[Ù[HH›Ú™Xİ›[Ù[\Ë™š[™
+][HOˆ][KšYOOH™Y‹˜ÛÛ\Û™[Y
+NÂˆÛÛœİ[Ù[T[ˆH[Ù[OËœ[œË™š[™
+][HOˆ][KšYOOH™Y‹œ[’Y
+NÂˆYˆ
+[Ù[H	‰ˆ[Ù[T[ˆ	‰ˆ[Ù[KšYOOHXİ]™S[Ù[RY	‰ˆİ™Ô™Y‹˜İ\œ™[
+HÂˆÛÛœİÚY\İ™Ô™Y‹˜İ\œ™[˜ÛY[ÚYZYÚ\İ™Ô™Y‹˜İ\œ™[˜ÛY[ZYÚÂˆÛÛœİØÜ™Y[”Ú[H[Ù[T[‹œÚYOOOIÛY	ÈÈŞŒKN›[Ù[T[‹œÜÚ][ÛŠšZYÚHˆ[Ù[T[‹œÚYOOOIÜšYÚ	ÈÈŞÚYLKN›[Ù[T[‹œÜÚ][ÛŠšZYÚHˆ[Ù[T[‹œÚYOOOIİÜ	ÈÈŞ›[Ù[T[‹œÜÚ][ÛŠÚYNŒ_HˆŞ›[Ù[T[‹œÜÚ][ÛŠÚYNšZYÚL_NÂˆ™]\›ˆØÜ™Y[•ÕÛÜ›
+ØÜ™Y[”Ú[šY]ÜÜ
+NÂˆBˆ™]\›ˆ[Ù[H	‰ˆ[Ù[T[ˆÈ[Ù[T[•ÛÜ›
+[Ù[K[Ù[T[ŠHˆ[™Yš[™YÂˆBˆÛÛœİ˜\ÙHHÈˆ[‹
+ˆYš[š][Û‹ÚYNˆ[‹H
+ˆYš[š][Û‹šZYÚNÂˆÛÛœİ[™ÛHHÛÛ\Û™[œ›İ][Ûˆ
+ˆX]”HÈNÂˆÛÛœİŞHYš[š][Û‹ÚYÈ‹ŞHHYš[š][Û‹šZYÚÈÂˆÛÛœİØØ[HHÛÛ\Û™[œØØ[HNÂˆ™]\›ˆÂˆˆÛÛ\Û™[
+È
+Ş
+È
+˜\ÙKHŞ
+H
+ˆX]˜ÛÜÊ[™ÛJHH
+˜\ÙKHHŞJH
+ˆX]œÚ[Š[™ÛJJH
+ˆØØ[KˆNˆÛÛ\Û™[H
+È
+ŞH
+È
+˜\ÙKHŞ
+H
+ˆX]œÚ[Š[™ÛJH
+È
+˜\ÙKHHŞJH
+ˆX]˜ÛÜÊ[™ÛJJH
+ˆØØ[KˆNÂˆKÜ›Ú™Xİ˜ÛÛ\Û™[Ë›Ú™Xİ›[Ù[\ËXİ]™S[Ù[RYšY]ÜÜJNÂ‚ˆÛÛœİÛ•ÚY[H
+]™[ˆ™XXİ•ÚY[]™[Õ‘ÔÕ‘Ñ[[Y[ŠHOˆÂˆ]™[œ™]™[Y˜][
 
-  const pinWorld = useCallback((ref: PinRef): Point | undefined => {
-    const component = project.components.find(item => item.id === ref.componentId);
-    const definition = component && CATALOG_BY_ID.get(component.definitionId);
-    const pin = definition?.pins.find(item => item.id === ref.pinId);
-    if (!component || !definition || !pin) {
-      const module = project.modules.find(item => item.id === ref.componentId);
-      const modulePin = module?.pins.find(item => item.id === ref.pinId);
-      if (module && modulePin && module.id === activeModuleId && svgRef.current) {
-        const width=svgRef.current.clientWidth, height=svgRef.current.clientHeight;
-        const screenPoint = modulePin.side==='left' ? {x:1,y:modulePin.position*height} : modulePin.side==='right' ? {x:width-1,y:modulePin.position*height} : modulePin.side==='top' ? {x:modulePin.position*width,y:1} : {x:modulePin.position*width,y:height-1};
-        return screenToWorld(screenPoint,viewport);
-      }
-      return module && modulePin ? modulePinWorld(module, modulePin) : undefined;
-    }
-    const base = { x: pin.x * definition.width, y: pin.y * definition.height };
-    const angle = component.rotation * Math.PI / 180;
-    const cx = definition.width / 2, cy = definition.height / 2;
-    const scale = component.scale || 1;
-    return {
-      x: component.x + (cx + (base.x - cx) * Math.cos(angle) - (base.y - cy) * Math.sin(angle)) * scale,
-      y: component.y + (cy + (base.x - cx) * Math.sin(angle) + (base.y - cy) * Math.cos(angle)) * scale,
-    };
-  }, [project.components, project.modules, activeModuleId, viewport]);
+NÂˆÛÛœİÚ[HØØ[Ú[
+]™[
+NÂˆÛÛœİ˜XİÜˆHX]™^
+Y]™[™[VH
+ˆŒMJNÂˆÙ]šY]ÜÜ
+İ\œ™[Oˆ›ÛÛP]
+İ\œ™[Ú[˜XİÜŠJNÂˆNÂ‚ˆÛÛœİÛ˜XÚÙÜ›İ[™İÛˆH
+]™[ˆ™XXİ”Ú[\‘]™[Õ‘ÔÕ‘Ñ[[Y[ŠHOˆÂˆYˆ
+]™[˜]ÛˆOOH	‰ˆ]™[˜]ÛˆOOHJH™]\›ÂˆÛÛœİØØ[HØØ[Ú[
+]™[
+NÂˆÛÛœİÛÜ›HØÜ™Y[•ÕÛÜ›
+ØØ[šY]ÜÜ
+NÂˆİ™Ô™Y‹˜İ\œ™[ËœÙ]Ú[\Ø\\™J]™[œÚ[\’Y
+NÂˆÙ]Ù[XİYÚ\™RY
+[™Yš[™Y
+NÂˆYˆ
+ÛÛOOH	Ü[‰È]™[˜]ÛˆOOHHÜXÙR[
+HÂˆÙ]İ\œ™[[\˜Xİ[ÛŠÈ\Nˆ	Ü[‰Ëİ\ˆØØ[ÜšYÚ[ˆšY]ÜÜJNÂˆH[ÙHYˆ
+ÛÛOOH	Û[Ù[IÊHÂˆÙ]İ\œ™[[\˜Xİ[ÛŠÈ\Nˆ	Û[Ù[IËİ\ˆÛÜ›İ\œ™[ˆÛÜ›JNÂˆÛ”Ù[XİY
+×JNÈÛ”Ù[XİY[Ù[J[™Yš[™Y
+NÂˆH[ÙHÂˆÙ]İ\œ™[[\˜Xİ[ÛŠÈ\Nˆ	ÛX\œ]YYIËİ\ˆÛÜ›İ\œ™[ˆÛÜ›JNÂˆYˆ
+Y]™[œÚYÙ^JHÈÛ”Ù[XİY
+×JNÈÛ”Ù[XİY[Ù[J[™Yš[™Y
+NÈBˆYˆ
+[™[™Ô[ŠHÙ][™[™Ô[Š[™Yš[™Y
+NÂˆBˆNÂ‚ˆÛÛœİÛ”Ú[\“[İ™HH
+]™[ˆ™XXİ”Ú[\‘]™[Õ‘ÔÕ‘Ñ[[Y[ŠHOˆÂˆÛÛœİØØ[HØØ[Ú[
+]™[
+NÂˆÛÛœİÛÜ›HØÜ™Y[•ÕÛÜ›
+ØØ[šY]ÜÜ
+NÂˆÙ]Ú[\•ÛÜ›
+ÛÜ›
+NÂˆÛÛœİİ\œ™[[\˜Xİ[ÛˆH[\˜Xİ[Û”™Y‹˜İ\œ™[ÂˆYˆ
+Xİ\œ™[[\˜Xİ[ÛŠH™]\›ÂˆYˆ
+İ\œ™[[\˜Xİ[Û‹\HOOH	Ü[‰ÊHÂˆÙ]šY]ÜÜ
+È‹‹˜İ\œ™[[\˜Xİ[Û‹›ÜšYÚ[‹ˆİ\œ™[[\˜Xİ[Û‹›ÜšYÚ[‹
+ÈØØ[Hİ\œ™[[\˜Xİ[Û‹œİ\Nˆİ\œ™[[\˜Xİ[Û‹›ÜšYÚ[‹H
+ÈØØ[HHİ\œ™[[\˜Xİ[Û‹œİ\HJNÂˆH[ÙHYˆ
+İ\œ™[[\˜Xİ[Û‹\HOOH	Ù˜YÉÊHÂˆÛÛœİHÛÜ›Hİ\œ™[[\˜Xİ[Û‹œİ\HHÛÜ›HHİ\œ™[[\˜Xİ[Û‹œİ\NÂˆÛÛœİÛ˜\H›Ú™XİœÙ][™ÜËœÛ˜\ÑÜšYÈ›Ú™XİœÙ][™ÜË™ÜšYÚ^™HˆNÂˆ\]J˜YOˆÂˆ›Üˆ
+ÛÛœİÚYÜšYÚ[—HÙˆİ\œ™[[\˜Xİ[Û‹›ÜšYÚ[œÊHÂˆÛÛœİÛÛ\Û™[H˜Y˜ÛÛ\Û™[Ë™š[™
+][HOˆ][KšYOOHY
+NÂˆYˆ
+XÛÛ\Û™[ÛÛ\Û™[›ØÚÙY
+HÛÛ[YNÂˆÛÛ\Û™[HX]œ›İ[™
 
-  const onWheel = (event: React.WheelEvent<SVGSVGElement>) => {
-    event.preventDefault();
-    const point = localPoint(event);
-    const factor = Math.exp(-event.deltaY * .0015);
-    setViewport(current => zoomAt(current, point, factor));
-  };
+ÜšYÚ[‹
+È
+HÈÛ˜\
+H
+ˆÛ˜\ÂˆÛÛ\Û™[HHX]œ›İ[™
 
-  const onBackgroundDown = (event: React.PointerEvent<SVGSVGElement>) => {
-    if (event.button !== 0 && event.button !== 1) return;
-    const local = localPoint(event);
-    const world = screenToWorld(local, viewport);
-    svgRef.current?.setPointerCapture(event.pointerId);
-    setSelectedWireId(undefined);
-    if (tool === 'pan' || event.button === 1 || spaceHeld) {
-      setCurrentInteraction({ type: 'pan', start: local, origin: viewport });
-    } else if (tool === 'module') {
-      setCurrentInteraction({ type: 'module', start: world, current: world });
-      onSelected([]); onSelectedModule(undefined);
-    } else {
-      setCurrentInteraction({ type: 'marquee', start: world, current: world });
-      if (!event.shiftKey) { onSelected([]); onSelectedModule(undefined); }
-      if (pendingPin) setPendingPin(undefined);
-    }
-  };
+ÜšYÚ[‹H
+ÈJHÈÛ˜\
+H
+ˆÛ˜\ÂˆBˆKXİ\œ™[[\˜Xİ[Û‹œ™XÛÜ™Y
+NÂˆYˆ
+Xİ\œ™[[\˜Xİ[Û‹œ™XÛÜ™Y
+HÙ]İ\œ™[[\˜Xİ[ÛŠÈ‹‹˜İ\œ™[[\˜Xİ[Û‹™XÛÜ™YˆYHJNÂˆH[ÙHYˆ
+İ\œ™[[\˜Xİ[Û‹\HOOH	Û[Ù[KY˜YÉÊHÂˆÛÛœİHÛÜ›Hİ\œ™[[\˜Xİ[Û‹œİ\HHÛÜ›HHİ\œ™[[\˜Xİ[Û‹œİ\NÂˆ\]J˜YOˆÂˆÛÛœİ[Ù[HH˜Y›[Ù[\Ë™š[™
+][HOˆ][KšYOOHİ\œ™[[\˜Xİ[Û‹›[Ù[RY
+NÂˆYˆ
+[[Ù[JH™]\›ÂˆÛÛœİ[İ™VHİ\œ™[[\˜Xİ[Û‹›ÜšYÚ[‹
+ÈH[Ù[KÂˆÛÛœİ[İ™VHHİ\œ™[[\˜Xİ[Û‹›ÜšYÚ[‹H
+ÈHH[Ù[KNÂˆ[Ù[K
+ÏH[İ™VÈ[Ù[KH
+ÏH[İ™VNÂˆÛÛœİ\ØÙ[™[YÈH™]ÈÙ]
+Û[Ù[KšYJNÂˆ]Ú[™ÙY]YNÂˆÚ[JÚ[™ÙY
+^ØÚ[™ÙYY˜[ÙNÙ›ÜŠÛÛœİÚ[Ùˆ˜Y›[Ù[\ÊZYŠÚ[œ\™[[Ù[RY	‰™\ØÙ[™[YËš\ÊÚ[œ\™[[Ù[RY
+I‰ˆY\ØÙ[™[YËš\ÊÚ[šY
+J^Ù\ØÙ[™[YË˜Y
+Ú[šY
+NØÚ[
+Ï[[İ™VØÚ[JÏ[[İ™VNØÚ[™ÙY]YNß_Bˆ›Üˆ
+ÛÛœİYÙˆ[Ù[K›Y[X™\’YÊHÈÛÛœİÛÛ\Û™[H˜Y˜ÛÛ\Û™[Ë™š[™
+][HOˆ][KšYOOHY
+NÈYˆ
+ÛÛ\Û™[
+HÈÛÛ\Û™[
+ÏH[İ™VÈÛÛ\Û™[H
+ÏH[İ™VNÈHBˆ›Üˆ
+ÛÛœİÚ\™HÙˆ˜YÚ\™\ÊHYˆ
+İÚ\™K™œ›ÛK˜ÛÛ\Û™[YÚ\™KË˜ÛÛ\Û™[YKœÛÛYJYOˆ[Ù[K›Y[X™\’YËš[˜ÛY\ÊY
+HYOOH[Ù[KšY
+JHÚ\™K˜ÛÛ›ÛÚ[ÈHÚ\™K˜ÛÛ›ÛÚ[ÏË›X\
+Ú[Oˆ
+ÈˆÚ[
+È[İ™VNˆÚ[H
+È[İ™VHJJNÂˆKXİ\œ™[[\˜Xİ[Û‹œ™XÛÜ™Y
+NÂˆYˆ
+Xİ\œ™[[\˜Xİ[Û‹œ™XÛÜ™Y
+HÙ]İ\œ™[[\˜Xİ[ÛŠÈ‹‹˜İ\œ™[[\˜Xİ[Û‹™XÛÜ™YˆYHJNÂˆH[ÙHYˆ
+İ\œ™[[\˜Xİ[Û‹\HOOH	Û[Ù[K\™\Ú^™IÊHÂˆÛÛœİHÛÜ›Hİ\œ™[[\˜Xİ[Û‹œİ\HHÛÜ›HHİ\œ™[[\˜Xİ[Û‹œİ\NÂˆ\]J˜YOˆÂˆÛÛœİ[Ù[HH˜Y›[Ù[\Ë™š[™
+][HOˆ][KšYOOHİ\œ™[[\˜Xİ[Û‹›[Ù[RY
+NÂˆYˆ
+[Ù[JHØš™Xİ˜\ÜÚYÛŠ[Ù[K™\Ú^™Y™Xİ
+İ\œ™[[\˜Xİ[Û‹›ÜšYÚ[‹İ\œ™[[\˜Xİ[Û‹š[™KJJNÂˆKXİ\œ™[[\˜Xİ[Û‹œ™XÛÜ™Y
+NÂˆYˆ
+Xİ\œ™[[\˜Xİ[Û‹œ™XÛÜ™Y
+HÙ]İ\œ™[[\˜Xİ[ÛŠÈ‹‹˜İ\œ™[[\˜Xİ[Û‹™XÛÜ™YˆYHJNÂˆH[ÙHYˆ
+İ\œ™[[\˜Xİ[Û‹\HOOH	İÚ\™K\[™[™ÉÊHÂˆYˆ
+X]š\İ
+ØØ[Xİ\œ™[[\˜Xİ[Û‹œİ\ØÜ™Y[‹ØØ[KXİ\œ™[[\˜Xİ[Û‹œİ\ØÜ™Y[‹JHHÊHÂˆ\]J˜YOÂˆÛÛœİÚ\™OY˜YÚ\™\Ë™š[™
+][OOš][KšYOOXİ\œ™[[\˜Xİ[Û‹Ú\™RY
+NÂˆYŠÚ\™J^ÈÚ\™K˜ÛÛ›ÛÚ[ÈÏÏV×NÈÚ\™K˜ÛÛ›ÛÚ[ËœÜXÙJİ\œ™[[\˜Xİ[Û‹š[™^ÛÜ›
+NÈBˆJNÂˆÙ]İ\œ™[[\˜Xİ[ÛŠİ\N‰İÚ\™K[›ÙIËÚ\™RY˜İ\œ™[[\˜Xİ[Û‹Ú\™RY[™^˜İ\œ™[[\˜Xİ[Û‹š[™^™XÛÜ™YY_JNÂˆBˆH[ÙHYˆ
+İ\œ™[[\˜Xİ[Û‹\HOOH	İÚ\™K[›ÙIÊHÂˆ\]J˜YOˆÂˆÛÛœİÚ\™HH˜YÚ\™\Ë™š[™
+][HOˆ][KšYOOHİ\œ™[[\˜Xİ[Û‹Ú\™RY
+NÂˆYˆ
+Ú\™OË˜ÛÛ›ÛÚ[ÏË–Øİ\œ™[[\˜Xİ[Û‹š[™^JHÚ\™K˜ÛÛ›ÛÚ[ÖØİ\œ™[[\˜Xİ[Û‹š[™^HHÛÜ›ÂˆKXİ\œ™[[\˜Xİ[Û‹œ™XÛÜ™Y
+NÂˆYˆ
+Xİ\œ™[[\˜Xİ[Û‹œ™XÛÜ™Y
+HÙ]İ\œ™[[\˜Xİ[ÛŠÈ‹‹˜İ\œ™[[\˜Xİ[Û‹™XÛÜ™YˆYHJNÂˆH[ÙHÂˆÙ]İ\œ™[[\˜Xİ[ÛŠÈ‹‹˜İ\œ™[[\˜Xİ[Û‹İ\œ™[ˆÛÜ›JNÂˆBˆNÂ‚ˆÛÛœİš[š\Ú[\˜Xİ[ÛˆH
+]™[ˆ™XXİ”Ú[\‘]™[Õ‘ÔÕ‘Ñ[[Y[ŠHOˆÂˆÛÛœİİ\œ™[[\˜Xİ[ÛˆH[\˜Xİ[Û”™Y‹˜İ\œ™[ÂˆYˆ
+Xİ\œ™[[\˜Xİ[ÛŠH™]\›ÂˆYˆ
+İ\œ™[[\˜Xİ[Û‹\HOOH	ÛX\œ]YYIÈİ\œ™[[\˜Xİ[Û‹\HOOH	Û[Ù[IÊHÂˆÛÛœİ™XİH›Ü›X[^™Y™Xİ
+İ\œ™[[\˜Xİ[Û‹œİ\İ\œ™[[\˜Xİ[Û‹˜İ\œ™[
+NÂˆYˆ
+™XİÚYˆ	‰ˆ™XİšZYÚˆ
+HÂˆÛÛœİY[X™\’YÈHš\ÚX›PÛÛ\Û™[Ë™š[\ŠÛÛ\Û™[OˆÂˆÛÛœİYš[š][ÛˆHĞUSÑ×Ğ–WÒQ™Ù]
+ÛÛ\Û™[™Yš[š][Û’Y
+NÂˆYˆ
+YYš[š][ÛŠH™]\›ˆ˜[ÙNÂˆÛÛœİØØ[OXÛÛ\Û™[œØØ[_NÂˆ™]\›ˆ[\œÙXİÊ™XİÈˆÛÛ\Û™[NˆÛÛ\Û™[KÚYˆYš[š][Û‹ÚY
+œØØ[KZYÚˆYš[š][Û‹šZYÚ
+œØØ[HJNÂˆJK›X\
+ÛÛ\Û™[OˆÛÛ\Û™[šY
+NÂˆYˆ
+İ\œ™[[\˜Xİ[Û‹\HOOH	ÛX\œ]YYIÊHÛ”Ù[XİY
+Y[X™\’YÊNÂˆ[ÙHÂˆÛÛœİ[Ù[Nˆ[Ù[P\™XHHÈYˆZY
+	Û[Ù[IÊK˜[YNˆ[˜Ø\İ[YÈ	Ü›Ú™Xİ›[Ù[\Ë›[™İ
+È_X‹‹œ™XİÛÛÜˆ	ÈÍØÙ™‰ËY[X™\’YË[˜X›YˆYKÛÛ\ÙYˆ˜[ÙK[œÎˆ×K\™[[Ù[RYˆXİ]™S[Ù[RYNÂˆ\]J˜YOˆÈ˜Y›[Ù[\Ëœ\Ú
+[Ù[JNÈJNÂˆÛ”Ù[XİY[Ù[J[Ù[KšY
+NÈÛ•ÛÛ
+	ÜÙ[Xİ	ÊNÂˆBˆBˆBˆÙ]İ\œ™[[\˜Xİ[ÛŠ[
+NÂˆHÈİ™Ô™Y‹˜İ\œ™[Ëœ™[X\ÙTÚ[\Ø\\™J]™[œÚ[\’Y
+NÈHØ]ÚÈÊˆ[™XYH™[X\ÙY
+‹ÈBˆNÂ‚ˆÛÛœİÛÛÛ\Û™[İÛˆH
+]™[ˆ™XXİ”Ú[\‘]™[Õ‘ÑÑ[[Y[‹ÛÛ\Û™[ˆÛÛ\Û™[[œİ[˜ÙJHOˆÂˆ]™[œİÜ›ÜYØ][ÛŠ
+NÂˆYˆ
+]™[˜]ÛˆOOHŠH™]\›ÂˆYˆ
+ÛÛOOH	Ü[‰È]™[˜]ÛˆOOHHÜXÙR[
+HÂˆÛÛœİØØ[HØØ[Ú[
+]™[
+NÂˆÙ]İ\œ™[[\˜Xİ[ÛŠÈ\Nˆ	Ü[‰Ëİ\ˆØØ[ÜšYÚ[ˆšY]ÜÜJNÂˆİ™Ô™Y‹˜İ\œ™[ËœÙ]Ú[\Ø\\™J]™[œÚ[\’Y
+NÂˆ™]\›ÂˆBˆËÈHÛÛ\Û™[›ÙH[Ø^\È™[XZ[œÈ˜YÙØX›NÈÚ\™H[ÙHÛ›HÚ[™Ù\È[ˆ™Z]š[İ\‹‚ˆÛÛœİ™^Ù[Xİ[ÛˆH]™[œÚYÙ^BˆÈÙ[XİYš[˜ÛY\ÊÛÛ\Û™[šY
+HÈÙ[XİY™š[\ŠYOˆYOOHÛÛ\Û™[šY
+HˆË‹‹œÙ[XİYÛÛ\Û™[šYBˆˆÙ[XİYš[˜ÛY\ÊÛÛ\Û™[šY
+HÈÙ[XİYˆØÛÛ\Û™[šYNÂˆÛ”Ù[XİY
+™^Ù[Xİ[ÛŠNÈÛ”Ù[XİY[Ù[J[™Yš[™Y
+NÂˆÛÛœİÛÜ›HØÜ™Y[•ÕÛÜ›
+ØØ[Ú[
+]™[
+KšY]ÜÜ
+NÂˆÛÛœİÜšYÚ[œÈH™]ÈX\
+™^Ù[Xİ[Û‹›X\
+YOˆÂˆÛÛœİ][HH›Ú™Xİ˜ÛÛ\Û™[Ë™š[™
+›ÙHOˆ›ÙKšYOOHY
+HNÂˆ™]\›ˆÚYÈˆ][KNˆ][KHWH\ÈÛÛœİÂˆJJNÂˆÙ]İ\œ™[[\˜Xİ[ÛŠÈ\Nˆ	Ù˜YÉËİ\ˆÛÜ›ÜšYÚ[œË™XÛÜ™Yˆ˜[ÙHJNÂˆİ™Ô™Y‹˜İ\œ™[ËœÙ]Ú[\Ø\\™J]™[œÚ[\’Y
+NÂˆNÂ‚ˆÛÛœİÛÛ›™Xİ[ˆH
+™^ˆ[”™YŠHOˆÂˆYˆ
+\[™[™Ô[ŠHÈÙ][™[™Ô[Š™^
+NÈÛ•ÛÛ
+	İÚ\™IÊNÈ™]\›ÈBˆYˆ
+[™[™Ô[‹˜ÛÛ\Û™[YOOH™^˜ÛÛ\Û™[Y	‰ˆ[™[™Ô[‹œ[’YOOH™^œ[’Y
+HÈÙ][™[™Ô[Š[™Yš[™Y
+NÈ™]\›ÈBˆÛÛœİ\XØ]HH›Ú™XİÚ\™\ËœÛÛYJÚ\™HO‚ˆ
+Ú\™K™œ›ÛK˜ÛÛ\Û™[YOOH[™[™Ô[‹˜ÛÛ\Û™[Y	‰ˆÚ\™K™œ›ÛKœ[’YOOH[™[™Ô[‹œ[’Y	‰ˆÚ\™KË˜ÛÛ\Û™[YOOH™^˜ÛÛ\Û™[Y	‰ˆÚ\™KËœ[’YOOH™^œ[’Y
+Bˆ
+Ú\™KË˜ÛÛ\Û™[YOOH[™[™Ô[‹˜ÛÛ\Û™[Y	‰ˆÚ\™KËœ[’YOOH[™[™Ô[‹œ[’Y	‰ˆÚ\™K™œ›ÛK˜ÛÛ\Û™[YOOH™^˜ÛÛ\Û™[Y	‰ˆÚ\™K™œ›ÛKœ[’YOOH™^œ[’Y
+JNÂˆYˆ
+Y\XØ]JH\]J˜YOˆÈ˜YÚ\™\Ëœ\Ú
+ÈYˆZY
+	İÚ\™IÊKœ›ÛNˆ[™[™Ô[‹Îˆ™^›İ][™Îˆ˜YœÙ][™ÜËÚ\™T›İ][™ÈJNÈJNÂˆÙ][™[™Ô[Š[™Yš[™Y
+NÂˆÛ•ÛÛ
+	ÜÙ[Xİ	ÊNÂˆNÂ‚ˆÛÛœİÛ”[ˆH
+]™[ˆ™XXİ”Ú[\‘]™[Õ‘ĞÚ\˜ÛQ[[Y[‹ÛÛ\Û™[ˆÛÛ\Û™[[œİ[˜ÙK[ˆ[‘Yš[š][ÛŠHOˆÂˆ]™[œİÜ›ÜYØ][ÛŠ
+NÂˆYˆ
+]™[˜]ÛˆOOH
+H™]\›ÂˆÛÛ›™Xİ[ŠÈÛÛ\Û™[YˆÛÛ\Û™[šY[’Yˆ[‹šYJNÂˆNÂ‚ˆÛÛœİ]ZXÚÕÙÙÛHH
+ÛÛ\Û™[ˆÛÛ\Û™[[œİ[˜ÙJHOˆ\]J˜YOˆÂˆÛÛœİ][HH˜Y˜ÛÛ\Û™[Ë™š[™
+›ÙHOˆ›ÙKšYOOHÛÛ\Û™[šY
+NÂˆÛÛœİYš[š][ÛˆHĞUSÑ×Ğ–WÒQ™Ù]
+ÛÛ\Û™[™Yš[š][Û’Y
+NÂˆYˆ
+Z][HYYš[š][ÛŠH™]\›ÂˆYˆ
+Yš[š][Û‹›[Ù[OOH	ÜİÚ]Ú	ÊH][Kœ›Ü\Y\Ë˜ÛÜÙYHP›ÛÛX[Š][Kœ›Ü\Y\Ë˜ÛÜÙY
+NÂˆYˆ
+Yš[š][Û‹›[Ù[OOH	ÛÙÚX×Ú[œ]	ÊH][Kœ›Ü\Y\Ëœİ]HH[X™\Š][Kœ›Ü\Y\Ëœİ]JHÈˆNÂˆJNÂ‚ˆÛÛœİÜ[ÛÛ\Û™[[œÜXİÜˆH
+ÛÛ\Û™[ˆÛÛ\Û™[[œİ[˜ÙJHOˆÈÛ”Ù[XİY
+ØÛÛ\Û™[šYJNÈÛ”Ù[XİY[Ù[J[™Yš[™Y
+NÈÛ“Ü[’[œÜXİÜŠ
+NÈNÂˆÛÛœİÛÛ\Û™[ÛÛ^H
+]™[”™XXİ“[İ\ÙQ]™[Õ‘ÑÑ[[Y[‹ÛÛ\Û™[ÛÛ\Û™[[œİ[˜ÙJHOˆÂˆ]™[œ™]™[Y˜][
 
-  const onPointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
-    const local = localPoint(event);
-    const world = screenToWorld(local, viewport);
-    setPointerWorld(world);
-    const currentInteraction = interactionRef.current;
-    if (!currentInteraction) return;
-    if (currentInteraction.type === 'pan') {
-      setViewport({ ...currentInteraction.origin, x: currentInteraction.origin.x + local.x - currentInteraction.start.x, y: currentInteraction.origin.y + local.y - currentInteraction.start.y });
-    } else if (currentInteraction.type === 'drag') {
-      const dx = world.x - currentInteraction.start.x, dy = world.y - currentInteraction.start.y;
-      const snap = project.settings.snapToGrid ? project.settings.gridSize : 1;
-      update(draft => {
-        for (const [id, origin] of currentInteraction.origins) {
-          const component = draft.components.find(item => item.id === id);
-          if (!component || component.locked) continue;
-          component.x = Math.round((origin.x + dx) / snap) * snap;
-          component.y = Math.round((origin.y + dy) / snap) * snap;
-        }
-      }, !currentInteraction.recorded);
-      if (!currentInteraction.recorded) setCurrentInteraction({ ...currentInteraction, recorded: true });
-    } else if (currentInteraction.type === 'module-drag') {
-      const dx = world.x - currentInteraction.start.x, dy = world.y - currentInteraction.start.y;
-      update(draft => {
-        const module = draft.modules.find(item => item.id === currentInteraction.moduleId);
-        if (!module) return;
-        const moveX = currentInteraction.origin.x + dx - module.x;
-        const moveY = currentInteraction.origin.y + dy - module.y;
-        module.x += moveX; module.y += moveY;
-        const descendantIds = new Set([module.id]);
-        let changed=true;
-        while(changed){changed=false;for(const child of draft.modules)if(child.parentModuleId&&descendantIds.has(child.parentModuleId)&&!descendantIds.has(child.id)){descendantIds.add(child.id);child.x+=moveX;child.y+=moveY;changed=true;}}
-        for (const id of module.memberIds) { const component = draft.components.find(item => item.id === id); if (component) { component.x += moveX; component.y += moveY; } }
-        for (const wire of draft.wires) if ([wire.from.componentId,wire.to.componentId].some(id => module.memberIds.includes(id) || id === module.id)) wire.controlPoints = wire.controlPoints?.map(point => ({ x: point.x + moveX, y: point.y + moveY }));
-      }, !currentInteraction.recorded);
-      if (!currentInteraction.recorded) setCurrentInteraction({ ...currentInteraction, recorded: true });
-    } else if (currentInteraction.type === 'module-resize') {
-      const dx = world.x - currentInteraction.start.x, dy = world.y - currentInteraction.start.y;
-      update(draft => {
-        const module = draft.modules.find(item => item.id === currentInteraction.moduleId);
-        if (module) Object.assign(module, resizedRect(currentInteraction.origin, currentInteraction.handle, dx, dy));
-      }, !currentInteraction.recorded);
-      if (!currentInteraction.recorded) setCurrentInteraction({ ...currentInteraction, recorded: true });
-    } else if (currentInteraction.type === 'wire-pending') {
-      if (Math.hypot(local.x-currentInteraction.startScreen.x,local.y-currentInteraction.startScreen.y) >= 3) {
-        update(draft=>{
-          const wire=draft.wires.find(item=>item.id===currentInteraction.wireId);
-          if(wire){ wire.controlPoints ??=[]; wire.controlPoints.splice(currentInteraction.index,0,world); }
-        });
-        setCurrentInteraction({type:'wire-node',wireId:currentInteraction.wireId,index:currentInteraction.index,recorded:true});
-      }
-    } else if (currentInteraction.type === 'wire-node') {
-      update(draft => {
-        const wire = draft.wires.find(item => item.id === currentInteraction.wireId);
-        if (wire?.controlPoints?.[currentInteraction.index]) wire.controlPoints[currentInteraction.index] = world;
-      }, !currentInteraction.recorded);
-      if (!currentInteraction.recorded) setCurrentInteraction({ ...currentInteraction, recorded: true });
-    } else {
-      setCurrentInteraction({ ...currentInteraction, current: world });
-    }
-  };
+NÙ]™[œİÜ›ÜYØ][ÛŠ
+NÛÛ”Ù[XİY
+ØÛÛ\Û™[šYJNÛÛ”Ù[XİY[Ù[J[™Yš[™Y
+NÂˆÛÛÛ^\™Ù]
+ÚÚ[™‰ØÛÛ\Û™[	ËY˜ÛÛ\Û™[šY™]™[˜ÛY[N™]™[˜ÛY[_JNÂˆNÂ‚ˆÛÛœİš]›Ú™XİH
 
-  const finishInteraction = (event: React.PointerEvent<SVGSVGElement>) => {
-    const currentInteraction = interactionRef.current;
-    if (!currentInteraction) return;
-    if (currentInteraction.type === 'marquee' || currentInteraction.type === 'module') {
-      const rect = normalizedRect(currentInteraction.start, currentInteraction.current);
-      if (rect.width > 8 && rect.height > 8) {
-        const memberIds = visibleComponents.filter(component => {
-          const definition = CATALOG_BY_ID.get(component.definitionId);
-          if (!definition) return false;
-          const scale=component.scale||1;
-          return intersects(rect, { x: component.x, y: component.y, width: definition.width*scale, height: definition.height*scale });
-        }).map(component => component.id);
-        if (currentInteraction.type === 'marquee') onSelected(memberIds);
-        else {
-          const module: ModuleArea = { id: uid('module'), name: `Encapsulado ${project.modules.length + 1}`, ...rect, color: '#7b8cff', memberIds, enabled: true, collapsed: false, pins: [], parentModuleId: activeModuleId };
-          update(draft => { draft.modules.push(module); });
-          onSelectedModule(module.id); onTool('select');
-        }
-      }
-    }
-    setCurrentInteraction(null);
-    try { svgRef.current?.releasePointerCapture(event.pointerId); } catch { /* already released */ }
-  };
+HOˆÂˆÛÛœİ™XİHİ™Ô™Y‹˜İ\œ™[K™Ù]›İ[™[™ĞÛY[™Xİ
 
-  const onComponentDown = (event: React.PointerEvent<SVGGElement>, component: ComponentInstance) => {
-    event.stopPropagation();
-    if (event.button === 2) return;
-    if (tool === 'pan' || event.button === 1 || spaceHeld) {
-      const local = localPoint(event);
-      setCurrentInteraction({ type: 'pan', start: local, origin: viewport });
-      svgRef.current?.setPointerCapture(event.pointerId);
-      return;
-    }
-    // A component body always remains draggable; wire mode only changes pin behaviour.
-    const nextSelection = event.shiftKey
-      ? selected.includes(component.id) ? selected.filter(id => id !== component.id) : [...selected, component.id]
-      : selected.includes(component.id) ? selected : [component.id];
-    onSelected(nextSelection); onSelectedModule(undefined);
-    const world = screenToWorld(localPoint(event), viewport);
-    const origins = new Map(nextSelection.map(id => {
-      const item = project.components.find(node => node.id === id)!;
-      return [id, { x: item.x, y: item.y }] as const;
-    }));
-    setCurrentInteraction({ type: 'drag', start: world, origins, recorded: false });
-    svgRef.current?.setPointerCapture(event.pointerId);
-  };
+NÂˆÛÛœİ›Ş\ÈHË‹‹š\ÚX›PÛÛ\Û™[Ë›X\
+ÛÛ\Û™[OˆÈÛÛœİHĞUSÑ×Ğ–WÒQ™Ù]
+ÛÛ\Û™[™Yš[š][Û’Y
+HNÈÛÛœİØØ[HHÛÛ\Û™[œØØ[HNÈ™]\›ˆÈˆÛÛ\Û™[NˆÛÛ\Û™[KÚYˆÚY
+ˆØØ[KZYÚˆšZYÚ
+ˆØØ[HNÈJK‹‹˜Ú[[Ù[\×NÂˆYˆ
+X›Ş\Ë›[™İ
+HÈÙ]šY]ÜÜ
+Èˆ™XİÚYÈ‹Nˆ™XİšZYÚÈ‹ØØ[NˆHJNÈ™]\›ÈBˆÛÛœİZ[–HX]›Z[Š‹‹˜›Ş\Ë›X\
+ˆOˆ‹
+JKZ[–HHX]›Z[Š‹‹˜›Ş\Ë›X\
+ˆOˆ‹JJNÂˆÛÛœİX^HX]›X^
+‹‹˜›Ş\Ë›X\
+ˆOˆ‹
+È‹ÚY
+JKX^HHX]›X^
+‹‹˜›Ş\Ë›X\
+ˆOˆ‹H
+È‹šZYÚ
+JNÂˆÙ]šY]ÜÜ
+š]›İ[™ÊÈˆZ[–NˆZ[–KÚYˆX^HZ[–ZYÚˆX^HHZ[–HKÈÚYˆ™XİÚYZYÚˆ™XİšZYÚKLL
+JNÂˆNÂ‚ˆÛÛœİ˜]šYØ]UÓ[Ù[HH
+YÎœİš[™ÊHOˆÂˆÛXİ]™S[Ù[JY
+NÈÛ”Ù[XİY
+×JNÈÛ”Ù[XİY[Ù[JY
+NÂˆÛÛœİ™Xİ\İ™Ô™Y‹˜İ\œ™[Ë™Ù]›İ[™[™ĞÛY[™Xİ
 
-  const connectPin = (next: PinRef) => {
-    if (!pendingPin) { setPendingPin(next); onTool('wire'); return; }
-    if (pendingPin.componentId === next.componentId && pendingPin.pinId === next.pinId) { setPendingPin(undefined); return; }
-    const duplicate = project.wires.some(wire =>
-      (wire.from.componentId === pendingPin.componentId && wire.from.pinId === pendingPin.pinId && wire.to.componentId === next.componentId && wire.to.pinId === next.pinId)
-      || (wire.to.componentId === pendingPin.componentId && wire.to.pinId === pendingPin.pinId && wire.from.componentId === next.componentId && wire.from.pinId === next.pinId));
-    if (!duplicate) update(draft => { draft.wires.push({ id: uid('wire'), from: pendingPin, to: next, routing: draft.settings.wireRouting }); });
-    setPendingPin(undefined);
-    onTool('select');
-  };
+NÂˆÛÛœİ[Ù[OZYÜ›Ú™Xİ›[Ù[\Ë™š[™
+][OOš][KšYOOZY
+N[™Yš[™YÂˆYŠ™Xİ	‰›[Ù[J\Ù]šY]ÜÜ
+š]›İ[™Ê[Ù[KİÚYœ™XİÚYZYÚœ™XİšZYÚKL
+JNÂˆ[ÙHYŠ™Xİ
+^ØÛÛœİ›ÛİÏ\›Ú™Xİ›[Ù[\Ë™š[\Š][OOˆZ][Kœ\™[[Ù[RY
+NÚYŠ›ÛİË›[™İ
+^ØÛÛœİZ[–SX]›Z[Š‹‹œ›ÛİË›X\
+][OOš][K
+JKZ[–OSX]›Z[Š‹‹œ›ÛİË›X\
+][OOš][KJJKX^SX]›X^
+‹‹œ›ÛİË›X\
+][OOš][K
+Ú][KÚY
+JKX^OSX]›X^
+‹‹œ›ÛİË›X\
+][OOš][KJÚ][KšZYÚ
+JNÜÙ]šY]ÜÜ
+š]›İ[™ÊŞ›Z[–N›Z[–KÚY›X^[Z[–ZYÚ›X^K[Z[–_KİÚYœ™XİÚYZYÚœ™XİšZYÚK
+JNß_BˆNÂ‚ˆÛÛœİY]H
+Yš[š][Û’Yˆİš[™ËÛÜ›ˆÚ[
+HOˆÂˆÛÛœİYš[š][ÛˆHĞUSÑ×Ğ–WÒQ™Ù]
+Yš[š][Û’Y
+NÂˆYˆ
+YYš[š][ÛŠH™]\›ÂˆÛÛœİ[œİ[˜ÙTØØ[HHX]›X^
+YKNKX]›Z[ŠŒHÈšY]ÜÜœØØ[JJNÂˆÛÛœİÛÛ\Û™[HÜ™X]R[œİ[˜ÙJYš[š][Û’YÛÜ›HYš[š][Û‹ÚY
+ˆ[œİ[˜ÙTØØ[HÈ‹ÛÜ›HHYš[š][Û‹šZYÚ
+ˆ[œİ[˜ÙTØØ[HÈ‹ZY
+	Û›ÙIÊK[œİ[˜ÙTØØ[JNÂˆ\]J˜YOˆÈ˜Y˜ÛÛ\Û™[Ëœ\Ú
+ÛÛ\Û™[
+NÈYˆ
+Xİ]™S[Ù[RY
+H˜Y›[Ù[\Ë™š[™
+[Ù[HOˆ[Ù[KšYOOHXİ]™S[Ù[RY
+OË›Y[X™\’YËœ\Ú
+ÛÛ\Û™[šY
+NÈJNÂˆÛ”Ù[XİY
+ØÛÛ\Û™[šYJNÈÛ”Ù[XİY[Ù[J[™Yš[™Y
+NÂˆNÂ‚ˆÛÛœİÛ“[Ù[QİÛˆH
+]™[ˆ™XXİ”Ú[\‘]™[Õ‘ÑÑ[[Y[‹[Ù[Nˆ[Ù[P\™XJHOˆÂˆ]™[œİÜ›ÜYØ][ÛŠ
+NÂˆYˆ
+]™[˜]ÛˆOOHŠH™]\›ÂˆÛÛœİ›İÏ\\™›Ü›X[˜ÙK››İÊ
+K™]š[İ\Ï[[Ù[T™\ÜÔ™Y‹˜İ\œ™[Âˆ[Ù[T™\ÜÔ™Y‹˜İ\œ™[^ÚY›[Ù[KšY]››İßNÂˆYŠ™]š[İ\ÏËšYOO[[Ù[KšY	‰››İË\™]š[İ\Ë˜]ÍŒ
+^ÜÙ]İ\œ™[[\˜Xİ[ÛŠ[
+NÛ˜]šYØ]UÓ[Ù[J[Ù[KšY
+NÜ™]\›ßBˆÛ”Ù[XİY
+×JNÈÛ”Ù[XİY[Ù[J[Ù[KšY
+NÈÙ]Ù[XİYÚ\™RY
+[™Yš[™Y
+NÂˆYˆ
+ÛÛOOH	ÜÙ[Xİ	ÈXİ]™S[Ù[RYOOH[Ù[KšY
+H™]\›ÂˆÛÛœİÛÜ›HØÜ™Y[•ÕÛÜ›
+ØØ[Ú[
+]™[
+KšY]ÜÜ
+NÂˆÙ]İ\œ™[[\˜Xİ[ÛŠÈ\Nˆ	Û[Ù[KY˜YÉËİ\ˆÛÜ›ÜšYÚ[ˆÈˆ[Ù[KNˆ[Ù[KHK[Ù[RYˆ[Ù[KšY™XÛÜ™Yˆ˜[ÙHJNÂˆİ™Ô™Y‹˜İ\œ™[ËœÙ]Ú[\Ø\\™J]™[œÚ[\’Y
+NÂˆNÂ‚ˆÛÛœİÛ“[Ù[T™\Ú^™HH
+]™[ˆ™XXİ”Ú[\‘]™[Õ‘Ô™Xİ[[Y[‹[Ù[Nˆ[Ù[P\™XK[™Nˆİš[™ÊHOˆÂˆ]™[œİÜ›ÜYØ][ÛŠ
+NÂˆÛÛœİÛÜ›HØÜ™Y[•ÕÛÜ›
+ØØ[Ú[
+]™[
+KšY]ÜÜ
+NÂˆÙ]İ\œ™[[\˜Xİ[ÛŠÈ\Nˆ	Û[Ù[K\™\Ú^™IËİ\ˆÛÜ›ÜšYÚ[ˆÈˆ[Ù[KNˆ[Ù[KKÚYˆ[Ù[KÚYZYÚˆ[Ù[KšZYÚK[Ù[RYˆ[Ù[KšY[™K™XÛÜ™Yˆ˜[ÙHJNÂˆİ™Ô™Y‹˜İ\œ™[ËœÙ]Ú[\Ø\\™J]™[œÚ[\’Y
+NÂˆNÂ‚ˆÛÛœİÛ•Ú\™QİÛˆH
+]™[ˆ™XXİ”Ú[\‘]™[Õ‘Ô][[Y[‹Ú\™NˆÚ\™Kœ›ÛNˆÚ[ÎˆÚ[
+HOˆÂˆ]™[œİÜ›ÜYØ][ÛŠ
+NÂˆYˆ
+]™[˜]ÛˆOOHŠH™]\›ÂˆÙ]Ù[XİYÚ\™RY
+Ú\™KšY
+NÈÛ”Ù[XİY
+×JNÈÛ”Ù[XİY[Ù[J[™Yš[™Y
+NÂˆYˆ
+]™[™]Z[ˆJH™]\›ÂˆÛÛœİÛÜ›HØÜ™Y[•ÕÛÜ›
+ØØ[Ú[
+]™[
+KšY]ÜÜ
+NÂˆÛÛœİÚ[ÈHÙœ›ÛK‹‹ŠÚ\™K˜ÛÛ›ÛÚ[ÈÏÈ×JK×NÂˆÛÛœİ[™^H™X\™\İÙYÛY[[™^
+Ú[ËÛÜ›
+NÂˆÙ]İ\œ™[[\˜Xİ[ÛŠÈ\N‰İÚ\™K\[™[™ÉËÚ\™RYÚ\™KšY[™^Ú[ÛÜ›İ\ØÜ™Y[›ØØ[Ú[
+]™[
+HJNÂˆİ™Ô™Y‹˜İ\œ™[ËœÙ]Ú[\Ø\\™J]™[œÚ[\’Y
+NÂˆNÂ‚ˆÛÛœİYÚ\™S›ÙHH
+]™[ˆ™XXİ“[İ\ÙQ]™[Õ‘Ô][[Y[‹Ú\™N•Ú\™Kœ›ÛN”Ú[Î”Ú[
+HOˆÂˆ]™[œİÜ›ÜYØ][ÛŠ
+NÂˆÛÛœİÛÜ›\ØÜ™Y[•ÕÛÜ›
+ØØ[Ú[
+]™[
+KšY]ÜÜ
+NÂˆÛÛœİ[™^[™X\™\İÙYÛY[[™^
+Ùœ›ÛK‹‹ŠÚ\™K˜ÛÛ›ÛÚ[ÏÏÖ×JK×KÛÜ›
+NÂˆ\]J˜YOØÛÛœİ\™Ù]Y˜YÚ\™\Ë™š[™
+][OOš][KšYOO]Ú\™KšY
+NÚYŠ\™Ù]
+^İ\™Ù]˜ÛÛ›ÛÚ[ÏÏÏV×Nİ\™Ù]˜ÛÛ›ÛÚ[ËœÜXÙJ[™^ÛÜ›
+Nß_JNÂˆÙ]Ù[XİYÚ\™RY
+Ú\™KšY
+NÂˆNÂ‚ˆÛÛœİÛ•Ú\™S›ÙQİÛˆH
+]™[ˆ™XXİ”Ú[\‘]™[Õ‘Ô™Xİ[[Y[‹Ú\™RYˆİš[™Ë[™^ˆ[X™\ŠHOˆÂˆ]™[œİÜ›ÜYØ][ÛŠ
+NÂˆÙ]Ù[XİYÚ\™RY
+Ú\™RY
+NÂˆÙ]İ\œ™[[\˜Xİ[ÛŠÈ\Nˆ	İÚ\™K[›ÙIËÚ\™RY[™^™XÛÜ™Yˆ˜[ÙHJNÂˆİ™Ô™Y‹˜İ\œ™[ËœÙ]Ú[\Ø\\™J]™[œÚ[\’Y
+NÂˆNÂ‚ˆÛÛœİ]ÚÚ\™HH
+Ú\™RYˆİš[™Ë]Úˆ\X[Ú\™OŠHOˆ\]J˜YOˆÈÛÛœİÚ\™HH˜YÚ\™\Ë™š[™
+][HOˆ][KšYOOHÚ\™RY
+NÈYˆ
+Ú\™JHØš™Xİ˜\ÜÚYÛŠÚ\™K]Ú
+NÈJNÂˆÛÛœİ[]UÚ\™HH
+Ú\™RYˆİš[™ÊHOˆÈ\]J˜YOˆÈ˜YÚ\™\ÈH˜YÚ\™\Ë™š[\Š][HOˆ][KšYOOHÚ\™RY
+NÈJNÈÙ]Ù[XİYÚ\™RY
+[™Yš[™Y
+NÈNÂ‚ˆÛÛœİX\œ]YYHH[\˜Xİ[Ûˆ	‰ˆ
+[\˜Xİ[Û‹\HOOH	ÛX\œ]YYIÈ[\˜Xİ[Û‹\HOOH	Û[Ù[IÊHÈ›Ü›X[^™Y™Xİ
+[\˜Xİ[Û‹œİ\[\˜Xİ[Û‹˜İ\œ™[
+Hˆ[™Yš[™YÂˆÛÛœİ[™[™Ôİ\H[™[™Ô[ˆÈ[•ÛÜ›
+[™[™Ô[ŠHˆ[™Yš[™YÂ‚ˆÛÛœİÜšYÚ^™HHY\]™QÜšY
+›Ú™XİœÙ][™ÜË™ÜšYÚ^™KšY]ÜÜœØØ[JNÂˆÛÛœİ™[™\™YÚ\™\ÈH\ÙSY[[Ê
 
-  const onPin = (event: React.PointerEvent<SVGCircleElement>, component: ComponentInstance, pin: PinDefinition) => {
-    event.stopPropagation();
-    if (event.button !== 0) return;
-    connectPin({ componentId: component.id, pinId: pin.id });
-  };
+HOˆš\ÚX›UÚ\™\Ë›X\
+Ú\™HOˆ
+ÈÚ\™Kœ›ÛNˆ[•ÛÜ›
+Ú\™K™œ›ÛJKÎˆ[•ÛÜ›
+Ú\™KÊHJJKİš\ÚX›UÚ\™\Ë[•ÛÜ›JNÂˆÛÛœİÙ[XİYÚ\™HH›Ú™XİÚ\™\Ë™š[™
+Ú\™HOˆÚ\™KšYOOHÙ[XİYÚ\™RY
+NÂˆÛÛœİ™[™\™Y[Ù[\ÈHÚ[[Ù[\ÎÂ‚ˆ™]\›ˆXZ[ˆÛ\ÜÓ˜[YO^ØÛÜšÜÜXÙH[YKIÜ™\ÛÛ™Y[Y_HÛÛIİÛÛH	ÜÜXÙR[È	ÜÜXÙK\[‰Èˆ	ÉßH	ØXİ]™S[Ù[HÈ	Ú[œÚYK[[Ù[IÈˆ	ÉßXO‚ˆİ™È™Y^Üİ™Ô™YŸHÛ\ÜÓ˜[YOH˜Ú\˜İZ]XØ[˜\ÈˆÛ•ÚY[^ÛÛ•ÚY[HÛ”Ú[\‘İÛ^ÛÛ˜XÚÙÜ›İ[™İÛŸHÛ”Ú[\“[İ™O^ÛÛ”Ú[\“[İ™_HÛ”Ú[\•\^Ùš[š\Ú[\˜Xİ[ÛŸHÛ”Ú[\Ø[˜Ù[^Ùš[š\Ú[\˜Xİ[ÛŸHÛÛÛ^Y[O^Ù]™[OÙ]™[œ™]™[Y˜][
 
-  const quickToggle = (component: ComponentInstance) => update(draft => {
-    const item = draft.components.find(node => node.id === component.id);
-    const definition = CATALOG_BY_ID.get(component.definitionId);
-    if (!item || !definition) return;
-    if (definition.model === 'switch') item.properties.closed = !Boolean(item.properties.closed);
-    if (definition.model === 'logic_input') item.properties.state = Number(item.properties.state) ? 0 : 1;
-  });
+NÚYŠ]™[\™Ù]OOY]™[˜İ\œ™[\™Ù]
 
-  const openComponentInspector = (component: ComponentInstance) => { onSelected([component.id]); onSelectedModule(undefined); onOpenInspector(); };
-  const componentContext = (event:React.MouseEvent<SVGGElement>,component:ComponentInstance) => {
-    event.preventDefault();event.stopPropagation();onSelected([component.id]);onSelectedModule(undefined);
-    onContextTarget({kind:'component',id:component.id,x:event.clientX,y:event.clientY});
-  };
+]™[\™Ù]\È[[Y[
+K˜Û\ÜÓ\İË˜ÛÛZ[œÊ	ÙÜšY\[™IÊJJ[ÛÛÛ^\™Ù]
+ÚÚ[™‰ØØ[˜\ÉË™]™[˜ÛY[N™]™[˜ÛY[_JNß_BˆÛ‘˜YÓİ™\^Ù]™[OˆÈYˆ
+]™[™]U˜[œÙ™\‹\\Ëš[˜ÛY\Ê	Ø\XØ][Û‹ŞXš]Ú\™KXÛÛ\Û™[	ÊJHÈ]™[œ™]™[Y˜][
 
-  const fitProject = () => {
-    const rect = svgRef.current!.getBoundingClientRect();
-    const boxes = [...visibleComponents.map(component => { const d = CATALOG_BY_ID.get(component.definitionId)!; const scale = component.scale || 1; return { x: component.x, y: component.y, width: d.width * scale, height: d.height * scale }; }),...childModules];
-    if (!boxes.length) { setViewport({ x: rect.width / 2, y: rect.height / 2, scale: 1 }); return; }
-    const minX = Math.min(...boxes.map(b => b.x)), minY = Math.min(...boxes.map(b => b.y));
-    const maxX = Math.max(...boxes.map(b => b.x + b.width)), maxY = Math.max(...boxes.map(b => b.y + b.height));
-    setViewport(fitBounds({ x: minX, y: minY, width: maxX - minX, height: maxY - minY }, { width: rect.width, height: rect.height }, 110));
-  };
+NÈ]™[™]U˜[œÙ™\‹™›ÜY™™XİH	ØÛÜIÎÈH_BˆÛ‘›Ü^Ù]™[OˆÈ]™[œ™]™[Y˜][
 
-  const navigateToModule = (id?:string) => {
-    onActiveModule(id); onSelected([]); onSelectedModule(id);
-    const rect=svgRef.current?.getBoundingClientRect();
-    const module=id?project.modules.find(item=>item.id===id):undefined;
-    if(rect&&module)setViewport(fitBounds(module,{width:rect.width,height:rect.height},90));
-    else if(rect){const roots=project.modules.filter(item=>!item.parentModuleId);if(roots.length){const minX=Math.min(...roots.map(item=>item.x)),minY=Math.min(...roots.map(item=>item.y)),maxX=Math.max(...roots.map(item=>item.x+item.width)),maxY=Math.max(...roots.map(item=>item.y+item.height));setViewport(fitBounds({x:minX,y:minY,width:maxX-minX,height:maxY-minY},{width:rect.width,height:rect.height},80));}}
-  };
+NÈÛÛœİYH]™[™]U˜[œÙ™\‹™Ù]]J	Ø\XØ][Û‹ŞXš]Ú\™KXÛÛ\Û™[	ÊNÈY]
+YØÜ™Y[•ÕÛÜ›
+ØØ[Ú[
+]™[
+KšY]ÜÜ
+JNÈ_O‚ˆYœÏ‚ˆ]\›ˆYH›Z[›Ü‘ÜšYˆÚY^ÙÜšYÚ^™_HZYÚ^ÙÜšYÚ^™_H]\›•[š]ÏH\Ù\”ÜXÙSÛ•\ÙH]^ØH	ÙÜšYÚ^™_H	ÙÜšYÚ^™_XHÛ\ÜÓ˜[YOH™ÜšY[Z[›Üˆ‹ÏÜ]\›‚ˆ]\›ˆYH›XZ›Ü‘ÜšYˆÚY^ÙÜšYÚ^™H
+ˆ_HZYÚ^ÙÜšYÚ^™H
+ˆ_H]\›•[š]ÏH\Ù\”ÜXÙSÛ•\ÙH™XİÚY^ÙÜšYÚ^™H
+ˆ_HZYÚ^ÙÜšYÚ^™H
+ˆ_Hš[H\›
+ÛZ[›Ü‘ÜšY
+H‹Ï]^ØH	ÙÜšYÚ^™H
+ˆ_H	ÙÜšYÚ^™H
+ˆ_XHÛ\ÜÓ˜[YOH™ÜšY[XZ›Üˆ‹ÏÜ]\›‚ˆš[\ˆYHœÚYÛ˜[ÛİÈˆH‹ML	HˆOH‹ML	HˆÚYHŒŒ	HˆZYÚHŒŒ	H™QØ]\ÜÚX[›\ˆİ]šX][ÛHŒÈˆ™\İ[H˜›\ˆ‹Ï™SY\™ÙO™SY\™ÙS›ÙH[H˜›\ˆ‹Ï™SY\™ÙS›ÙH[H”Ûİ\˜ÙQÜ˜\XÈ‹ÏÙ™SY\™ÙOÙš[\‚ˆš[\ˆYHÚ\™QÛİÈˆH‹M	HˆOH‹M	HˆÚYHŒN	HˆZYÚHŒN	H™QØ]\ÜÚX[›\ˆİ]šX][ÛHŒKŒHˆ™\İ[H˜›\ˆ‹Ï™SY\™ÙO™SY\™ÙS›ÙH[H˜›\ˆ‹Ï™SY\™ÙS›ÙH[H”Ûİ\˜ÙQÜ˜\XÈ‹ÏÙ™SY\™ÙOÙš[\‚ˆÙYœÏ‚ˆÈ˜[œÙ›Ü›O^Ø˜[œÛ]J	İšY]ÜÜH	İšY]ÜÜ_JHØØ[J	İšY]ÜÜœØØ[_JXO‚ˆ™XİÛ\ÜÓ˜[YOH™ÜšY\[™Hˆ^ËLLHO^ËLLHÚY^ÌŒHZYÚ^ÌŒHš[H\›
+ÛXZ›Ü‘ÜšY
+H‹Ï‚ˆÈÛ\ÜÓ˜[YOH›[Ù[K[^Y\ˆÜ™[™\™Y[Ù[\Ë›X\
+[Ù[HOˆÈÙ^O^Û[Ù[KšYHÛ\ÜÓ˜[YO^Ø[Ù[KX\™XH	Û[Ù[K˜ÛÛ\ÙYÈ	ØÚ\[[ÙIÈˆ	Ø\™XK[[ÙIßH	Û[Ù[KšYOOHÙ[XİY[Ù[RYÈ	ÜÙ[XİY	Èˆ	ÉßH	Û[Ù[K™[˜X›YÈ	ÉÈˆ	Ù\ØX›Y	ßXHÛ”Ú[\‘İÛ^Ù]™[OˆÛ“[Ù[QİÛŠ]™[[Ù[J_HÛ‘İX›PÛXÚÏ^Ù]™[OˆÈ]™[œİÜ›ÜYØ][ÛŠ
+NÈ˜]šYØ]UÓ[Ù[J[Ù[KšY
+NÈ_HÛÛÛ^Y[O^Ù]™[OÙ]™[œ™]™[Y˜][
 
-  const addAt = (definitionId: string, world: Point) => {
-    const definition = CATALOG_BY_ID.get(definitionId);
-    if (!definition) return;
-    const instanceScale = Math.max(1e-9, Math.min(20, 1 / viewport.scale));
-    const component = createInstance(definitionId, world.x - definition.width * instanceScale / 2, world.y - definition.height * instanceScale / 2, uid('node'), instanceScale);
-    update(draft => { draft.components.push(component); if (activeModuleId) draft.modules.find(module => module.id === activeModuleId)?.memberIds.push(component.id); });
-    onSelected([component.id]); onSelectedModule(undefined);
-  };
+NÙ]™[œİÜ›ÜYØ][ÛŠ
+NÛÛ”Ù[XİY
+×JNÛÛ”Ù[XİY[Ù[J[Ù[KšY
+NÛÛÛÛ^\™Ù]
+ÚÚ[™‰Û[Ù[IËY›[Ù[KšY™]™[˜ÛY[N™]™[˜ÛY[_JNß_O‚ˆ™XİÛ\ÜÓ˜[YOH›[Ù[K\Ú[ˆ^Û[Ù[KHO^Û[Ù[K_HÚY^Û[Ù[KÚYHZYÚ^Û[Ù[KšZYÚHİ[O^ŞÈİ›ÚÙNˆ[Ù[K˜ÛÛÜˆ_KÏ‚ˆ[Ù[T™]šY]È›Ú™Xİ^Ü›Ú™XİH[Ù[O^Û[Ù[_HÛ˜\Úİ^ÜÛ˜\ÚİKÏ‚ˆ]^ØIÛ[Ù[KH	Û[Ù[KH
+ÈÍZ	Û[Ù[KÚYXHİ[O^ŞÈİ›ÚÙNˆ[Ù[K˜ÛÛÜˆ_KÏ‚ˆÛ[Ù[K˜ÛÛ\ÙY	‰ˆĞ\œ˜^K™œ›ÛJÛ[™İ“X]›X^
+‹X]›Z[ŠL‹[Ù[Kœ[œË›[™İ
+J_K
+Ë[™^
+OO]Ù^O^Ú[™^HÛ\ÜÓ˜[YOH˜Ú\YXÛÜ˜][Ûˆˆ^ØIÛ[Ù[K
+ÌŒŠÚ[™^
+ŒMH	Û[Ù[KJÌLŸ]ŒLHİ[O^ŞÜİ›ÚÙN›[Ù[K˜ÛÛÜŸ_KÏŠ_OÏŸBˆ^^Û[Ù[K
+ÈMHO^Û[Ù[KH
+ÈŒßHİ[O^ŞÈš[ˆ[Ù[K˜ÛÛÜˆ_OÛ[Ù[K›˜[YKÕ\\Ø\ÙJ
+_Oİ^^Û\ÜÓ˜[YOH›[Ù[K\İ]Hˆ^Û[Ù[K
+È[Ù[KÚYHMHO^Û[Ù[KH
+ÈŒßH^[˜ÚÜH™[™Û[Ù[K˜ÛÛ\ÙYÈ	Û[Ù[Kœ[œË›[™İHS‘TØˆ[Ù[K™[˜X›YÈ	ĞPÕU“ÉÈˆ	ĞRTÓQÉßOİ^‚ˆÛ[Ù[Kœ[œË›X\
+[ˆOˆ[Ù[T[“›ÙHÙ^O^Ü[‹šYH[Ù[O^Û[Ù[_H[^Ü[ŸHÛ”[^Ù]™[OˆÈ]™[œİÜ›ÜYØ][ÛŠ
+NÈÛÛ›™Xİ[ŠÈÛÛ\Û™[Yˆ[Ù[KšY[’Yˆ[‹šYJNÈ_KÏŠHBˆÛ[Ù[KšYOOHÙ[XİY[Ù[RY	‰ˆ™\Ú^™R[™\È[Ù[O^Û[Ù[_HÛ”Ú[\‘İÛ^ÛÛ“[Ù[T™\Ú^™_KÏŸHˆÙÏŠ_OÙÏ‚ˆÈÛ\ÜÓ˜[YOHÚ\™K[^Y\ˆÜ™[™\™YÚ\™\Ë›X\
 
-  const onModuleDown = (event: React.PointerEvent<SVGGElement>, module: ModuleArea) => {
-    event.stopPropagation();
-    if (event.button === 2) return;
-    const now=performance.now(),previous=modulePressRef.current;
-    modulePressRef.current={id:module.id,at:now};
-    if(previous?.id===module.id&&now-previous.at<360){setCurrentInteraction(null);navigateToModule(module.id);return;}
-    onSelected([]); onSelectedModule(module.id); setSelectedWireId(undefined);
-    if (tool !== 'select' || activeModuleId === module.id) return;
-    const world = screenToWorld(localPoint(event), viewport);
-    setCurrentInteraction({ type: 'module-drag', start: world, origin: { x: module.x, y: module.y }, moduleId: module.id, recorded: false });
-    svgRef.current?.setPointerCapture(event.pointerId);
-  };
+ÈÚ\™Kœ›ÛKÈJHOˆÂˆYˆ
+Yœ›ÛH]ÊH™]\›ˆ[ÂˆÛÛœİÚYÛ˜[HÛ˜\ÚİËÚ\™TÚYÛ˜[ÖİÚ\™KšYNÂˆÛÛœİ˜[YHH›Ü›X]ÚYÛ˜[
+ÚYÛ˜[›Ú™XİœÙ][™ÜËœÚYÛ˜[šY]ÊNÂˆÛÛœİZYHÚ\™SX™[Ú[
+œ›ÛKËÚ\™Kœ›İ][™ËÚ\™K˜ÛÛ›ÛÚ[ÊNÂˆÛÛœİÚ\™T]H›İ]UÚ\™Jœ›ÛKËÚ\™Kœ›İ][™ËÚ\™K˜ÛÛ›ÛÚ[ÊNÂˆ™]\›ˆÈÙ^O^İÚ\™KšYHÛ\ÜÓ˜[YO^ØÚ\™H	ÜÚYÛ˜[Ë˜Xİ]™HÈ	ØXİ]™IÈˆ	ÉßHÙÚXËIÜÚYÛ˜[Ë›ÙÚXÈÏÈ	Ş‰ßH	Ü[›š[™ÈÈ	Ü[›š[™ÉÈˆ	ÉßXO‚ˆ]Û\ÜÓ˜[YOHÚ\™KZ]ˆ^İÚ\™T]HÛ”Ú[\‘İÛ^Ù]™[OˆÛ•Ú\™QİÛŠ]™[Ú\™Kœ›ÛKÊ_HÛ‘İX›PÛXÚÏ^Ù]™[OˆYÚ\™S›ÙJ]™[Ú\™Kœ›ÛKÊ_HÛÛÛ^Y[O^Ù]™[OÙ]™[œ™]™[Y˜][
 
-  const onModuleResize = (event: React.PointerEvent<SVGRectElement>, module: ModuleArea, handle: string) => {
-    event.stopPropagation();
-    const world = screenToWorld(localPoint(event), viewport);
-    setCurrentInteraction({ type: 'module-resize', start: world, origin: { x: module.x, y: module.y, width: module.width, height: module.height }, moduleId: module.id, handle, recorded: false });
-    svgRef.current?.setPointerCapture(event.pointerId);
-  };
+NÙ]™[œİÜ›ÜYØ][ÛŠ
+NÜÙ]Ù[XİYÚ\™RY
+Ú\™KšY
+NÛÛÛÛ^\™Ù]
+ÚÚ[™‰İÚ\™IËYÚ\™KšY™]™[˜ÛY[N™]™[˜ÛY[_JNß_KÏ‚ˆ]Û\ÜÓ˜[YOHÚ\™KX˜\ÙHˆ^İÚ\™T]KÏ‚ˆ]Û\ÜÓ˜[YOHÚ\™K\ÚYÛ˜[ˆ^İÚ\™T]KÏ‚ˆÜ›Ú™XİœÙ][™ÜË˜[š[X]Pİ\œ™[	‰ˆ[›š[™È	‰ˆÚYÛ˜[Ë˜Xİ]™H	‰ˆ‚ˆ]Û\ÜÓ˜[YOHÚ\™KY›İÈˆ^İÚ\™T]O[š[X]H]šX]S˜[YOHœİ›ÚÙKY\ÚÙ™œÙ]ˆœ›ÛOHŒˆÏH‹LÍˆ\HŒœÈˆØ[Ó[ÙOH›[™X\ˆˆ™\X]Ûİ[Hš[™Yš[š]H‹ÏÜ]‚ˆ]Û\ÜÓ˜[YOHÚ\™KY›İËZYÚYÚˆ^İÚ\™T]O[š[X]H]šX]S˜[YOHœİ›ÚÙKY\ÚÙ™œÙ]ˆœ›ÛOHŒˆÏH‹LÍˆ\HŒœÈˆØ[Ó[ÙOH›[™X\ˆˆ™\X]Ûİ[Hš[™Yš[š]H‹ÏÜ]‚ˆÏŸBˆÜ›Ú™XİœÙ][™ÜËœÚİÕ˜[Y\È	‰ˆÈÛ\ÜÓ˜[YOHœÚYÛ˜[[X™[ˆ˜[œÙ›Ü›O^Ø˜[œÛ]J	ÛZYH	ÛZY_JXO™XİH‹LÍˆˆOH‹LLÈˆÚYHÌˆˆZYÚHŒŒˆ‹Ï^^[˜ÚÜH›ZYHˆOHŒÈİ˜[Y_Oİ^ÙÏŸBˆİÚ\™KšYOOHÙ[XİYÚ\™RY	‰ˆÚ\™K˜ÛÛ›ÛÚ[ÏË›X\
 
-  const onWireDown = (event: React.PointerEvent<SVGPathElement>, wire: Wire, from: Point, to: Point) => {
-    event.stopPropagation();
-    if (event.button === 2) return;
-    setSelectedWireId(wire.id); onSelected([]); onSelectedModule(undefined);
-    if (event.detail > 1) return;
-    const world = screenToWorld(localPoint(event), viewport);
-    const points = [from, ...(wire.controlPoints ?? []), to];
-    const index = nearestSegmentIndex(points, world);
-    setCurrentInteraction({ type:'wire-pending',wireId:wire.id,index,point:world,startScreen:localPoint(event) });
-    svgRef.current?.setPointerCapture(event.pointerId);
-  };
+Ú[[™^
+OO™XİÙ^O^Ú[™^HÛ\ÜÓ˜[YOHÚ\™KXÛÛ›Û[›ÙHˆ^ÜÚ[MŸHO^ÜÚ[KMŸHÚYHŒLˆˆZYÚHŒLˆˆÛ”Ú[\‘İÛ^Ù]™[OˆÛ•Ú\™S›ÙQİÛŠ]™[Ú\™KšY[™^
+_HÛ‘İX›PÛXÚÏ^Ù]™[OˆÈ]™[œİÜ›ÜYØ][ÛŠ
+NÈ]ÚÚ\™JÚ\™KšYÈÛÛ›ÛÚ[ÎÚ\™K˜ÛÛ›ÛÚ[ÏË™š[\Š
+Ë][R[™^
+OOš][R[™^OOZ[™^
+HJNÈ_KÏŠHBˆÙÏÂˆJ_^Ü[™[™Ôİ\	‰ˆ]Û\ÜÓ˜[YOHÚ\™K\™]šY]Èˆ^Ü›İ]T™]šY]Ê[™[™Ôİ\Ú[\•ÛÜ›
+_KÏŸOÙÏ‚ˆÈÛ\ÜÓ˜[YOH˜ÛÛ\Û™[[^Y\ˆİš\ÚX›PÛÛ\Û™[Ë›X\
+ÛÛ\Û™[OˆÂˆÛÛœİYš[š][ÛˆHĞUSÑ×Ğ–WÒQ™Ù]
+ÛÛ\Û™[™Yš[š][Û’Y
+NÂˆYˆ
+YYš[š][ÛŠH™]\›ˆ[ÂˆÛÛœİÛÛ\Û™[ÙHÙ›Ü”ØØ[JšY]ÜÜœØØ[H
+ˆ
+ÛÛ\Û™[œØØ[HJJNÂˆ™]\›ˆÚ\˜İZ]Ş[X›ÛÙ^O^ØÛÛ\Û™[šYHÛÛ\Û™[^ØÛÛ\Û™[HYš[š][Û^ÙYš[š][ÛŸHÙ[XİY^ÜÙ[XİYš[˜ÛY\ÊÛÛ\Û™[šY
+_HÙ^ØÛÛ\Û™[Ù›]™[HÚYÛ˜[^ÜÛ˜\ÚİË˜ÛÛ\Û™[ÚYÛ˜[ÖØÛÛ\Û™[šY_HÛ”Ú[\‘İÛ^ÛÛÛÛ\Û™[İÛŸHÛ‘İX›PÛXÚÏ^ÛÜ[ÛÛ\Û™[[œÜXİÜŸHÛÛÛ^Y[O^ØÛÛ\Û™[ÛÛ^HÛ”[^ÛÛ”[ŸHÛ”]ZXÚÕÙÙÛO^Ü]ZXÚÕÙÙÛ_HÛ”›Ü\O^Ê][KÙ^K˜[YJHOˆ\]J˜YOˆÈÛÛœİ\™Ù]Y˜Y˜ÛÛ\Û™[Ë™š[™
+›ÙOO››ÙKšYOOZ][KšY
+NÈYŠ\™Ù]
+H\™Ù]œ›Ü\Y\ÖÚÙ^WO]˜[YNÈJ_KÏÂˆJ_OÙÏ‚ˆÛX\œ]YYH	‰ˆ™XİÛ\ÜÓ˜[YO^Ú[\˜Xİ[ÛË\HOOH	Û[Ù[IÈÈ	Û[Ù[K[X\œ]YYIÈˆ	ÜÙ[Xİ[Û‹[X\œ]YYIßH^ÛX\œ]YYKHO^ÛX\œ]YYK_HÚY^ÛX\œ]YYKÚYHZYÚ^ÛX\œ]YYKšZYÚKÏŸHˆÙÏ‚ˆÜİ™Ï‚ˆ˜]ˆÛ\ÜÓ˜[YOHÛÜšÜÜXÙKXœ™XYÜ[Xˆˆ\šXK[X™[H”]H[Y[›È]ÛˆÛÛXÚÏ^Ê
+HOˆ˜]šYØ]UÓ[Ù[J
+_O”“ÖQPÕÏØ]Û‹ÏØ]ÛˆÛÛXÚÏ^Ê
+HOˆ˜]šYØ]UÓ[Ù[J
+_OÜ›Ú™Xİ›˜[Y_OØ]ÛØ[˜Ù\İÜœË›X\
 
-  const addWireNode = (event: React.MouseEvent<SVGPathElement>,wire:Wire,from:Point,to:Point) => {
-    event.stopPropagation();
-    const world=screenToWorld(localPoint(event),viewport);
-    const index=nearestSegmentIndex([from,...(wire.controlPoints??[]),to],world);
-    update(draft=>{const target=draft.wires.find(item=>item.id===wire.id);if(target){target.controlPoints??=[];target.controlPoints.splice(index,0,world);}});
-    setSelectedWireId(wire.id);
-  };
+[Ù[K[™^
+OOÜ[ˆÛ\ÜÓ˜[YOH˜œ™XYÜ[X‹[]™[ˆÙ^O^Û[Ù[KšYO‹ÏØ]ÛˆÛ\ÜÓ˜[YO^Ú[™^OOX[˜Ù\İÜœË›[™İLOÉØİ\œ™[	Î‰ÉßHİ[O^ŞØÛÛÜ›[Ù[K˜ÛÛÜŸ_HÛÛXÚÏ^Ê
+OO›˜]šYØ]UÓ[Ù[J[Ù[KšY
+_OÛ[Ù[K›˜[Y_^Ú[™^OOX[˜Ù\İÜœË›[™İLOÉÈ0­ÈQS–“ÈS•T““ÉÎ‰ÉßOØ]ÛÜÜ[Š_^ÈXXİ]™S[Ù[H	‰ˆÙ[XİY[Ù[H	‰ˆÜ[ˆÛ\ÜÓ˜[YOH˜œ™XYÜ[X‹[]™[‹ÏØÜ[ˆİ[O^ŞØÛÛÜœÙ[XİY[Ù[K˜ÛÛÜŸ_OÜÙ[XİY[Ù[K›˜[Y_OÜÜ[ÜÜ[ŸOÛ˜]‚ˆ˜]ˆÛ\ÜÓ˜[YOH˜Ø[˜\Ë]ÛÛ\[]Hˆ\šXK[X™[H’\œ˜[ZY[\È[Y[›È‚ˆÜ[’T”SRQS•TÏÜÜ[‚ˆ]ÛˆÛ\ÜÓ˜[YO^İÛÛOOIÜÙ[Xİ	ÏÉØXİ]™IÎ‰ÉßHÛÛXÚÏ^Ê
+OO›Û•ÛÛ
+	ÜÙ[Xİ	Ê_H]OH”Ù[XØÚ[Û˜\ˆ
+ŠHˆ\šXK[X™[H”Ù[XØÚ[Û˜\ˆ[İ\ÙTÚ[\ŒˆÚ^™O^ÌMßKÏØ]Û‚ˆ]ÛˆÛ\ÜÓ˜[YO^İÛÛOOIİÚ\™IÏÉØXİ]™IÎ‰ÉßHÛÛXÚÏ^Ê
+OO›Û•ÛÛ
+	İÚ\™IÊ_H]OHØX›X\ˆ
+ÊHˆ\šXK[X™[HØX›X\ˆØ^\Ú[ÈÚ^™O^ÌMßKÏØ]Û‚ˆ]ÛˆÛ\ÜÓ˜[YO^İÛÛOOIÜ[‰ÏÉØXİ]™IÎ‰ÉßHÛÛXÚÏ^Ê
+OO›Û•ÛÛ
+	Ü[‰Ê_H]OH‘\Ü^˜\ˆ
+
+Hˆ\šXK[X™[H‘\Ü^˜\ˆ[™Ú^™O^ÌMßKÏØ]Û‚ˆ]ÛˆÛ\ÜÓ˜[YO^İÛÛOOIÛ[Ù[IÏÉØXİ]™IÎ‰ÉßHÛÛXÚÏ^Ê
+OO›Û•ÛÛ
+	Û[Ù[IÊ_H]OHÜ™X\ˆ[˜Ø\İ[YÈˆ\šXK[X™[HÜ™X\ˆ[˜Ø\İ[YÈ›ŞÚ^™O^ÌMßKÏØ]Û‚ˆÛ˜]‚ˆØXİ]™S[Ù[H	‰ˆ[Ù[TÜØÚÜÈ[Ù[O^ØXİ]™S[Ù[_HÛ”[^Ü[O˜ÛÛ›™Xİ[ŠØÛÛ\Û™[Y˜Xİ]™S[Ù[KšY[’Yœ[‹šYJ_KÏŸHˆ]ˆÛ\ÜÓ˜[YOH›ÙZ[™XØ]ÜˆØØ[ˆÚ^™O^ÌM_KÏ]Ü[“ÑÛÙ›]™[OÜÜ[İ›Û™ÏÛÙ›˜[Y_OÜİ›Û™ÏÙ]ÛX[ÛÙ™]Z[OÜÛX[Ù]‚ˆÜ[™[™Ô[ˆ	‰ˆ]ˆÛ\ÜÓ˜[YOHÚ\™KZ[Ø^TÚ[XÛÛ‹Ï”Ù[XØÚ[Û˜Hİ›È\›Z[˜[\˜HÛÛ\]\ˆ[ØX›O]ÛˆÛÛXÚÏ^Ê
+HOˆÙ][™[™Ô[Š[™Yš[™Y
+_OÚ^™O^ÌMKÏØ]ÛÙ]ŸBˆÜÙ[XİYÚ\™H	‰ˆ]ˆÛ\ÜÓ˜[YOHÚ\™KYY]Üˆ›İ]HÚ^™O^ÌMKÏİ›Û™ÏÓÓ‘VpäÓÜİ›Û™ÏÙ[Xİ˜[YO^ÜÙ[XİYÚ\™Kœ›İ][™ßHÛÚ[™ÙO^Ù]™[Oˆ]ÚÚ\™JÙ[XİYÚ\™KšYÜ›İ][™Î™]™[\™Ù]˜[YH\ÈÚ\™VÉÜ›İ][™É×_J_OÜ[Ûˆ˜[YOH›ÜÙÛÛ˜[“ÜÙÛÛ˜[ÛÜ[ÛÜ[Ûˆ˜[YOH˜™^šY\ˆ°ê^šY\ÛÜ[ÛÜ[Ûˆ˜[YOHœİ˜ZYÚ”™XİOÛÜ[ÛÜÙ[XİÜ[ÜÙ[XİYÚ\™K˜ÛÛ›ÛÚ[ÏË›[™İÏÈH›ÙÜÏÜÜ[]ÛˆÛÛXÚÏ^Ê
+HOˆ]ÚÚ\™JÙ[XİYÚ\™KšYØÛÛ›ÛÚ[Î–×_J_O“[\X\ˆ›ÙÜÏØ]Û]ÛˆÛ\ÜÓ˜[YOH™[™Ù\ˆˆÛÛXÚÏ^Ê
+HOˆ[]UÚ\™JÙ[XİYÚ\™KšY
+_O˜\ÚˆÚ^™O^ÌLßKÏØ]ÛÙ]ŸBˆ]ˆÛ\ÜÓ˜[YOH›ÛÛKXÛÛ›ÛÈ]ÛˆÛÛXÚÏ^Ê
+HOˆÙ]šY]ÜÜ
+İ\œ™[Oˆ›ÛÛP]
+İ\œ™[Èˆİ™Ô™Y‹˜İ\œ™[K˜ÛY[ÚYÌ‹Nˆİ™Ô™Y‹˜İ\œ™[K˜ÛY[ZYÚÌˆKKŒJJ_O\ÈÚ^™O^ÌMŸKÏØ]ÛÜ[ˆ]O^Ø	İšY]ÜÜœØØ[H
+ˆLIXOÙ›Ü›X]›ÛÛJšY]ÜÜœØØ[J_OÜÜ[]ÛˆÛÛXÚÏ^Ê
+HOˆÙ]šY]ÜÜ
+İ\œ™[Oˆ›ÛÛP]
+İ\œ™[Èˆİ™Ô™Y‹˜İ\œ™[K˜ÛY[ÚYÌ‹Nˆİ™Ô™Y‹˜İ\œ™[K˜ÛY[ZYÚÌˆK
+J_OZ[\ÈÚ^™O^ÌMŸKÏØ]Û]ÛˆÛÛXÚÏ^Ùš]›Ú™XİH]OH‘[˜ØZ˜\ˆ›ŞYXİÈX^[Z^™HÚ^™O^ÌMŸKÏØ]Û]ÛˆÛÛXÚÏ^Ê
+HOˆÙ]šY]ÜÜ
+Èˆİ™Ô™Y‹˜İ\œ™[K˜ÛY[ÚYÌ‹Nˆİ™Ô™Y‹˜İ\œ™[K˜ÛY[ZYÚÌ‹ØØ[NˆHJ_H]OHÙ[˜\ˆÜšYÙ[ˆÜ›ÜÜÚZ\ˆÚ^™O^ÌMŸKÏØ]ÛÙ]‚ˆÛXZ[ÂŸB‚™[˜İ[Ûˆ›Ü›X[^™Y™Xİ
+NˆÚ[ˆÚ[
+HÈ™]\›ˆÈˆX]›Z[ŠK‹
+KNˆX]›Z[ŠKK‹JKÚYˆX]˜XœÊKX‹
+KZYÚˆX]˜XœÊKKX‹JHNÈB™[˜İ[Ûˆ[\œÙXİÊNˆŞ›[X™\ŞN›[X™\İÚY›[X™\ÚZYÚ›[X™\ŸKˆŞ›[X™\ŞN›[X™\İÚY›[X™\ÚZYÚ›[X™\ŸJHÈ™]\›ˆK‹
+Ø‹ÚY	‰ˆK
+ØKÚYˆ‹	‰ˆKH‹JØ‹šZYÚ	‰ˆKJØKšZYÚˆ‹NÈB™[˜İ[ÛˆY\]™QÜšY
+˜\ÙNˆ[X™\‹ØØ[Nˆ[X™\ŠHÈ]Ú^™HH˜\ÙNÈÚ[H
+Ú^™H
+ˆØØ[HL
+HÚ^™H
+HNÈÚ[H
+Ú^™H
+ˆØØ[Hˆ
+HÚ^™HÏHÈ™]\›ˆÚ^™NÈB™[˜İ[Ûˆ›Ü›X]›ÛÛJØØ[N›[X™\ŠHÈÛÛœİ\˜Ù[\ØØ[JŒLÈYŠ\˜Ù[LÌ
+\™]\›ˆ	ÓX]œ›İ[™
+\˜Ù[
+_IXÈYŠ\˜Ù[WÌÌ
+\™]\›ˆ	Ê\˜Ù[ÌL
+KÑš^Y
+J_ZÉXÈ™]\›ˆ	Ê\˜Ù[ÌWÌÌ
+KÑš^Y
+\˜Ù[LÌÌÌNŒ
+_SIXÈB™[˜İ[Ûˆ\Õ\[™Ê\™Ù]ˆ]™[\™Ù][
+HÈ™]\›ˆ\™Ù][œİ[˜Ù[ÙˆS[œ][[Y[\™Ù][œİ[˜Ù[ÙˆS^\™XQ[[Y[\™Ù][œİ[˜Ù[ÙˆSÙ[Xİ[[Y[ÈB™[˜İ[Ûˆ›Ü›X]ÚYÛ˜[
+ÚYÛ˜[ˆÚ\™TÚYÛ˜[[™Yš[™YšY]Îˆš]Ú\™T›Ú™XİÉÜÙ][™ÜÉ×VÉÜÚYÛ˜[šY]É×JHÈYˆ
+\ÚYÛ˜[\ÚYÛ˜[˜Xİ]™JH™]\›ˆ	ø %	ÎÈYˆ
+šY]ÈOOH	ÛÙÚXÉÊH™]\›ˆİš[™ÊÚYÛ˜[›ÙÚXÊNÈYˆ
+šY]ÈOOH	Øİ\œ™[	ÊH™]\›ˆÚYÛ˜[˜İ\œ™[HHÈ	ÜÚYÛ˜[˜İ\œ™[Ñš^Y
+Š_HXˆ	ÊÚYÛ˜[˜İ\œ™[
+ŒL
+KÑš^Y
+J_HPXÈYˆ
+šY]ÈOOH	ÜİÙ\‰ÊH™]\›ˆ	ÓX]˜XœÊÚYÛ˜[›ÛYÙJœÚYÛ˜[˜İ\œ™[
+KÑš^Y
+Ê_HØÈ™]\›ˆ	ÜÚYÛ˜[›ÛYÙKÑš^Y
+Š_H˜ÈB™[˜İ[ÛˆØ^TÚ[XÛÛŠ
+HÈ™]\›ˆİ™ÈšY]Ğ›ŞHŒˆÚYHŒMˆÚ\˜ÛHŞHHˆŞOHŒLˆˆHŒÈ‹ÏÚ\˜ÛHŞHŒNHˆŞOHŒLˆˆHŒÈ‹Ï]H“NLšˆš[H››Û™Hˆİ›ÚÙOH˜İ\œ™[ÛÛÜˆˆİ›ÚÙUÚYHŒˆ‹ÏÜİ™ÏÈB‚™[˜İ[Ûˆ[Ù[T[•ÛÜ›
+[Ù[Nˆ[Ù[P\™XK[ˆ[Ù[T[ŠNˆÚ[ÂˆÛÛœİÜÚ][ÛˆHX]›X^
+X]›Z[ŠK[‹œÜÚ][ÛŠJNÂˆYˆ
+[‹œÚYHOOH	ÛY	ÊH™]\›ˆÈ›[Ù[KN›[Ù[KJÜÜÚ][ÛŠ›[Ù[KšZYÚNÂˆYˆ
+[‹œÚYHOOH	ÜšYÚ	ÊH™]\›ˆÈ›[Ù[K
+Û[Ù[KÚYN›[Ù[KJÜÜÚ][ÛŠ›[Ù[KšZYÚNÂˆYˆ
+[‹œÚYHOOH	İÜ	ÊH™]\›ˆÈ›[Ù[K
+ÜÜÚ][ÛŠ›[Ù[KÚYN›[Ù[KHNÂˆ™]\›ˆÈ›[Ù[K
+ÜÜÚ][ÛŠ›[Ù[KÚYN›[Ù[KJÛ[Ù[KšZYÚNÂŸB‚™[˜İ[Ûˆ[Ù[T[“›ÙJÈ[Ù[K[‹Û”[ˆNˆÈ[Ù[Nˆ[Ù[P\™XNÈ[ˆ[Ù[T[ÈÛ”[Š]™[ˆ™XXİ”Ú[\‘]™[Õ‘ĞÚ\˜ÛQ[[Y[ŠNˆ›ÚYJHÂˆÛÛœİÚ[H[Ù[T[•ÛÜ›
+[Ù[K[ŠNÂˆÛÛœİÜš^›Û[H[‹œÚYHOOH	ÛY	È[‹œÚYHOOH	ÜšYÚ	ÎÂˆÛÛœİX™[HÚ[
+È
+[‹œÚYHOOH	ÛY	ÈÈLHˆ[‹œÚYHOOH	ÜšYÚ	ÈÈLLHˆ
+NÂˆÛÛœİX™[HHÚ[H
+È
+[‹œÚYHOOH	İÜ	ÈÈLÈˆ[‹œÚYHOOH	Ø›İÛIÈÈNˆN
+NÂˆ™]\›ˆÈÛ\ÜÓ˜[YO^Ø[Ù[K\[ˆ	Ü[‹™ÛXZ[‹ÓİÙ\Ø\ÙJ
+_XO‚ˆÚ\˜ÛHŞ^ÜÚ[HŞO^ÜÚ[_HHH‹Ï‚ˆÚ\˜ÛHÛ\ÜÓ˜[YOH›[Ù[K\[‹Z]ˆŞ^ÜÚ[HŞO^ÜÚ[_HHŒMˆÛ”Ú[\‘İÛ^ÛÛ”[ŸKÏ‚ˆ^^ÛX™[HO^ÛX™[_H^[˜ÚÜ^ÚÜš^›Û[È[‹œÚYHOOH	ÛY	ÈÈ	Üİ\	Èˆ	Ù[™	Èˆ	ÛZYIßOÜ[‹›˜[Y_^Ü[‹››ÛZ[˜[›ÛYÙHOOH[™Yš[™YÈ0­È	Ü[‹››ÛZ[˜[›ÛYÙ_U˜ˆ	ÉßOİ^‚ˆÙÏÂŸB‚™[˜İ[Ûˆ[Ù[TÜØÚÜÊÈ[Ù[KÛ”[ˆNˆÈ[Ù[Nˆ[Ù[P\™XNÈÛ”[Š[“[Ù[T[ŠN›ÚYJHÂˆ™]\›ˆ]ˆÛ\ÜÓ˜[YOH›[Ù[K\ÜYØÚÜÈˆ\šXK[X™[^Ø\›Z[˜[\ÈH	Û[Ù[K›˜[Y_XOÛ[Ù[Kœ[œË›X\
+[ˆOˆÂˆÛÛœİ[Û™ÈH	ÓX]›X^
+X]›Z[ŠM‹[‹œÜÚ][ÛŠŒL
+J_IXÂˆÛÛœİİ[HH[‹œÚYHOOH	ÛY	È[‹œÚYHOOH	ÜšYÚ	ÈÈÈÜˆ[Û™ÈHˆÈYˆ[Û™ÈNÂˆ™]\›ˆ]ÛˆÙ^O^Ü[‹šYHÛ\ÜÓ˜[YO^Ø[Ù[K\ÜYØÚÈ	Ü[‹œÚY_H	Ü[‹™ÛXZ[‹ÓİÙ\Ø\ÙJ
+_XHİ[O^Üİ[_HÛ”Ú[\‘İÛ^Ù]™[O™]™[œİÜ›ÜYØ][ÛŠ
+_HÛÛXÚÏ^Ê
+OO›Û”[Š[Š_H]O^Ø	Ü[‹šÚ[™H0­È	Ü[‹™ÛXZ[ŸIÜ[‹››ÛZ[˜[›ÛYÙHOOH[™Yš[™YÈ0­È	Ü[‹››ÛZ[˜[›ÛYÙ_H˜ˆ	ÉßXO‚ˆKÏÜ[İ›Û™ÏÜ[‹›˜[Y_OÜİ›Û™ÏÛX[Ü[‹šÚ[™^Ü[‹››ÛZ[˜[›ÛYÙHOOH[™Yš[™YÈ0­È	Ü[‹››ÛZ[˜[›ÛYÙ_H˜ˆ	ÉßOÜÛX[ÜÜ[‚ˆØ]ÛÂˆJ_OÙ]ÂŸB‚˜ÛÛœİ‘TÒV‘WÒS‘TÈHÂˆÉÛÉËKÉÛ‰ËKKÉÛ™IËKKÉÙIËKWKÉÜÙIËKWKÉÜÉËKWKÉÜİÉËWKÉİÉËWK—H\ÈÛÛœİÂ‚™[˜İ[Ûˆ™\Ú^™R[™\ÊÈ[Ù[KÛ”Ú[\‘İÛˆNˆÈ[Ù[Nˆ[Ù[P\™XNÈÛ”Ú[\‘İÛŠ]™[ˆ™XXİ”Ú[\‘]™[Õ‘Ô™Xİ[[Y[‹[Ù[N“[Ù[P\™XK[™Nœİš[™ÊN›ÚYJHÂˆ™]\›ˆÈÛ\ÜÓ˜[YOHœ™\Ú^™KZ[™\ÈÔ‘TÒV‘WÒS‘TË›X\
 
-  const onWireNodeDown = (event: React.PointerEvent<SVGRectElement>, wireId: string, index: number) => {
-    event.stopPropagation();
-    setSelectedWireId(wireId);
-    setCurrentInteraction({ type: 'wire-node', wireId, index, recorded: false });
-    svgRef.current?.setPointerCapture(event.pointerId);
-  };
-
-  const patchWire = (wireId: string, patch: Partial<Wire>) => update(draft => { const wire = draft.wires.find(item => item.id === wireId); if (wire) Object.assign(wire, patch); });
-  const deleteWire = (wireId: string) => { update(draft => { draft.wires = draft.wires.filter(item => item.id !== wireId); }); setSelectedWireId(undefined); };
-
-  const marquee = interaction && (interaction.type === 'marquee' || interaction.type === 'module') ? normalizedRect(interaction.start, interaction.current) : undefined;
-  const pendingStart = pendingPin ? pinWorld(pendingPin) : undefined;
-
-  const gridSize = adaptiveGrid(project.settings.gridSize, viewport.scale);
-  const renderedWires = useMemo(() => visibleWires.map(wire => ({ wire, from: pinWorld(wire.from), to: pinWorld(wire.to) })), [visibleWires, pinWorld]);
-  const selectedWire = project.wires.find(wire => wire.id === selectedWireId);
-  const renderedModules = childModules;
-
-  return <main className={`workspace theme-${resolvedTheme} tool-${tool} ${spaceHeld ? 'space-pan' : ''} ${activeModule ? 'inside-module' : ''}`}>
-    <svg ref={svgRef} className="circuit-canvas" onWheel={onWheel} onPointerDown={onBackgroundDown} onPointerMove={onPointerMove} onPointerUp={finishInteraction} onPointerCancel={finishInteraction} onContextMenu={event=>{event.preventDefault();if(event.target===event.currentTarget||((event.target as Element).classList?.contains('grid-plane')))onContextTarget({kind:'canvas',x:event.clientX,y:event.clientY});}}
-      onDragOver={event => { if (event.dataTransfer.types.includes('application/x-bitwire-component')) { event.preventDefault(); event.dataTransfer.dropEffect = 'copy'; } }}
-      onDrop={event => { event.preventDefault(); const id = event.dataTransfer.getData('application/x-bitwire-component'); addAt(id, screenToWorld(localPoint(event), viewport)); }}>
-      <defs>
-        <pattern id="minorGrid" width={gridSize} height={gridSize} patternUnits="userSpaceOnUse"><path d={`M ${gridSize} 0 L 0 0 0 ${gridSize}`} className="grid-minor"/></pattern>
-        <pattern id="majorGrid" width={gridSize * 5} height={gridSize * 5} patternUnits="userSpaceOnUse"><rect width={gridSize * 5} height={gridSize * 5} fill="url(#minorGrid)"/><path d={`M ${gridSize * 5} 0 L 0 0 0 ${gridSize * 5}`} className="grid-major"/></pattern>
-        <filter id="signalGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        <filter id="wireGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.1" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      </defs>
-      <g transform={`translate(${viewport.x} ${viewport.y}) scale(${viewport.scale})`}>
-        <rect className="grid-plane" x={-100000} y={-100000} width={200000} height={200000} fill="url(#majorGrid)"/>
-        <g className="module-layer">{renderedModules.map(module => <g key={module.id} className={`module-area ${module.collapsed ? 'chip-mode' : 'area-mode'} ${module.id === selectedModuleId ? 'selected' : ''} ${module.enabled ? '' : 'disabled'}`} onPointerDown={event => onModuleDown(event,module)} onDoubleClick={event => { event.stopPropagation(); navigateToModule(module.id); }} onContextMenu={event=>{event.preventDefault();event.stopPropagation();onSelected([]);onSelectedModule(module.id);onContextTarget({kind:'module',id:module.id,x:event.clientX,y:event.clientY});}}>
-          <rect className="module-shell" x={module.x} y={module.y} width={module.width} height={module.height} style={{ stroke: module.color }}/>
-          <ModulePreview project={project} module={module} snapshot={snapshot}/>
-          <path d={`M${module.x} ${module.y + 34}h${module.width}`} style={{ stroke: module.color }}/>
-          {module.collapsed && <>{Array.from({length:Math.max(2,Math.min(12,module.pins.length))},(_,index)=><path key={index} className="chip-decoration" d={`M${module.x+22+index*14} ${module.y+12}v10`} style={{stroke:module.color}}/>)}</>}
-          <text x={module.x + 14} y={module.y + 23} style={{ fill: module.color }}>{module.name.toUpperCase()}</text><text className="module-state" x={module.x + module.width - 14} y={module.y + 23} textAnchor="end">{module.collapsed ? `${module.pins.length} PINES` : module.enabled ? 'ACTIVO' : 'AISLADO'}</text>
-          {module.pins.map(pin => <ModulePinNode key={pin.id} module={module} pin={pin} onPin={event => { event.stopPropagation(); connectPin({ componentId: module.id, pinId: pin.id }); }}/>) }
-          {module.id === selectedModuleId && <ResizeHandles module={module} onPointerDown={onModuleResize}/>} 
-        </g>)}</g>
-        <g className="wire-layer">{renderedWires.map(({ wire, from, to }) => {
-          if (!from || !to) return null;
-          const signal = snapshot?.wireSignals[wire.id];
-          const value = formatSignal(signal, project.settings.signalView);
-          const mid = wireLabelPoint(from,to,wire.routing,wire.controlPoints);
-          const wirePath = routeWire(from, to, wire.routing, wire.controlPoints);
-          return <g key={wire.id} className={`wire ${signal?.active ? 'active' : ''} logic-${signal?.logic ?? 'z'} ${running ? 'running' : ''}`}>
-            <path className="wire-hit" d={wirePath} onPointerDown={event => onWireDown(event,wire,from,to)} onDoubleClick={event => addWireNode(event,wire,from,to)} onContextMenu={event=>{event.preventDefault();event.stopPropagation();setSelectedWireId(wire.id);onContextTarget({kind:'wire',id:wire.id,x:event.clientX,y:event.clientY});}}/>
-            <path className="wire-base" d={wirePath}/>
-            <path className="wire-signal" d={wirePath}/>
-            {running && signal?.active && <>
-              <path className="wire-flow" d={wirePath}><animate attributeName="stroke-dashoffset" from="0" to="-34" dur="0.82s" calcMode="linear" repeatCount="indefinite"/></path>
-              <path className="wire-flow-highlight" d={wirePath}><animate attributeName="stroke-dashoffset" from="0" to="-34" dur="0.82s" calcMode="linear" repeatCount="indefinite"/></path>
-            </>}
-            {project.settings.showValues && <g className="signal-label" transform={`translate(${mid.x} ${mid.y})`}><rect x="-36" y="-13" width="72" height="22"/><text textAnchor="middle" y="3">{value}</text></g>}
-            {wire.id === selectedWireId && wire.controlPoints?.map((point,index)=><rect key={index} className="wire-control-node" x={point.x-6} y={point.y-6} width="12" height="12" onPointerDown={event => onWireNodeDown(event,wire.id,index)} onDoubleClick={event => { event.stopPropagation(); patchWire(wire.id,{ controlPoints:wire.controlPoints?.filter((_,itemIndex)=>itemIndex!==index) }); }}/>) }
-          </g>;
-        })}{pendingStart && <path className="wire-preview" d={routePreview(pendingStart, pointerWorld)}/>}</g>
-        <g className="component-layer">{visibleComponents.map(component => {
-          const definition = CATALOG_BY_ID.get(component.definitionId);
-          if (!definition) return null;
-          const componentLod = lodForScale(viewport.scale * (component.scale || 1));
-          return <CircuitSymbol key={component.id} component={component} definition={definition} selected={selected.includes(component.id)} lod={componentLod.level} signal={snapshot?.componentSignals[component.id]} onPointerDown={onComponentDown} onDoubleClick={openComponentInspector} onContextMenu={componentContext} onPin={onPin} onQuickToggle={quickToggle} onProperty={(item,key,value) => update(draft => { const target=draft.components.find(node=>node.id===item.id); if(target) target.properties[key]=value; })}/>;
-        })}</g>
-        {marquee && <rect className={interaction?.type === 'module' ? 'module-marquee' : 'selection-marquee'} x={marquee.x} y={marquee.y} width={marquee.width} height={marquee.height}/>} 
-      </g>
-    </svg>
-    <nav className="workspace-breadcrumb" aria-label="Ruta del lienzo"><button onClick={() => navigateToModule()}>PROYECTO</button><b>/</b><button onClick={() => navigateToModule()}>{project.name}</button>{ancestors.map((module,index)=><span className="breadcrumb-level" key={module.id}><b>/</b><button className={index===ancestors.length-1?'current':''} style={{color:module.color}} onClick={()=>navigateToModule(module.id)}>{module.name}{index===ancestors.length-1?' Â· LIENZO INTERNO':''}</button></span>)}{!activeModule && selectedModule && <span className="breadcrumb-level"><b>/</b><span style={{color:selectedModule.color}}>{selectedModule.name}</span></span>}</nav>
-    <nav className="canvas-tool-palette" aria-label="Herramientas del lienzo">
-      <span>HERRAMIENTAS</span>
-      <button className={tool==='select'?'active':''} onClick={()=>onTool('select')} title="Seleccionar (V)" aria-label="Seleccionar"><MousePointer2 size={17}/></button>
-      <button className={tool==='wire'?'active':''} onClick={()=>onTool('wire')} title="Cablear (W)" aria-label="Cablear"><Waypoints size={17}/></button>
-      <button className={tool==='pan'?'active':''} onClick={()=>onTool('pan')} title="Desplazar (H)" aria-label="Desplazar"><Hand size={17}/></button>
-      <button className={tool==='module'?'active':''} onClick={()=>onTool('module')} title="Crear encapsulado" aria-label="Crear encapsulado"><Box size={17}/></button>
-    </nav>
-    {activeModule && <ModulePortDocks module={activeModule} onPin={pin=>connectPin({componentId:activeModule.id,pinId:pin.id})}/>} 
-    <div className="lod-indicator"><Scan size={15}/><div><span>LOD {lod.level}</span><strong>{lod.name}</strong></div><small>{lod.detail}</small></div>
-    {pendingPin && <div className="wire-hint"><WayPointIcon/>Selecciona otro terminal para completar el cable<button onClick={() => setPendingPin(undefined)}><X size={14}/></button></div>}
-    {selectedWire && <div className="wire-editor"><Route size={14}/><strong>CONEXIÃ“N</strong><select value={selectedWire.routing} onChange={event => patchWire(selectedWire.id,{routing:event.target.value as Wire['routing']})}><option value="orthogonal">Ortogonal</option><option value="bezier">BÃ©zier</option><option value="straight">Recta</option></select><span>{selectedWire.controlPoints?.length ?? 0} nodos</span><button onClick={() => patchWire(selectedWire.id,{controlPoints:[]})}>Limpiar nodos</button><button className="danger" onClick={() => deleteWire(selectedWire.id)}><Trash2 size={13}/></button></div>}
-    <div className="zoom-controls"><button onClick={() => setViewport(current => zoomAt(current, { x: svgRef.current!.clientWidth/2, y: svgRef.current!.clientHeight/2 }, 1.25))}><Plus size={16}/></button><span title={`${viewport.scale * 100}%`}>{formatZoom(viewport.scale)}</span><button onClick={() => setViewport(current => zoomAt(current, { x: svgRef.current!.clientWidth/2, y: svgRef.current!.clientHeight/2 }, .8))}><Minus size={16}/></button><button onClick={fitProject} title="Encajar proyecto"><Maximize size={16}/></button><button onClick={() => setViewport({ x: svgRef.current!.clientWidth/2, y: svgRef.current!.clientHeight/2, scale: 1 })} title="Centrar origen"><Crosshair size={16}/></button></div>
-  </main>;
-}
-
-function normalizedRect(a: Point, b: Point) { return { x: Math.min(a.x,b.x), y: Math.min(a.y,b.y), width: Math.abs(a.x-b.x), height: Math.abs(a.y-b.y) }; }
-function intersects(a: {x:number;y:number;width:number;height:number}, b: {x:number;y:number;width:number;height:number}) { return a.x < b.x+b.width && a.x+a.width > b.x && a.y < b.y+b.height && a.y+a.height > b.y; }
-function adaptiveGrid(base: number, scale: number) { let size = base; while (size * scale < 10) size *= 5; while (size * scale > 80) size /= 2; return size; }
-function formatZoom(scale:number) { const percent=scale*100; if(percent<10_000)return `${Math.round(percent)}%`; if(percent<1_000_000)return `${(percent/1000).toFixed(1)}k%`; return `${(percent/1_000_000).toFixed(percent<10_000_000?1:0)}M%`; }
-function isTyping(target: EventTarget | null) { return target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement; }
-function formatSignal(signal: WireSignal | undefined, view: BitWireProject['settings']['signalView']) { if (!signal || !signal.active) return 'â€”'; if (view === 'logic') return String(signal.logic); if (view === 'current') return signal.current >= 1 ? `${signal.current.toFixed(2)} A` : `${(signal.current*1000).toFixed(1)} mA`; if (view === 'power') return `${Math.abs(signal.voltage*signal.current).toFixed(3)} W`; return `${signal.voltage.toFixed(2)} V`; }
-function WayPointIcon() { return <svg viewBox="0 0 24 24" width="16"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="12" r="3"/><path d="M8 12h8" fill="none" stroke="currentColor" strokeWidth="2"/></svg>; }
-
-function modulePinWorld(module: ModuleArea, pin: ModulePin): Point {
-  const position = Math.max(0,Math.min(1,pin.position));
-  if (pin.side === 'left') return { x:module.x, y:module.y+position*module.height };
-  if (pin.side === 'right') return { x:module.x+module.width, y:module.y+position*module.height };
-  if (pin.side === 'top') return { x:module.x+position*module.width, y:module.y };
-  return { x:module.x+position*module.width, y:module.y+module.height };
-}
-
-function ModulePinNode({ module, pin, onPin }: { module: ModuleArea; pin: ModulePin; onPin(event: React.PointerEvent<SVGCircleElement>): void }) {
-  const point = modulePinWorld(module,pin);
-  const horizontal = pin.side === 'left' || pin.side === 'right';
-  const labelX = point.x + (pin.side === 'left' ? 11 : pin.side === 'right' ? -11 : 0);
-  const labelY = point.y + (pin.side === 'top' ? 13 : pin.side === 'bottom' ? -8 : -8);
-  return <g className={`module-pin ${pin.domain.toLowerCase()}`}>
-    <circle cx={point.x} cy={point.y} r="5"/>
-    <circle className="module-pin-hit" cx={point.x} cy={point.y} r="14" onPointerDown={onPin}/>
-    <text x={labelX} y={labelY} textAnchor={horizontal ? pin.side === 'left' ? 'start' : 'end' : 'middle'}>{pin.name}{pin.nominalVoltage !== undefined ? ` Â· ${pin.nominalVoltage}V` : ''}</text>
-  </g>;
-}
-
-function ModulePortDocks({ module, onPin }: { module: ModuleArea; onPin(pin:ModulePin):void }) {
-  return <div className="module-port-docks" aria-label={`Terminales de ${module.name}`}>{module.pins.map(pin => {
-    const along = `${Math.max(4,Math.min(96,pin.position*100))}%`;
-    const style = pin.side === 'left' || pin.side === 'right' ? { top: along } : { left: along };
-    return <button key={pin.id} className={`module-port-dock ${pin.side} ${pin.domain.toLowerCase()}`} style={style} onPointerDown={event=>event.stopPropagation()} onClick={()=>onPin(pin)} title={`${pin.kind} Â· ${pin.domain}${pin.nominalVoltage !== undefined ? ` Â· ${pin.nominalVoltage} V` : ''}`}>
-      <i/><span><strong>{pin.name}</strong><small>{pin.kind}{pin.nominalVoltage !== undefined ? ` Â· ${pin.nominalVoltage} V` : ''}</small></span>
-    </button>;
-  })}</div>;
-}
-
-const RESIZE_HANDLES = [
-  ['nw',0,0],['n',.5,0],['ne',1,0],['e',1,.5],['se',1,1],['s',.5,1],['sw',0,1],['w',0,.5],
-] as const;
-
-function ResizeHandles({ module, onPointerDown }: { module: ModuleArea; onPointerDown(event: React.PointerEvent<SVGRectElement>,module:ModuleArea,handle:string):void }) {
-  return <g className="resize-handles">{RESIZE_HANDLES.map(([handle,x,y])=><rect key={handle} x={module.x+x*module.width-6} y={module.y+y*module.height-6} width="12" height="12" data-handle={handle} onPointerDown={event=>onPointerDown(event,module,handle)}/>)}</g>;
-}
-
-function resizedRect(origin: {x:number;y:number;width:number;height:number}, handle:string, dx:number, dy:number) {
-  let {x,y,width,height}=origin;
-  if (handle.includes('e')) width=Math.max(100,origin.width+dx);
-  if (handle.includes('s')) height=Math.max(80,origin.height+dy);
-  if (handle.includes('w')) { const next=Math.max(100,origin.width-dx); x=origin.x+origin.width-next; width=next; }
-  if (handle.includes('n')) { const next=Math.max(80,origin.height-dy); y=origin.y+origin.height-next; height=next; }
-  return {x,y,width,height};
-}
+Ú[™KWJOO™XİÙ^O^Ú[™_H^Û[Ù[K
+Ş
+›[Ù[KÚYMŸHO^Û[Ù[KJŞJ›[Ù[KšZYÚMŸHÚYHŒLˆˆZYÚHŒLˆˆ]KZ[™O^Ú[™_HÛ”Ú[\‘İÛ^Ù]™[O›Û”Ú[\‘İÛŠ]™[[Ù[K[™J_KÏŠ_OÙÏÂŸB‚™[˜İ[Ûˆ™\Ú^™Y™Xİ
+ÜšYÚ[ˆŞ›[X™\ŞN›[X™\İÚY›[X™\ÚZYÚ›[X™\ŸK[™Nœİš[™Ë›[X™\‹N›[X™\ŠHÂˆ]ŞKÚYZYÚO[ÜšYÚ[ÂˆYˆ
+[™Kš[˜ÛY\Ê	ÙIÊJHÚYSX]›X^
+LÜšYÚ[‹ÚY
+Ù
+NÂˆYˆ
+[™Kš[˜ÛY\Ê	ÜÉÊJHZYÚSX]›X^
+ÜšYÚ[‹šZYÚ
+ÙJNÂˆYˆ
+[™Kš[˜ÛY\Ê	İÉÊJHÈÛÛœİ™^SX]›X^
+LÜšYÚ[‹ÚYY
+NÈ[ÜšYÚ[‹
+ÛÜšYÚ[‹ÚY[™^ÈÚY[™^ÈBˆYˆ
+[™Kš[˜ÛY\Ê	Û‰ÊJHÈÛÛœİ™^SX]›X^
+ÜšYÚ[‹šZYÚYJNÈO[ÜšYÚ[‹JÛÜšYÚ[‹šZYÚ[™^ÈZYÚ[™^ÈBˆ™]\›ˆŞKÚYZYÚNÂŸB

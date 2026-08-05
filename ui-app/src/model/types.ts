@@ -1,177 +1,9 @@
-export type PinKind = 'INPUT' | 'OUTPUT' | 'BIDIRECTIONAL' | 'POWER' | 'VCC' | 'GND' | 'ANALOG';
-export type SignalDomain = 'ANALOG' | 'DIGITAL' | 'MIXED' | 'POWER';
-export type LogicValue = 0 | 1 | 'X' | 'Z';
-export type PropertyValue = string | number | boolean;
-
-export interface PinDefinition {
-  id: string;
-  name: string;
-  kind: PinKind;
-  domain: SignalDomain;
-  x: number;
-  y: number;
-}
-
-export interface ComponentDefinition {
-  id: string;
-  name: string;
-  category: string;
-  family: string;
-  description: string;
-  tags: string[];
-  model: string;
-  symbol: string;
-  width: number;
-  height: number;
-  pins: PinDefinition[];
-  defaults: Record<string, PropertyValue>;
-  customGui?: boolean;
-  internal?: string;
-}
-
-export interface Point { x: number; y: number }
-export interface PinRef { componentId: string; pinId: string }
-
-export interface ComponentInstance {
-  id: string;
-  definitionId: string;
-  x: number;
-  y: number;
-  rotation: number;
-  /** World-space scale. New parts are sized from the zoom at insertion time. */
-  scale: number;
-  properties: Record<string, PropertyValue>;
-  enabled: boolean;
-  locked?: boolean;
-}
-
-export interface Wire {
-  id: string;
-  from: PinRef;
-  to: PinRef;
-  label?: string;
-  routing: 'orthogonal' | 'bezier' | 'straight';
-  /** User-authored bend or BÃ©zier control nodes in world coordinates. */
-  controlPoints?: Point[];
-}
-
-export type ModulePinSide = 'left' | 'right' | 'top' | 'bottom';
-
-export interface ModulePin {
-  id: string;
-  name: string;
-  kind: PinKind;
-  domain: SignalDomain;
-  side: ModulePinSide;
-  /** Position along the selected side, from 0 to 1. */
-  position: number;
-  nominalVoltage?: number;
-  description?: string;
-}
-
-export interface ModuleArea {
-  id: string;
-  name: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  color: string;
-  memberIds: string[];
-  enabled: boolean;
-  /** Collapsed modules behave as a single reusable chip on the parent canvas. */
-  collapsed: boolean;
-  pins: ModulePin[];
-  /** Parent encapsulation. Undefined places the module on the project canvas. */
-  parentModuleId?: string;
-  description?: string;
-}
-
-export interface SavedModule {
-  format: 'bitwire-module';
-  version: 1;
-  id: string;
-  name: string;
-  description: string;
-  width: number;
-  height: number;
-  color: string;
-  pins: ModulePin[];
-  components: ComponentInstance[];
-  wires: Wire[];
-  /** Nested encapsulations stored relative to the reusable module root. */
-  modules?: ModuleArea[];
-  savedAt: string;
-}
-
-export interface ProjectSettings {
-  gridSize: number;
-  snapToGrid: boolean;
-  wireRouting: Wire['routing'];
-  theme: Theme;
-  signalView: SignalView;
-  showValues: boolean;
-}
-
-export interface BitWireProject {
-  format: 'bitwire';
-  version: 1;
-  id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  components: ComponentInstance[];
-  wires: Wire[];
-  modules: ModuleArea[];
-  settings: ProjectSettings;
-}
-
-export interface WireSignal {
-  logic: LogicValue;
-  voltage: number;
-  current: number;
-  active: boolean;
-  floating?: boolean;
-}
-
-export interface ComponentSignal {
-  /** Signals currently resolved at every physical input pin. */
-  inputs?: Record<string, WireSignal>;
-  outputs: Record<string, WireSignal>;
-  active: boolean;
-  power: number;
-}
-
-export interface SimulationSnapshot {
-  tick: number;
-  time: number;
-  wireSignals: Record<string, WireSignal>;
-  componentSignals: Record<string, ComponentSignal>;
-  warnings: string[];
-}
-
-export type ToolMode = 'select' | 'wire' | 'pan' | 'module';
-export type Theme =
-  | 'auto'
-  | 'morning'
-  | 'afternoon'
-  | 'night'
-  | 'classic'
-  | 'blueprint'
-  | 'laboratory'
-  | 'terminal'
-  | 'chalkboard'
-  | 'parchment';
-export type SignalView = 'voltage' | 'current' | 'logic' | 'power';
-
-export interface ViewportState { x: number; y: number; scale: number }
-
-export interface CatalogDatabaseStatus {
-  source: 'sqlite' | 'embedded';
-  count: number;
-}
-
-export const EMPTY_SIGNAL: WireSignal = {
-  logic: 'Z', voltage: 0, current: 0, active: false, floating: true,
-};
+şº(·úk¡ø¥zX§{ßİzÿçºYOz¹¢²È¨×§‰çY^Ü\H[’Ú[™H	ÒS”U	È	ÓÕUU	È	Ğ’QT‘PÕSÓS	È	ÔÕÑT‰È	ÕĞÉÈ	ÑÓ‘	È	ĞSSÑÉÎÂ™^Ü\HÚYÛ˜[ÛXZ[ˆH	ĞSSÑÉÈ	ÑQÒUS	È	ÓRVQ	È	ÔÕÑT‰ÎÂ™^Ü\HÙÚXÕ˜[YHHH	Ö	È	Ö‰ÎÂ™^Ü\H›Ü\U˜[YHHİš[™È[X™\ˆ›ÛÛX[Â‚™^Ü[\™˜XÙH[‘Yš[š][ÛˆÂˆYˆİš[™ÎÂˆ˜[YNˆİš[™ÎÂˆÚ[™ˆ[’Ú[™ÂˆÛXZ[ˆÚYÛ˜[ÛXZ[Âˆˆ[X™\ÂˆNˆ[X™\ÂŸB‚™^Ü[\™˜XÙHÛÛ\Û™[Yš[š][ÛˆÂˆYˆİš[™ÎÂˆ˜[YNˆİš[™ÎÂˆØ]YÛÜNˆİš[™ÎÂˆ˜[Z[Nˆİš[™ÎÂˆ\ØÜš\[Ûˆİš[™ÎÂˆYÜÎˆİš[™Ö×NÂˆ[Ù[ˆİš[™ÎÂˆŞ[X›Ûˆİš[™ÎÂˆÚYˆ[X™\ÂˆZYÚˆ[X™\Âˆ[œÎˆ[‘Yš[š][Û–×NÂˆY˜][Îˆ™XÛÜ™İš[™Ë›Ü\U˜[YOÂˆİ\İÛQİZOÎˆ›ÛÛX[Âˆ[\›˜[Îˆİš[™ÎÂŸB‚™^Ü[\™˜XÙHÚ[Èˆ[X™\ÈNˆ[X™\ˆB™^Ü[\™˜XÙH[”™YˆÈÛÛ\Û™[Yˆİš[™ÎÈ[’Yˆİš[™ÈB‚™^Ü[\™˜XÙHÛÛ\Û™[[œİ[˜ÙHÂˆYˆİš[™ÎÂˆYš[š][Û’Yˆİš[™ÎÂˆˆ[X™\ÂˆNˆ[X™\Âˆ›İ][Ûˆ[X™\ÂˆÊŠˆÛÜ›\ÜXÙHØØ[Kˆ™]È\È\™HÚ^™Yœ›ÛHH›ÛÛH][œÙ\[Ûˆ[YKˆ
+‹ÂˆØØ[Nˆ[X™\Âˆ›Ü\Y\Îˆ™XÛÜ™İš[™Ë›Ü\U˜[YOÂˆ[˜X›Yˆ›ÛÛX[ÂˆØÚÙYÎˆ›ÛÛX[ÂŸB‚™^Ü[\™˜XÙHÚ\™HÂˆYˆİš[™ÎÂˆœ›ÛNˆ[”™YÂˆÎˆ[”™YÂˆX™[Îˆİš[™ÎÂˆ›İ][™Îˆ	ÛÜÙÛÛ˜[	È	Ø™^šY\‰È	Üİ˜ZYÚ	ÎÂˆÊŠˆ\Ù\‹X]]Ü™Y™[™Üˆ°ê^šY\ˆÛÛ›Û›Ù\È[ˆÛÜ›ÛÛÜ™[˜]\Ëˆ
+‹ÂˆÛÛ›ÛÚ[ÏÎˆÚ[×NÂŸB‚™^Ü\H[Ù[T[”ÚYHH	ÛY	È	ÜšYÚ	È	İÜ	È	Ø›İÛIÎÂ‚™^Ü[\™˜XÙH[Ù[T[ˆÂˆYˆİš[™ÎÂˆ˜[YNˆİš[™ÎÂˆÚ[™ˆ[’Ú[™ÂˆÛXZ[ˆÚYÛ˜[ÛXZ[ÂˆÚYNˆ[Ù[T[”ÚYNÂˆÊŠˆÜÚ][Ûˆ[Û™ÈHÙ[XİYÚYKœ›ÛHÈKˆ
+‹ÂˆÜÚ][Ûˆ[X™\Âˆ›ÛZ[˜[›ÛYÙOÎˆ[X™\Âˆ\ØÜš\[ÛÎˆİš[™ÎÂŸB‚™^Ü[\™˜XÙH[Ù[P\™XHÂˆYˆİš[™ÎÂˆ˜[YNˆİš[™ÎÂˆˆ[X™\ÂˆNˆ[X™\ÂˆÚYˆ[X™\ÂˆZYÚˆ[X™\ÂˆÛÛÜˆİš[™ÎÂˆY[X™\’YÎˆİš[™Ö×NÂˆ[˜X›Yˆ›ÛÛX[ÂˆÊŠˆÛÛ\ÙY[Ù[\È™Z]™H\ÈHÚ[™ÛH™]\ØX›HÚ\ÛˆH\™[Ø[˜\Ëˆ
+‹ÂˆÛÛ\ÙYˆ›ÛÛX[Âˆ[œÎˆ[Ù[T[–×NÂˆÊŠˆ\™[[˜Ø\İ[][Û‹ˆ[™Yš[™YXÙ\ÈH[Ù[HÛˆH›Ú™XİØ[˜\Ëˆ
+‹Âˆ\™[[Ù[RYÎˆİš[™ÎÂˆ\ØÜš\[ÛÎˆİš[™ÎÂŸB‚™^Ü[\™˜XÙHØ]™Y[Ù[HÂˆ›Ü›X]ˆ	Øš]Ú\™K[[Ù[IÎÂˆ™\œÚ[ÛˆNÂˆYˆİš[™ÎÂˆ˜[YNˆİš[™ÎÂˆ\ØÜš\[Ûˆİš[™ÎÂˆÚYˆ[X™\ÂˆZYÚˆ[X™\ÂˆÛÛÜˆİš[™ÎÂˆ[œÎˆ[Ù[T[–×NÂˆÛÛ\Û™[ÎˆÛÛ\Û™[[œİ[˜ÙV×NÂˆÚ\™\ÎˆÚ\™V×NÂˆÊŠˆ™\İY[˜Ø\İ[][ÛœÈİÜ™Y™[]]™HÈH™]\ØX›H[Ù[H›Ûİˆ
+‹Âˆ[Ù[\ÏÎˆ[Ù[P\™XV×NÂˆØ]™Y]ˆİš[™ÎÂŸB‚™^Ü[\™˜XÙH›Ú™XİÙ][™ÜÈÂˆÜšYÚ^™Nˆ[X™\ÂˆÛ˜\ÑÜšYˆ›ÛÛX[ÂˆÚ\™T›İ][™ÎˆÚ\™VÉÜ›İ][™É×NÂˆ[YNˆ[YNÂˆÚYÛ˜[šY]ÎˆÚYÛ˜[šY]ÎÂˆÚİÕ˜[Y\Îˆ›ÛÛX[ÂˆÊŠˆ˜]È[İš[™Èİ\œ™[X\šÙ\œÈÚ[HHÚ[][][Ûˆ\È[›š[™Ëˆ
+‹Âˆ[š[X]Pİ\œ™[ˆ›ÛÛX[ÂŸB‚™^Ü[\™˜XÙHš]Ú\™T›Ú™XİÂˆ›Ü›X]ˆ	Øš]Ú\™IÎÂˆ™\œÚ[ÛˆNÂˆYˆİš[™ÎÂˆ˜[YNˆİš[™ÎÂˆ\ØÜš\[Ûˆİš[™ÎÂˆÜ™X]Y]ˆİš[™ÎÂˆ\]Y]ˆİš[™ÎÂˆÛÛ\Û™[ÎˆÛÛ\Û™[[œİ[˜ÙV×NÂˆÚ\™\ÎˆÚ\™V×NÂˆ[Ù[\Îˆ[Ù[P\™XV×NÂˆÙ][™ÜÎˆ›Ú™XİÙ][™ÜÎÂŸB‚™^Ü[\™˜XÙHÚ\™TÚYÛ˜[ÂˆÙÚXÎˆÙÚXÕ˜[YNÂˆ›ÛYÙNˆ[X™\Âˆİ\œ™[ˆ[X™\ÂˆXİ]™Nˆ›ÛÛX[Âˆ›Ø][™ÏÎˆ›ÛÛX[ÂŸB‚™^Ü[\™˜XÙHÛÛ\Û™[ÚYÛ˜[ÂˆÊŠˆÚYÛ˜[Èİ\œ™[H™\ÛÛ™Y]]™\H\ÚXØ[[œ][‹ˆ
+‹Âˆ[œ]ÏÎˆ™XÛÜ™İš[™ËÚ\™TÚYÛ˜[Âˆİ]]Îˆ™XÛÜ™İš[™ËÚ\™TÚYÛ˜[ÂˆXİ]™Nˆ›ÛÛX[ÂˆİÙ\ˆ[X™\ÂŸB‚™^Ü[\™˜XÙHÚ[][][Û”Û˜\ÚİÂˆXÚÎˆ[X™\Âˆ[YNˆ[X™\ÂˆÚ\™TÚYÛ˜[Îˆ™XÛÜ™İš[™ËÚ\™TÚYÛ˜[ÂˆÛÛ\Û™[ÚYÛ˜[Îˆ™XÛÜ™İš[™ËÛÛ\Û™[ÚYÛ˜[ÂˆØ\›š[™ÜÎˆİš[™Ö×NÂŸB‚™^Ü\HÛÛ[ÙHH	ÜÙ[Xİ	È	İÚ\™IÈ	Ü[‰È	Û[Ù[IÎÂ™^Ü\H[YHBˆ	Ø]]ÉÂˆ	Û[Ü›š[™ÉÂˆ	ØY\››ÛÛ‰Âˆ	ÛšYÚ	Âˆ	ØÛ\ÜÚXÉÂˆ	Ø›Y\š[	Âˆ	ÛX›Ü˜]ÜIÂˆ	İ\›Z[˜[	Âˆ	ØÚ[Ø›Ø\™	Âˆ	Ü\˜ÚY[	ÎÂ™^Ü\HÚYÛ˜[šY]ÈH	İ›ÛYÙIÈ	Øİ\œ™[	È	ÛÙÚXÉÈ	ÜİÙ\‰ÎÂ‚™^Ü[\™˜XÙHšY]ÜÜİ]HÈˆ[X™\ÈNˆ[X™\ÈØØ[Nˆ[X™\ˆB‚™^Ü[\™˜XÙHØ][ÙÑ]X˜\ÙTİ]\ÈÂˆÛİ\˜ÙNˆ	ÜÜ[]IÈ	Ù[X™YY	ÎÂˆÛİ[ˆ[X™\ÂŸB‚™^ÜÛÛœİSTWÔÒQÓSˆÚ\™TÚYÛ˜[HÂˆÙÚXÎˆ	Ö‰Ë›ÛYÙNˆİ\œ™[ˆXİ]™Nˆ˜[ÙK›Ø][™ÎˆYKŸNÂ

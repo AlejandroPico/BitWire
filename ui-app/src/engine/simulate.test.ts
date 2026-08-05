@@ -1,77 +1,73 @@
-import { describe, expect, it } from 'vitest';
-import { createBlankProject, createDemoProject, createInstance } from '../state/project';
-import { evaluateCircuit } from './simulate';
+ює(·ъkЎшҐzX§{ЯЭzязєYOz№ўІИЁќЧ§‰зZ[\ЬќИ\ШЬљX™K^XЭ]Hњ›ЫH	Эљ]\Э	ОВљ[\ЬќИЬ™X]P›[љФ›Ъ™XЭЬ™X]Q[[Ф›Ъ™XЭЬ™X]R[њЭ[ЩHHњ›ЫH	Л‹‹ЬЭ]KЬ›Ъ™XЭ	ОВљ[\ЬќИ][X]PЪ\ЭZ]Hњ›ЫH	Л‹ЬЪ[][]IОВ‚™\ШЬљX™J	Рљ]Ъ\™HЪ[][][Ы€ЫЬ™IЛ
 
-describe('BitWire simulation core', () => {
-  it('propagates the electrical demo voltage through the closed switch', () => {
-    const project = createDemoProject();
-    const snapshot = evaluateCircuit(project, 0, 1);
-    expect(snapshot.wireSignals.w_power.voltage).toBe(5);
-    expect(snapshot.wireSignals.w_load.active).toBe(true);
-  });
+HO€В€]
+	Ь›ЬYШ]\ИH[XЭљXШ[[[И›ЫYЩH›ЭYЪHЫЬЩYЭЪ]Ъ	Л
 
-  it('evaluates the AND gate deterministically', () => {
-    const project = createDemoProject();
-    const snapshot = evaluateCircuit(project, 0, 1);
-    expect(snapshot.wireSignals.w_gate_out.logic).toBe(1);
-  });
+HO€В€ЫЫњЭ›Ъ™XЭHЬ™X]Q[[Ф›Ъ™XЭ
 
-  it('blocks a circuit when its switch is open', () => {
-    const project = createDemoProject();
-    const switchNode = project.components.find(node => node.id === 'switch_main')!;
-    switchNode.properties.closed = false;
-    const snapshot = evaluateCircuit(project, 0, 1);
-    expect(snapshot.wireSignals.w_load.active).toBe(false);
-  });
+NВ€ЫЫњЭЫ\ЪЭH][X]PЪ\ЭZ]
+›Ъ™XЭJNВ€^XЭ
+Ы\ЪЭќЪ\™TЪYЫ[ЛќЧЬЭЩ\‹ќ›ЫYЩJKќР™JJNВ€^XЭ
+Ы\ЪЭќЪ\™TЪYЫ[ЛќЧЫШYXЭ]™JKќР™JќYJNВ€^XЭ
+Ы\ЪЭќЪ\™TЪYЫ[ЛќЧЬ™]\›‹XЭ]™JKќР™JќYJNВ€^XЭ
+Ы\ЪЭќЪ\™TЪYЫ[ЛќЧЩЬ›Э[™XЭ]™JKќР™JќYJNВ€^XЭ
+Ы\ЪЭќЪ\™TЪYЫ[ЛќЧЩЬ›Э[™Щ^\›[XЭ]™JKќР™JќYJNВ€^XЭ
+Ы\ЪЭќЪ\™TЪYЫ[ЛќЧЬ™]\›‹Э\њ™[ќ
+KќР™QЬ™X]\•[Љ
+NВ€JNВ‚€]
+	Щ][X]\ИHS‘Ш]H]\›Z[љ\ЭXШ[IЛ
 
-  it('passes a signal through an encapsulation boundary pin', () => {
-    const project = createBlankProject('Boundary test');
-    project.components.push(
-      createInstance('dc_source',0,0,'source'),
-      createInstance('resistor',300,0,'inside_resistor'),
-      createInstance('lamp',520,0,'inside_lamp'),
-    );
-    project.modules.push({
-      id:'module',name:'Chip',x:240,y:-80,width:500,height:220,color:'#2be4c4',
-      memberIds:['inside_resistor','inside_lamp'],enabled:true,collapsed:true,
-      pins:[{id:'vin',name:'VIN',kind:'POWER',domain:'POWER',side:'left',position:.5,nominalVoltage:5}],
-    });
-    project.wires.push(
-      {id:'outside',from:{componentId:'source',pinId:'pos'},to:{componentId:'module',pinId:'vin'},routing:'orthogonal'},
-      {id:'boundary',from:{componentId:'module',pinId:'vin'},to:{componentId:'inside_resistor',pinId:'a'},routing:'orthogonal'},
-      {id:'inside',from:{componentId:'inside_resistor',pinId:'b'},to:{componentId:'inside_lamp',pinId:'a'},routing:'orthogonal'},
-    );
-    const snapshot=evaluateCircuit(project,0,1);
-    expect(snapshot.wireSignals.boundary.voltage).toBe(5);
-    expect(snapshot.wireSignals.inside.active).toBe(true);
-  });
+HO€В€ЫЫњЭ›Ъ™XЭHЬ™X]Q[[Ф›Ъ™XЭ
 
-  it('evaluates every input of a three-input gate', () => {
-    const project=createBlankProject('Three input gate');
-    project.components.push(createInstance('logic_input',0,0,'a'),createInstance('logic_input',0,100,'b'),createInstance('logic_input',0,200,'c'),createInstance('gate_and_3',300,100,'gate'));
-    project.wires.push(
-      {id:'a',from:{componentId:'a',pinId:'out'},to:{componentId:'gate',pinId:'a'},routing:'straight'},
-      {id:'b',from:{componentId:'b',pinId:'out'},to:{componentId:'gate',pinId:'b'},routing:'straight'},
-      {id:'c',from:{componentId:'c',pinId:'out'},to:{componentId:'gate',pinId:'c'},routing:'straight'},
-    );
-    expect(evaluateCircuit(project).componentSignals.gate.outputs.out.logic).toBe(1);
-    project.components.find(item=>item.id==='c')!.properties.state=0;
-    expect(evaluateCircuit(project).componentSignals.gate.outputs.out.logic).toBe(0);
-  });
+NВ€ЫЫњЭЫ\ЪЭH][X]PЪ\ЭZ]
+›Ъ™XЭJNВ€^XЭ
+Ы\ЪЭќЪ\™TЪYЫ[ЛќЧЩШ]WЫЭ]›ЩЪXКKќР™JJNВ€JNВ‚€]
+	Ш›ШЪЬИHЪ\ЭZ]Ъ[€]ИЭЪ]Ъ\ИЬ[‰Л
 
-  it('exposes the resolved inputs of LED displays to their visual model',()=>{
-    const project=createBlankProject('Display inputs');
-    const sourceA=createInstance('logic_input',0,0,'source_a');
-    const sourceB=createInstance('logic_input',0,100,'source_b');
-    sourceB.properties.state=0;
-    project.components.push(sourceA,sourceB,createInstance('seven_segment',300,0,'display'));
-    project.wires.push(
-      {id:'segment_a',from:{componentId:'source_a',pinId:'out'},to:{componentId:'display',pinId:'a'},routing:'straight'},
-      {id:'segment_b',from:{componentId:'source_b',pinId:'out'},to:{componentId:'display',pinId:'b'},routing:'straight'},
-    );
-    const display=evaluateCircuit(project).componentSignals.display;
-    expect(display.inputs?.a.logic).toBe(1);
-    expect(display.inputs?.b.logic).toBe(0);
-    expect(display.active).toBe(true);
-  });
-});
+HO€В€ЫЫњЭ›Ъ™XЭHЬ™X]Q[[Ф›Ъ™XЭ
+
+NВ€ЫЫњЭЭЪ]Ъ›ЩHH›Ъ™XЭЫЫ\Ы™[ќЛ™љ[™
+›ЩHO€›ЩKљYOOH	ЬЭЪ]ЪЫXZ[‰КHNВ€ЭЪ]Ъ›ЩKњ›Ь\ќY\ЛЫЬЩYH[ЩNВ€ЫЫњЭЫ\ЪЭH][X]PЪ\ЭZ]
+›Ъ™XЭJNВ€^XЭ
+Ы\ЪЭќЪ\™TЪYЫ[ЛќЧЫШYXЭ]™JKќР™J[ЩJNВ€^XЭ
+Ы\ЪЭќЪ\™TЪYЫ[ЛќЧЬ™]\›‹XЭ]™JKќР™J[ЩJNВ€JNВ‚€]
+	Ь\ЬЩ\ИHЪYЫ[›ЭYЪ[€[Ш\Э[][Ы€›Э[™\ћH[‰Л
+
+HO€В€ЫЫњЭ›Ъ™XЭHЬ™X]P›[љФ›Ъ™XЭ
+	Р›Э[™\ћH\Э	КNВ€›Ъ™XЭЫЫ\Ы™[ќЛњ\Ъ
+€Ь™X]R[њЭ[ЩJ	ЩЧЬЫЭ\ЩIЛ	ЬЫЭ\ЩIКK€Ь™X]R[њЭ[ЩJ	Ь™\Ъ\ЭЬ‰ЛМ	Ъ[њЪYWЬ™\Ъ\ЭЬ‰КK€Ь™X]R[њЭ[ЩJ	Ы[\	ЛLЊ	Ъ[њЪYWЫ[\	КK€
+NВ€›Ъ™XЭ›[Щ[\Лњ\Ъ
+В€Y‰Ы[Щ[IЛ[YN‰РЪ\	ЛЊЌN‹NЪYЌLZYЪЊЊЊЫЫЬЋ‰ИМ™MН	Л€Y[X™\’YО–ЙЪ[њЪYWЬ™\Ъ\ЭЬ‰Л	Ъ[њЪYWЫ[\	ЧK[X›YќќYKЫЫ\ЩYќќYK€[њО–ЮЪY‰Эљ[‰Л[YN‰Х’S‰ЛЪ[™‰ФХСT‰ЛЫXZ[Ћ‰ФХСT‰ЛЪYN‰ЫYќ	ЛЬЪ][ЫЋ‹ЌK›ЫZ[[›ЫYЩNЌ_WK€JNВ€›Ъ™XЭќЪ\™\Лњ\Ъ
+€ЪY‰ЫЭ]ЪYIЛњ›ЫNћШЫЫ\Ы™[ќY‰ЬЫЭ\ЩIЛ[’Y‰ЬЬЙЯKОћШЫЫ\Ы™[ќY‰Ы[Щ[IЛ[’Y‰Эљ[‰ЯK›Э][™О‰ЫЬќЩЫЫ[	ЯK€ЪY‰Ш›Э[™\ћIЛњ›ЫNћШЫЫ\Ы™[ќY‰Ы[Щ[IЛ[’Y‰Эљ[‰ЯKОћШЫЫ\Ы™[ќY‰Ъ[њЪYWЬ™\Ъ\ЭЬ‰Л[’Y‰ШIЯK›Э][™О‰ЫЬќЩЫЫ[	ЯK€ЪY‰Ъ[њЪYIЛњ›ЫNћШЫЫ\Ы™[ќY‰Ъ[њЪYWЬ™\Ъ\ЭЬ‰Л[’Y‰Ш‰ЯKОћШЫЫ\Ы™[ќY‰Ъ[њЪYWЫ[\	Л[’Y‰ШIЯK›Э][™О‰ЫЬќЩЫЫ[	ЯK€
+NВ€ЫЫњЭЫ\ЪЭY][X]PЪ\ЭZ]
+›Ъ™XЭJNВ€^XЭ
+Ы\ЪЭќЪ\™TЪYЫ[Л›Э[™\ћKќ›ЫYЩJKќР™JJNВ€^XЭ
+Ы\ЪЭќЪ\™TЪYЫ[Лљ[њЪYKXЭ]™JKќР™JќYJNВ€JNВ‚€]
+	Щ][X]\И]™\ћH[њ]Щ€H™YKZ[њ]Ш]IЛ
+
+HO€В€ЫЫњЭ›Ъ™XЭXЬ™X]P›[љФ›Ъ™XЭ
+	Х™YH[њ]Ш]IКNВ€›Ъ™XЭЫЫ\Ы™[ќЛњ\Ъ
+Ь™X]R[њЭ[ЩJ	ЫЩЪXЧЪ[њ]	Л	ШIКKЬ™X]R[њЭ[ЩJ	ЫЩЪXЧЪ[њ]	ЛL	Ш‰КKЬ™X]R[њЭ[ЩJ	ЫЩЪXЧЪ[њ]	ЛЊ	ШЙКKЬ™X]R[њЭ[ЩJ	ЩШ]WШ[™МЙЛМL	ЩШ]IКJNВ€›Ъ™XЭќЪ\™\Лњ\Ъ
+€ЪY‰ШIЛњ›ЫNћШЫЫ\Ы™[ќY‰ШIЛ[’Y‰ЫЭ]	ЯKОћШЫЫ\Ы™[ќY‰ЩШ]IЛ[’Y‰ШIЯK›Э][™О‰ЬЭZYЪ	ЯK€ЪY‰Ш‰Лњ›ЫNћШЫЫ\Ы™[ќY‰Ш‰Л[’Y‰ЫЭ]	ЯKОћШЫЫ\Ы™[ќY‰ЩШ]IЛ[’Y‰Ш‰ЯK›Э][™О‰ЬЭZYЪ	ЯK€ЪY‰ШЙЛњ›ЫNћШЫЫ\Ы™[ќY‰ШЙЛ[’Y‰ЫЭ]	ЯKОћШЫЫ\Ы™[ќY‰ЩШ]IЛ[’Y‰ШЙЯK›Э][™О‰ЬЭZYЪ	ЯK€
+NВ€^XЭ
+][X]PЪ\ЭZ]
+›Ъ™XЭ
+KЫЫ\Ы™[ќЪYЫ[Л™Ш]K›Э]]Л›Э]›ЩЪXКKќР™JJNВ€›Ъ™XЭЫЫ\Ы™[ќЛ™љ[™
+][OOљ][KљYOOIШЙКHKњ›Ь\ќY\ЛњЭ]OLВ€^XЭ
+][X]PЪ\ЭZ]
+›Ъ™XЭ
+KЫЫ\Ы™[ќЪYЫ[Л™Ш]K›Э]]Л›Э]›ЩЪXКKќР™J
+NВ€JNВ‚€]
+	Щ^ЬЩ\ИH™\ЫЫ™Y[њ]ИЩ€Q\Ь^\ИИZ\€љ\ЭX[[Щ[	Л
+
+OOћВ€ЫЫњЭ›Ъ™XЭXЬ™X]P›[љФ›Ъ™XЭ
+	С\Ь^H[њ]ЙКNВ€ЫЫњЭЫЭ\ЩPOXЬ™X]R[њЭ[ЩJ	ЫЩЪXЧЪ[њ]	Л	ЬЫЭ\ЩWШIКNВ€ЫЫњЭЫЭ\ЩPЏXЬ™X]R[њЭ[ЩJ	ЫЩЪXЧЪ[њ]	ЛL	ЬЫЭ\ЩWШ‰КNВ€ЫЭ\ЩP‹њ›Ь\ќY\ЛњЭ]OLВ€›Ъ™XЭЫЫ\Ы™[ќЛњ\Ъ
+ЫЭ\ЩPKЫЭ\ЩP‹Ь™X]R[њЭ[ЩJ	ЬЩ]™[—ЬЩYЫY[ќ	ЛМ	Щ\Ь^IКJNВ€›Ъ™XЭќЪ\™\Лњ\Ъ
+€ЪY‰ЬЩYЫY[ќШIЛњ›ЫNћШЫЫ\Ы™[ќY‰ЬЫЭ\ЩWШIЛ[’Y‰ЫЭ]	ЯKОћШЫЫ\Ы™[ќY‰Щ\Ь^IЛ[’Y‰ШIЯK›Э][™О‰ЬЭZYЪ	ЯK€ЪY‰ЬЩYЫY[ќШ‰Лњ›ЫNћШЫЫ\Ы™[ќY‰ЬЫЭ\ЩWШ‰Л[’Y‰ЫЭ]	ЯKОћШЫЫ\Ы™[ќY‰Щ\Ь^IЛ[’Y‰Ш‰ЯK›Э][™О‰ЬЭZYЪ	ЯK€
+NВ€ЫЫњЭ\Ь^OY][X]PЪ\ЭZ]
+›Ъ™XЭ
+KЫЫ\Ы™[ќЪYЫ[Л™\Ь^NВ€^XЭ
+\Ь^Kљ[њ]ПЛK›ЩЪXКKќР™JJNВ€^XЭ
+\Ь^Kљ[њ]ПЛ‹›ЩЪXКKќР™J
+NВ€^XЭ
+\Ь^KXЭ]™JKќР™JќYJNВ€JNВџJNВ

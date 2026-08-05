@@ -1,130 +1,92 @@
-import type { BitWireProject, ComponentInstance, ModuleArea, ProjectSettings, Theme, Wire } from '../model/types';
-import { CATALOG_BY_ID } from '../catalog/catalog';
+şº(·úk¡ø¥zX§{ßİzÿçºYOz¹¢²È¨×§‰çZ[\Ü\HÈš]Ú\™T›Ú™XİÛÛ\Û™[[œİ[˜ÙK[Ù[P\™XK›Ú™XİÙ][™ÜË[YKÚ\™HHœ›ÛH	Ë‹‹Û[Ù[İ\\ÉÎÂš[\ÜÈĞUSÑ×Ğ–WÒQHœ›ÛH	Ë‹‹ØØ][ÙËØØ][ÙÉÎÂš[\ÜÈÛÛ\Û™[İÛ™\“[Ù[RYHœ›ÛH	Ë‹‹Û[Ù[Û[Ù[TØÛÜIÎÂ‚˜ÛÛœİ›İÈH
 
-const now = () => new Date().toISOString();
-export const uid = (prefix: string) => `${prefix}_${crypto.randomUUID().slice(0, 8)}`;
+HOˆ™]È]J
+KÒTÓÔİš[™Ê
+NÂ™^ÜÛÛœİZYH
+™Yš^ˆİš[™ÊHOˆ	Ü™Yš^WÉØÜ\Ëœ˜[™ÛUURQ
 
-export const DEFAULT_SETTINGS: ProjectSettings = {
-  gridSize: 20,
-  snapToGrid: true,
-  wireRouting: 'orthogonal',
-  theme: 'auto',
-  signalView: 'voltage',
-  showValues: true,
-};
+KœÛXÙJ
+_XÂ‚™^ÜÛÛœİQUSÔÑUS‘ÔÎˆ›Ú™XİÙ][™ÜÈHÂˆÜšYÚ^™NˆŒˆÛ˜\ÑÜšYˆYKˆÚ\™T›İ][™Îˆ	ÛÜÙÛÛ˜[	Ëˆ[YNˆ	Ø]]ÉËˆÚYÛ˜[šY]Îˆ	İ›ÛYÙIËˆÚİÕ˜[Y\ÎˆYKˆ[š[X]Pİ\œ™[ˆYKŸNÂ‚™^Ü[˜İ[ÛˆÜ™X]R[œİ[˜ÙJYš[š][Û’Yˆİš[™Ëˆ[X™\‹Nˆ[X™\‹YHZY
+	Û›ÙIÊKØØ[HHJNˆÛÛ\Û™[[œİ[˜ÙHÂˆÛÛœİYš[š][ÛˆHĞUSÑ×Ğ–WÒQ™Ù]
+Yš[š][Û’Y
+NÂˆYˆ
+YYš[š][ÛŠH›İÈ™]È\œ›ÜŠÛÛ\Û™[H\ØÛÛ›ØÚYÎˆ	ÙYš[š][Û’YX
+NÂˆ™]\›ˆÂˆYˆYš[š][Û’YˆˆKˆ›İ][ÛˆˆØØ[Kˆ›Ü\Y\ÎˆÈ‹‹™Yš[š][Û‹™Y˜][ÈKˆ[˜X›YˆYKˆNÂŸB‚˜ÛÛœİÚ\™HH
+Yˆİš[™Ëœ›ÛPÛÛ\Û™[ˆİš[™Ëœ›ÛT[ˆİš[™ËĞÛÛ\Û™[ˆİš[™ËÔ[ˆİš[™ÊNˆÚ\™HOˆ
+ÂˆYœ›ÛNˆÈÛÛ\Û™[Yˆœ›ÛPÛÛ\Û™[[’Yˆœ›ÛT[ˆKÎˆÈÛÛ\Û™[YˆĞÛÛ\Û™[[’YˆÔ[ˆK›İ][™Îˆ	ÛÜÙÛÛ˜[	ËŸJNÂ‚™^Ü[˜İ[ÛˆÜ™X]Q[[Ô›Ú™Xİ
 
-export function createInstance(definitionId: string, x: number, y: number, id = uid('node'), scale = 1): ComponentInstance {
-  const definition = CATALOG_BY_ID.get(definitionId);
-  if (!definition) throw new Error(`Componente desconocido: ${definitionId}`);
-  return {
-    id,
-    definitionId,
-    x,
-    y,
-    rotation: 0,
-    scale,
-    properties: { ...definition.defaults },
-    enabled: true,
-  };
-}
-
-const wire = (id: string, fromComponent: string, fromPin: string, toComponent: string, toPin: string): Wire => ({
-  id, from: { componentId: fromComponent, pinId: fromPin }, to: { componentId: toComponent, pinId: toPin }, routing: 'orthogonal',
-});
-
-export function createDemoProject(): BitWireProject {
-  const createdAt = now();
-  const components: ComponentInstance[] = [
-    createInstance('dc_source', -560, -110, 'source_main'),
-    createInstance('switch_spst', -320, -110, 'switch_main'),
-    createInstance('resistor', -80, -110, 'resistor_main'),
-    createInstance('lamp', 180, -110, 'lamp_main'),
-    createInstance('ground', 440, 30, 'ground_main'),
-    createInstance('logic_input', -520, 300, 'logic_a'),
-    createInstance('logic_input', -520, 430, 'logic_b'),
-    createInstance('gate_and', -180, 345, 'gate_main'),
-    createInstance('led', 120, 345, 'led_logic'),
-    createInstance('oscilloscope', 400, 300, 'scope_main'),
-  ];
-  components.find(c => c.id === 'resistor_main')!.properties.resistance = 330;
-  components.find(c => c.id === 'lamp_main')!.properties.ratedVoltage = 5;
-  components.find(c => c.id === 'led_logic')!.properties.color = '#2be4c4';
-  const wires: Wire[] = [
-    wire('w_power', 'source_main', 'pos', 'switch_main', 'a'),
-    wire('w_control', 'switch_main', 'b', 'resistor_main', 'a'),
-    wire('w_load', 'resistor_main', 'b', 'lamp_main', 'a'),
-    wire('w_return', 'lamp_main', 'b', 'module_power', 'gnd'),
-    wire('w_ground', 'source_main', 'neg', 'module_power', 'gnd'),
-    wire('w_ground_external', 'module_power', 'gnd', 'ground_main', 'gnd'),
-    wire('w_a', 'logic_a', 'out', 'module_gate_core', 'a'),
-    wire('w_a_internal', 'module_gate_core', 'a', 'gate_main', 'a'),
-    wire('w_b', 'logic_b', 'out', 'module_gate_core', 'b'),
-    wire('w_b_internal', 'module_gate_core', 'b', 'gate_main', 'b'),
-    wire('w_gate_internal', 'gate_main', 'out', 'module_gate_core', 'q'),
-    wire('w_gate_out', 'module_gate_core', 'q', 'led_logic', 'a'),
-    wire('w_module_q_internal', 'module_gate_core', 'q', 'module_logic', 'q'),
-    wire('w_led_return', 'led_logic', 'b', 'module_logic', 'gnd'),
-    wire('w_logic_ground_external', 'module_logic', 'gnd', 'ground_main', 'gnd'),
-    wire('w_scope', 'module_logic', 'q', 'scope_main', 'ch1'),
-  ];
-  const modules: ModuleArea[] = [
-    { id: 'module_power', name: 'Etapa elÃ©ctrica de 5 V', x: -610, y: -170, width: 900, height: 210, color: '#f5b942', memberIds: ['source_main','switch_main','resistor_main','lamp_main'], enabled: true, collapsed: false, pins: [
-      { id: 'vin', name: 'VIN 5V', kind: 'POWER', domain: 'POWER', side: 'left', position: 1/3, nominalVoltage: 5 },
-      { id: 'gnd', name: 'GND', kind: 'GND', domain: 'POWER', side: 'left', position: 2/3, nominalVoltage: 0 },
-      { id: 'vout', name: 'VOUT', kind: 'OUTPUT', domain: 'ANALOG', side: 'right', position: .5, nominalVoltage: 5 },
-    ] },
-    { id: 'module_logic', name: 'Demostrador AND', x: -580, y: 250, width: 920, height: 320, color: '#2be4c4', memberIds: ['logic_a','logic_b','gate_main','led_logic'], enabled: true, collapsed: false, pins: [
-      { id: 'a', name: 'A', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: 1/3 },
-      { id: 'b', name: 'B', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: 2/3 },
-      { id: 'q', name: 'Q', kind: 'OUTPUT', domain: 'DIGITAL', side: 'right', position: .5 },
-      { id: 'gnd', name: 'GND', kind: 'GND', domain: 'POWER', side: 'bottom', position: .5, nominalVoltage: 0 },
-    ] },
-    { id: 'module_gate_core', name: 'NÃºcleo lÃ³gico AND', x: -260, y: 300, width: 320, height: 180, color: '#7b8cff', memberIds: ['gate_main'], enabled: true, collapsed: true, parentModuleId: 'module_logic', pins: [
-      { id: 'a', name: 'A', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: 1/3 },
-      { id: 'b', name: 'B', kind: 'INPUT', domain: 'DIGITAL', side: 'left', position: 2/3 },
-      { id: 'q', name: 'Q', kind: 'OUTPUT', domain: 'DIGITAL', side: 'right', position: .5 },
-    ] },
-  ];
-  return {
-    format: 'bitwire', version: 1, id: uid('project'), name: 'Laboratorio inicial',
-    description: 'Circuito elÃ©ctrico y bloque lÃ³gico de demostraciÃ³n.', createdAt, updatedAt: createdAt,
-    components, wires, modules, settings: { ...DEFAULT_SETTINGS },
-  };
-}
-
-export function createBlankProject(name = 'Circuito sin tÃ­tulo'): BitWireProject {
-  const createdAt = now();
-  return {
-    format: 'bitwire', version: 1, id: uid('project'), name, description: '',
-    createdAt, updatedAt: createdAt, components: [], wires: [], modules: [], settings: { ...DEFAULT_SETTINGS },
-  };
-}
-
-export function cloneProject(project: BitWireProject): BitWireProject {
-  return structuredClone(project);
-}
-
-export function validateProject(input: unknown): BitWireProject {
-  if (!input || typeof input !== 'object') throw new Error('El archivo no contiene un proyecto vÃ¡lido.');
-  const candidate = input as Partial<BitWireProject>;
-  if (candidate.format !== 'bitwire' || candidate.version !== 1) throw new Error('VersiÃ³n de archivo .bitwire incompatible.');
-  if (!Array.isArray(candidate.components) || !Array.isArray(candidate.wires)) throw new Error('El grafo del circuito estÃ¡ incompleto.');
-  candidate.modules ??= [];
-  const ids = new Set([...candidate.components.map(item => item.id), ...candidate.modules.map(item => item.id)]);
-  for (const connection of candidate.wires) {
-    if (!ids.has(connection.from.componentId) || !ids.has(connection.to.componentId)) {
-      throw new Error(`El cable ${connection.id} apunta a un componente inexistente.`);
-    }
-  }
-  const project = candidate as BitWireProject;
-  // Forward-compatible migration of projects saved by the first public build.
-  for (const component of project.components) component.scale = Number(component.scale) || 1;
-  for (const module of project.modules) {
-    module.collapsed ??= false;
-    module.pins ??= [];
-  }
-  for (const connection of project.wires) connection.controlPoints ??= [];
-  if (project.settings.theme === ('dark' as Theme)) project.settings.theme = 'night';
-  if (project.settings.theme === ('light' as Theme)) project.settings.theme = 'morning';
-  return project;
-}
+Nˆš]Ú\™T›Ú™XİÂˆÛÛœİÜ™X]Y]H›İÊ
+NÂˆÛÛœİÛÛ\Û™[ÎˆÛÛ\Û™[[œİ[˜ÙV×HHÂˆÜ™X]R[œİ[˜ÙJ	Ù×ÜÛİ\˜ÙIËMMŒLLL	ÜÛİ\˜ÙWÛXZ[‰ÊKˆÜ™X]R[œİ[˜ÙJ	ÜİÚ]ÚÜÜİ	ËLÌŒLLL	ÜİÚ]ÚÛXZ[‰ÊKˆÜ™X]R[œİ[˜ÙJ	Ü™\Ú\İÜ‰ËNLLL	Ü™\Ú\İÜ—ÛXZ[‰ÊKˆÜ™X]R[œİ[˜ÙJ	Û[\	ËNLLL	Û[\ÛXZ[‰ÊKˆÜ™X]R[œİ[˜ÙJ	ÙÜ›İ[™	ËÌ	ÙÜ›İ[™ÛXZ[‰ÊKˆÜ™X]R[œİ[˜ÙJ	ÛÙÚX×Ú[œ]	ËMLŒÌ	ÛÙÚX×ØIÊKˆÜ™X]R[œİ[˜ÙJ	ÛÙÚX×Ú[œ]	ËMLŒÌ	ÛÙÚX×Ø‰ÊKˆÜ™X]R[œİ[˜ÙJ	ÙØ]WØ[™	ËLNÍK	ÙØ]WÛXZ[‰ÊKˆÜ™X]R[œİ[˜ÙJ	ÛY	ËLŒÍK	ÛYÛÙÚXÉÊKˆÜ™X]R[œİ[˜ÙJ	ÛÜØÚ[ÜØÛÜIËÌ	ÜØÛÜWÛXZ[‰ÊKˆNÂˆÛÛ\Û™[Ë™š[™
+ÈOˆËšYOOH	Ü™\Ú\İÜ—ÛXZ[‰ÊHKœ›Ü\Y\Ëœ™\Ú\İ[˜ÙHHÌÌÂˆÛÛ\Û™[Ë™š[™
+ÈOˆËšYOOH	Û[\ÛXZ[‰ÊHKœ›Ü\Y\Ëœ˜]Y›ÛYÙHHNÂˆÛÛ\Û™[Ë™š[™
+ÈOˆËšYOOH	ÛYÛÙÚXÉÊHKœ›Ü\Y\Ë˜ÛÛÜˆH	ÈÌ˜™MÍ	ÎÂˆÛÛœİÚ\™\ÎˆÚ\™V×HHÂˆÚ\™J	İ×ÜİÙ\‰Ë	ÜÛİ\˜ÙWÛXZ[‰Ë	ÜÜÉË	ÜİÚ]ÚÛXZ[‰Ë	ØIÊKˆÚ\™J	İ×ØÛÛ›Û	Ë	ÜİÚ]ÚÛXZ[‰Ë	Ø‰Ë	Ü™\Ú\İÜ—ÛXZ[‰Ë	ØIÊKˆÚ\™J	İ×ÛØY	Ë	Ü™\Ú\İÜ—ÛXZ[‰Ë	Ø‰Ë	Û[\ÛXZ[‰Ë	ØIÊKˆÚ\™J	İ×Ü™]\›‰Ë	Û[\ÛXZ[‰Ë	Ø‰Ë	Û[Ù[WÜİÙ\‰Ë	ÙÛ™	ÊKˆÚ\™J	İ×ÙÜ›İ[™	Ë	ÜÛİ\˜ÙWÛXZ[‰Ë	Û™YÉË	Û[Ù[WÜİÙ\‰Ë	ÙÛ™	ÊKˆÚ\™J	İ×ÙÜ›İ[™Ù^\›˜[	Ë	Û[Ù[WÜİÙ\‰Ë	ÙÛ™	Ë	ÙÜ›İ[™ÛXZ[‰Ë	ÙÛ™	ÊKˆÚ\™J	İ×ØIË	ÛÙÚX×ØIË	Ûİ]	Ë	Û[Ù[WÙØ]WØÛÜ™IË	ØIÊKˆÚ\™J	İ×ØWÚ[\›˜[	Ë	Û[Ù[WÙØ]WØÛÜ™IË	ØIË	ÙØ]WÛXZ[‰Ë	ØIÊKˆÚ\™J	İ×Ø‰Ë	ÛÙÚX×Ø‰Ë	Ûİ]	Ë	Û[Ù[WÙØ]WØÛÜ™IË	Ø‰ÊKˆÚ\™J	İ×Ø—Ú[\›˜[	Ë	Û[Ù[WÙØ]WØÛÜ™IË	Ø‰Ë	ÙØ]WÛXZ[‰Ë	Ø‰ÊKˆÚ\™J	İ×ÙØ]WÚ[\›˜[	Ë	ÙØ]WÛXZ[‰Ë	Ûİ]	Ë	Û[Ù[WÙØ]WØÛÜ™IË	ÜIÊKˆÚ\™J	İ×ÙØ]WÛİ]	Ë	Û[Ù[WÙØ]WØÛÜ™IË	ÜIË	ÛYÛÙÚXÉË	ØIÊKˆÚ\™J	İ×Û[Ù[WÜWÚ[\›˜[	Ë	Û[Ù[WÙØ]WØÛÜ™IË	ÜIË	Û[Ù[WÛÙÚXÉË	ÜIÊKˆÚ\™J	İ×ÛYÜ™]\›‰Ë	ÛYÛÙÚXÉË	Ø‰Ë	Û[Ù[WÛÙÚXÉË	ÙÛ™	ÊKˆÚ\™J	İ×ÛÙÚX×ÙÜ›İ[™Ù^\›˜[	Ë	Û[Ù[WÛÙÚXÉË	ÙÛ™	Ë	ÙÜ›İ[™ÛXZ[‰Ë	ÙÛ™	ÊKˆÚ\™J	İ×ÜØÛÜIË	Û[Ù[WÛÙÚXÉË	ÜIË	ÜØÛÜWÛXZ[‰Ë	ØÚIÊKˆNÂˆÛÛœİ[Ù[\Îˆ[Ù[P\™XV×HHÂˆÈYˆ	Û[Ù[WÜİÙ\‰Ë˜[YNˆ	Ñ]\H[0êXİšXØHHH‰ËˆMŒLNˆLMÌÚYˆLZYÚˆŒLÛÛÜˆ	ÈÙXM‰ËY[X™\’YÎˆÉÜÛİ\˜ÙWÛXZ[‰Ë	ÜİÚ]ÚÛXZ[‰Ë	Ü™\Ú\İÜ—ÛXZ[‰Ë	Û[\ÛXZ[‰×K[˜X›YˆYKÛÛ\ÙYˆ˜[ÙK[œÎˆÂˆÈYˆ	İš[‰Ë˜[YNˆ	Õ’SˆU‰ËÚ[™ˆ	ÔÕÑT‰ËÛXZ[ˆ	ÔÕÑT‰ËÚYNˆ	ÛY	ËÜÚ][ÛˆKÌË›ÛZ[˜[›ÛYÙNˆHKˆÈYˆ	ÙÛ™	Ë˜[YNˆ	ÑÓ‘	ËÚ[™ˆ	ÑÓ‘	ËÛXZ[ˆ	ÔÕÑT‰ËÚYNˆ	ÛY	ËÜÚ][Ûˆ‹ÌË›ÛZ[˜[›ÛYÙNˆKˆÈYˆ	İ›İ]	Ë˜[YNˆ	Õ“ÕU	ËÚ[™ˆ	ÓÕUU	ËÛXZ[ˆ	ĞSSÑÉËÚYNˆ	ÜšYÚ	ËÜÚ][ÛˆK›ÛZ[˜[›ÛYÙNˆHKˆHKˆÈYˆ	Û[Ù[WÛÙÚXÉË˜[YNˆ	Ñ[[Üİ˜YÜˆS‘	ËˆMNNˆLÚYˆLŒZYÚˆÌŒÛÛÜˆ	ÈÌ˜™MÍ	ËY[X™\’YÎˆÉÛÙÚX×ØIË	ÛÙÚX×Ø‰Ë	ÙØ]WÛXZ[‰Ë	ÛYÛÙÚXÉ×K[˜X›YˆYKÛÛ\ÙYˆ˜[ÙK[œÎˆÂˆÈYˆ	ØIË˜[YNˆ	ĞIËÚ[™ˆ	ÒS”U	ËÛXZ[ˆ	ÑQÒUS	ËÚYNˆ	ÛY	ËÜÚ][ÛˆKÌÈKˆÈYˆ	Ø‰Ë˜[YNˆ	Ğ‰ËÚ[™ˆ	ÒS”U	ËÛXZ[ˆ	ÑQÒUS	ËÚYNˆ	ÛY	ËÜÚ][Ûˆ‹ÌÈKˆÈYˆ	ÜIË˜[YNˆ	ÔIËÚ[™ˆ	ÓÕUU	ËÛXZ[ˆ	ÑQÒUS	ËÚYNˆ	ÜšYÚ	ËÜÚ][ÛˆHKˆÈYˆ	ÙÛ™	Ë˜[YNˆ	ÑÓ‘	ËÚ[™ˆ	ÑÓ‘	ËÛXZ[ˆ	ÔÕÑT‰ËÚYNˆ	Ø›İÛIËÜÚ][ÛˆK›ÛZ[˜[›ÛYÙNˆKˆHKˆÈYˆ	Û[Ù[WÙØ]WØÛÜ™IË˜[YNˆ	Ó°î˜Û[È0ìÙÚXÛÈS‘	ËˆLŒNˆÌÚYˆÌŒZYÚˆNÛÛÜˆ	ÈÍØÙ™‰ËY[X™\’YÎˆÉÙØ]WÛXZ[‰×K[˜X›YˆYKÛÛ\ÙYˆYK\™[[Ù[RYˆ	Û[Ù[WÛÙÚXÉË[œÎˆÂˆÈYˆ	ØIË˜[YNˆ	ĞIËÚ[™ˆ	ÒS”U	ËÛXZ[ˆ	ÑQÒUS	ËÚYNˆ	ÛY	ËÜÚ][ÛˆKÌÈKˆÈYˆ	Ø‰Ë˜[YNˆ	Ğ‰ËÚ[™ˆ	ÒS”U	ËÛXZ[ˆ	ÑQÒUS	ËÚYNˆ	ÛY	ËÜÚ][Ûˆ‹ÌÈKˆÈYˆ	ÜIË˜[YNˆ	ÔIËÚ[™ˆ	ÓÕUU	ËÛXZ[ˆ	ÑQÒUS	ËÚYNˆ	ÜšYÚ	ËÜÚ][ÛˆHKˆHKˆNÂˆ™]\›ˆÂˆ›Ü›X]ˆ	Øš]Ú\™IË™\œÚ[ÛˆKYˆZY
+	Ü›Ú™Xİ	ÊK˜[YNˆ	ÓX›Ü˜]Üš[È[šXÚX[	Ëˆ\ØÜš\[Ûˆ	ĞÚ\˜İZ]È[0êXİšXÛÈH›Ü]YH0ìÙÚXÛÈH[[Üİ˜XÚpìÛ‹‰ËÜ™X]Y]\]Y]ˆÜ™X]Y]ˆÛÛ\Û™[ËÚ\™\Ë[Ù[\ËÙ][™ÜÎˆÈ‹‹‘QUSÔÑUS‘ÔÈKˆNÂŸB‚™^Ü[˜İ[ÛˆÜ™X]P›[šÔ›Ú™Xİ
+˜[YHH	ĞÚ\˜İZ]ÈÚ[ˆ0ë][ÉÊNˆš]Ú\™T›Ú™XİÂˆÛÛœİÜ™X]Y]H›İÊ
+NÂˆ™]\›ˆÂˆ›Ü›X]ˆ	Øš]Ú\™IË™\œÚ[ÛˆKYˆZY
+	Ü›Ú™Xİ	ÊK˜[YK\ØÜš\[Ûˆ	ÉËˆÜ™X]Y]\]Y]ˆÜ™X]Y]ÛÛ\Û™[Îˆ×KÚ\™\Îˆ×K[Ù[\Îˆ×KÙ][™ÜÎˆÈ‹‹‘QUSÔÑUS‘ÔÈKˆNÂŸB‚™^Ü[˜İ[ÛˆÛÛ™T›Ú™Xİ
+›Ú™Xİˆš]Ú\™T›Ú™Xİ
+Nˆš]Ú\™T›Ú™XİÂˆ™]\›ˆİXİ\™YÛÛ™J›Ú™Xİ
+NÂŸB‚‹ÊŠˆ\XØ]\ÈÛÛ\Û™[È[™ÙY\È]™\HÛÜH[ˆHØ[YHY\˜\˜ÚXØ[Ø[˜\È\È]ÈÛİ\˜ÙKˆ
+‹Â™^Ü[˜İ[Ûˆ\XØ]PÛÛ\Û™[Êˆ›Ú™Xİˆš]Ú\™T›Ú™XİˆÙ[XİYYÎˆ™XYÛ›Hİš[™Ö×KˆXZÙRYˆ
+™Yš^ˆİš[™ÊHOˆİš[™ÈHZYŠNˆİš[™Ö×HÂˆÛÛœİÙ[XİYH™]ÈÙ]
+Ù[XİYYÊNÂˆÛÛœİÛİ\˜Ù\ÈH›Ú™Xİ˜ÛÛ\Û™[Ë™š[\ŠÛÛ\Û™[OˆÙ[XİYš\ÊÛÛ\Û™[šY
+JNÂˆÛÛœİİÛ™\œÈH™]ÈX\
+Ûİ\˜Ù\Ë›X\
+ÛÛ\Û™[OˆØÛÛ\Û™[šYÛÛ\Û™[İÛ™\“[Ù[RY
+›Ú™XİÛÛ\Û™[šY
+WJJNÂˆÛÛœİYX\H™]ÈX\
+Ûİ\˜Ù\Ë›X\
+ÛÛ\Û™[OˆØÛÛ\Û™[šYXZÙRY
+	Û›ÙIÊWJJNÂˆÛÛœİÛÜY\ÈHÛİ\˜Ù\Ë›X\
+ÛÛ\Û™[Oˆ
+Âˆ‹‹œİXİ\™YÛÛ™JÛÛ\Û™[
+KˆYˆYX\™Ù]
+ÛÛ\Û™[šY
+HKˆˆÛÛ\Û™[
+ÈˆNˆÛÛ\Û™[H
+ÈˆJJNÂˆÛÛœİÚ\™\ÈH›Ú™XİÚ\™\Âˆ™š[\ŠÛÛ›™Xİ[ÛˆOˆYX\š\ÊÛÛ›™Xİ[Û‹™œ›ÛK˜ÛÛ\Û™[Y
+H	‰ˆYX\š\ÊÛÛ›™Xİ[Û‹Ë˜ÛÛ\Û™[Y
+JBˆ›X\
+ÛÛ›™Xİ[ÛˆOˆ
+Âˆ‹‹œİXİ\™YÛÛ™JÛÛ›™Xİ[ÛŠKˆYˆXZÙRY
+	İÚ\™IÊKˆœ›ÛNˆÈ‹‹˜ÛÛ›™Xİ[Û‹™œ›ÛKÛÛ\Û™[YˆYX\™Ù]
+ÛÛ›™Xİ[Û‹™œ›ÛK˜ÛÛ\Û™[Y
+HHKˆÎˆÈ‹‹˜ÛÛ›™Xİ[Û‹ËÛÛ\Û™[YˆYX\™Ù]
+ÛÛ›™Xİ[Û‹Ë˜ÛÛ\Û™[Y
+HHKˆJJNÂ‚ˆ›Ú™Xİ˜ÛÛ\Û™[Ëœ\Ú
+‹‹˜ÛÜY\ÊNÂˆ›Ú™XİÚ\™\Ëœ\Ú
+‹‹Ú\™\ÊNÂˆ›Üˆ
+ÛÛœİÛİ\˜ÙHÙˆÛİ\˜Ù\ÊHÂˆÛÛœİİÛ™\’YHİÛ™\œË™Ù]
+Ûİ\˜ÙKšY
+NÂˆÛÛœİ\XØ]RYHYX\™Ù]
+Ûİ\˜ÙKšY
+HNÂˆYˆ
+İÛ™\’Y
+H›Ú™Xİ›[Ù[\Ë™š[™
+[Ù[HOˆ[Ù[KšYOOHİÛ™\’Y
+OË›Y[X™\’YËœ\Ú
+\XØ]RY
+NÂˆBˆ™]\›ˆÛÜY\Ë›X\
+ÛÛ\Û™[OˆÛÛ\Û™[šY
+NÂŸB‚™^Ü[˜İ[Ûˆ˜[Y]T›Ú™Xİ
+[œ]ˆ[šÛ›İÛŠNˆš]Ú\™T›Ú™XİÂˆYˆ
+Z[œ]\[Ùˆ[œ]OOH	ÛØš™Xİ	ÊH›İÈ™]È\œ›ÜŠ	Ñ[\˜Ú]›È›ÈÛÛY[™H[ˆ›ŞYXİÈ°è[YË‰ÊNÂˆÛÛœİØ[™Y]HH[œ]\È\X[š]Ú\™T›Ú™XİÂˆYˆ
+Ø[™Y]K™›Ü›X]OOH	Øš]Ú\™IÈØ[™Y]K™\œÚ[ÛˆOOHJH›İÈ™]È\œ›ÜŠ	Õ™\œÚpìÛˆH\˜Ú]›È˜š]Ú\™H[˜ÛÛ\]X›K‰ÊNÂˆYˆ
+P\œ˜^Kš\Ğ\œ˜^JØ[™Y]K˜ÛÛ\Û™[ÊHP\œ˜^Kš\Ğ\œ˜^JØ[™Y]KÚ\™\ÊJH›İÈ™]È\œ›ÜŠ	Ñ[Ü˜Y›È[Ú\˜İZ]È\İ0èH[˜ÛÛ\]Ë‰ÊNÂˆØ[™Y]K›[Ù[\ÈÏÏH×NÂˆÛÛœİYÈH™]ÈÙ]
+Ë‹‹˜Ø[™Y]K˜ÛÛ\Û™[Ë›X\
+][HOˆ][KšY
+K‹‹˜Ø[™Y]K›[Ù[\Ë›X\
+][HOˆ][KšY
+WJNÂˆ›Üˆ
+ÛÛœİÛÛ›™Xİ[ÛˆÙˆØ[™Y]KÚ\™\ÊHÂˆYˆ
+ZYËš\ÊÛÛ›™Xİ[Û‹™œ›ÛK˜ÛÛ\Û™[Y
+HZYËš\ÊÛÛ›™Xİ[Û‹Ë˜ÛÛ\Û™[Y
+JHÂˆ›İÈ™]È\œ›ÜŠ[ØX›H	ØÛÛ›™Xİ[Û‹šYH\[HH[ˆÛÛ\Û™[H[™^\İ[K˜
+NÂˆBˆBˆÛÛœİ›Ú™XİHØ[™Y]H\Èš]Ú\™T›Ú™XİÂˆ›Ú™XİœÙ][™ÜÈHÈ‹‹‘QUSÔÑUS‘ÔË‹‹ŠØ[™Y]KœÙ][™ÜÈÏÈßJHNÂˆËÈ›ÜØ\™XÛÛ\]X›HZYÜ˜][ÛˆÙˆ›Ú™XİÈØ]™YHHš\œİX›XÈZ[‚ˆ›Üˆ
+ÛÛœİÛÛ\Û™[Ùˆ›Ú™Xİ˜ÛÛ\Û™[ÊHÛÛ\Û™[œØØ[HH[X™\ŠÛÛ\Û™[œØØ[JHNÂˆ›Üˆ
+ÛÛœİ[Ù[HÙˆ›Ú™Xİ›[Ù[\ÊHÂˆ[Ù[K˜ÛÛ\ÙYÏÏH˜[ÙNÂˆ[Ù[Kœ[œÈÏÏH×NÂˆBˆ›Üˆ
+ÛÛœİÛÛ›™Xİ[ÛˆÙˆ›Ú™XİÚ\™\ÊHÛÛ›™Xİ[Û‹˜ÛÛ›ÛÚ[ÈÏÏH×NÂˆYˆ
+›Ú™XİœÙ][™ÜË[YHOOH
+	Ù\šÉÈ\È[YJJH›Ú™XİœÙ][™ÜË[YHH	ÛšYÚ	ÎÂˆYˆ
+›Ú™XİœÙ][™ÜË[YHOOH
+	ÛYÚ	È\È[YJJH›Ú™XİœÙ][™ÜË[YHH	Û[Ü›š[™ÉÎÂˆ™]\›ˆ›Ú™XİÂŸB
