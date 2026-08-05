@@ -1,417 +1,291 @@
-ює(·ъkЎшҐzX§{ЯЭzязєYOz№ўІИЁќЧ§‰зZ[\ЬќИЪXЪРЪ\ЫL‹Ъ\ЫP[\ќ[Ъ\ЫK[™›ЛHњ›ЫH	ЫXЪYK\™XXЭ	ОВљ[\ЬќИ\ЩPШ[XЪЛ\ЩQY™™XЭ\ЩT™Y‹\ЩTЭ]HHњ›ЫH	Ь™XXЭ	ОВљ[\ЬќИX›Э]X[ЩИHњ›ЫH	Л‹ШЫЫ\Ы™[ќЛРX›Э]X[ЩЙОВљ[\ЬќИШ][ЩФ[™[Hњ›ЫH	Л‹ШЫЫ\Ы™[ќЛРШ][ЩФ[™[	ОВљ[\ЬќИЫЫќ^Y[ќK\HЫЫќ^XЭ[Ы‹\HЫЫќ^\™Щ]Hњ›ЫH	Л‹ШЫЫ\Ы™[ќЛРЫЫќ^Y[ќIОВљ[\ЬќИ[ЭZYHHњ›ЫH	Л‹ШЫЫ\Ы™[ќЛТ[ЭZYIОВљ[\ЬќИ[њЬXЭЬ€Hњ›ЫH	Л‹ШЫЫ\Ы™[ќЛТ[њЬXЭЬ‰ОВљ[\ЬќИ[њЭќ[Y[ќЪ[™ЭЛ\H[њЭќ[Y[ќЪ[™ЭФЭ]HHњ›ЫH	Л‹ШЫЫ\Ы™[ќЛТ[њЭќ[Y[ќЪ[™ЭЙОВљ[\ЬќИ[њЭќ[Y[ќ^HHњ›ЫH	Л‹ШЫЫ\Ы™[ќЛУЬШЪ[ЬШЫЬIОВљ[\ЬќИЩ™›[™QX[ЩИHњ›ЫH	Л‹ШЫЫ\Ы™[ќЛУЩ™›[™QX[ЩЙОВљ[\ЬќИЬ\€Hњ›ЫH	Л‹ШЫЫ\Ы™[ќЛХЬ\‰ОВљ[\ЬќИЫЬљЬЬXЩHHњ›ЫH	Л‹ШЫЫ\Ы™[ќЛХЫЬљЬЬXЩIОВљ[\ЬќИSP‘QQРРUSСЛ™\љYћPШ][ЩС]X\ЩHHњ›ЫH	Л‹ШШ][ЩЛШШ][ЩЙОВљ[\Ьќ\HВ€љ]Ъ\™T›Ъ™XЭШ][ЩС]X\ЩTЭ]\ЛЫЫ\Ы™[ќYљ[љ][Ы‹[Щ[P\™XK€›Ь\ќU[YKШ]™Y[Щ[KЪ[][][Ы”Ы\ЪЭ[YKЫЫ[ЩKљY]ЬЬќЭ]KџHњ›ЫH	Л‹Ы[Щ[Э\\ЙОВљ[\ЬќИЬ™X]P›[љФ›Ъ™XЭЬ™X]Q[[Ф›Ъ™XЭЬ™X]R[њЭ[ЩK\XШ]PЫЫ\Ы™[ќЛZYHњ›ЫH	Л‹ЬЭ]KЬ›Ъ™XЭ	ОВљ[\ЬќИ\ЩT›Ъ™XЭ\ЭЬћHHњ›ЫH	Л‹ЬЭ]KЭ\ЩT›Ъ™XЭ\ЭЬћIОВљ[\ЬќИ^Ьќ›Ъ™XЭ[\Ьќ›Ъ™XЭШYШШ[›Ъ™XЭШ]™T›Ъ™XЭШШ[HHњ›ЫH	Л‹Э][ЛЬ›Ъ™XЭSЙОВљ[\ЬќИ[]TШ]™Y[Щ[K^Ьќ[Щ[K[\Ьќ[Щ[K[њЩ\ќШ]™Y[Щ[KШY[Щ[SXњ\ћKШ]™S[Щ[UУXњ\ћHHњ›ЫH	Л‹Э][ЛЫ[Щ[RSЙОВљ[\ЬќИШY[YT™Y™\™[ЩK™\ЫЫ™U[YKШ]™U[YT™Y™\™[ЩK[YQYљ[љ][Ы€Hњ›ЫH	Л‹Э[YKЭ[Y\ЙОВ‚™^ЬќY][ќ[Э[Ы€\
+import { CheckCircle2, CircleAlert, HelpCircle, Info, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AboutDialog } from './components/AboutDialog';
+import { CatalogPanel } from './components/CatalogPanel';
+import { ContextMenu, type ContextAction, type ContextTarget } from './components/ContextMenu';
+import { HelpGuide } from './components/HelpGuide';
+import { Inspector } from './components/Inspector';
+import { InstrumentWindow, type InstrumentWindowState } from './components/InstrumentWindow';
+import { InstrumentTray } from './components/Oscilloscope';
+import { OfflineDialog } from './components/OfflineDialog';
+import { Topbar } from './components/Topbar';
+import { Workspace } from './components/Workspace';
+import { EMBEDDED_CATALOG, verifyCatalogDatabase } from './catalog/catalog';
+import type {
+  BitWireProject, CatalogDatabaseStatus, ComponentDefinition, ModuleArea,
+  PropertyValue, SavedModule, SimulationSnapshot, Theme, ToolMode, ViewportState,
+} from './model/types';
+import { createBlankProject, createDemoProject, createInstance, duplicateComponents, uid } from './state/project';
+import { useProjectHistory } from './state/useProjectHistory';
+import { exportProject, importProject, loadLocalProject, saveProjectLocally } from './utils/projectIO';
+import { deleteSavedModule, exportModule, importModule, insertSavedModule, loadModuleLibrary, saveModuleToLibrary } from './utils/moduleIO';
+import { loadThemePreference, resolveTheme, saveThemePreference, themeDefinition } from './theme/themes';
 
-HВ€ЫЫњЭ[љ]X[H\ЩT™YЉШYШШ[›Ъ™XЭ
+export default function App() {
+  const initial = useRef(loadLocalProject() ?? createDemoProject()).current;
+  const { project, update, reset, undo, redo, canUndo, canRedo } = useProjectHistory(initial);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [selectedModuleId, setSelectedModuleId] = useState<string>();
+  const [activeModuleId, setActiveModuleId] = useState<string>();
+  const [moduleLibrary, setModuleLibrary] = useState<SavedModule[]>(loadModuleLibrary);
+  const [tool, setTool] = useState<ToolMode>('select');
+  const [running, setRunning] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const [snapshot, setSnapshot] = useState<SimulationSnapshot>();
+  const [samples, setSamples] = useState<SimulationSnapshot[]>([]);
+  const [catalogCollapsed, setCatalogCollapsed] = useState(false);
+  const [inspectorCollapsed, setInspectorCollapsed] = useState(true);
+  const [instrumentsCollapsed, setInstrumentsCollapsed] = useState(false);
+  const [database, setDatabase] = useState<CatalogDatabaseStatus>({ source: 'embedded', count: EMBEDDED_CATALOG.length });
+  const [viewport, setViewport] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
+  const [savedRevision, setSavedRevision] = useState(initial.updatedAt);
+  const [toast, setToast] = useState<{ type: 'ok' | 'error'; message: string }>();
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [offlineOpen, setOfflineOpen] = useState(false);
+  const [contextTarget, setContextTarget] = useState<ContextTarget>();
+  const [instrumentWindows, setInstrumentWindows] = useState<InstrumentWindowState[]>([]);
+  const [theme, setTheme] = useState<Theme>(loadThemePreference);
+  const [themeClock, setThemeClock] = useState(() => Date.now());
+  const workerRef = useRef<Worker | null>(null);
+  const importRef = useRef<HTMLInputElement>(null);
+  const moduleImportRef = useRef<HTMLInputElement>(null);
+  const windowZ = useRef(120);
 
-HПИЬ™X]Q[[Ф›Ъ™XЭ
+  const simulationProject = useCallback((source: BitWireProject) => {
+    const next = structuredClone(source);
+    for (const module of next.modules) {
+      if (!module.enabled) for (const id of module.memberIds) {
+        const component = next.components.find(item => item.id === id);
+        if (component) component.enabled = false;
+      }
+    }
+    return next;
+  }, []);
 
-JKЭ\њ™[ќВ€ЫЫњЭИ›Ъ™XЭ\]K™\Щ][™Л™YЛШ[•[™ЛШ[”™YИHH\ЩT›Ъ™XЭ\ЭЬћJ[љ]X[
-NВ€ЫЫњЭЬЩ[XЭYЩ]Щ[XЭYHH\ЩTЭ]OЭљ[™ЦЧOЉЧJNВ€ЫЫњЭЬЩ[XЭY[Щ[RYЩ]Щ[XЭY[Щ[RYHH\ЩTЭ]OЭљ[™ПЉ
-NВ€ЫЫњЭШXЭ]™S[Щ[RYЩ]XЭ]™S[Щ[RYHH\ЩTЭ]OЭљ[™ПЉ
-NВ€ЫЫњЭЫ[Щ[SXњ\ћKЩ][Щ[SXњ\ћWHH\ЩTЭ]OШ]™Y[Щ[VЧOЉШY[Щ[SXњ\ћJNВ€ЫЫњЭЭЫЫЩ]ЫЫHH\ЩTЭ]OЫЫ[ЩOЉ	ЬЩ[XЭ	КNВ€ЫЫњЭЬќ[›љ[™ЛЩ]ќ[›љ[™ЧHH\ЩTЭ]J[ЩJNВ€ЫЫњЭЬЬYYЩ]ЬYYHH\ЩTЭ]JJNВ€ЫЫњЭЬЫ\ЪЭЩ]Ы\ЪЭHH\ЩTЭ]OЪ[][][Ы”Ы\ЪЭЉ
-NВ€ЫЫњЭЬШ[\\ЛЩ]Ш[\\ЧHH\ЩTЭ]OЪ[][][Ы”Ы\ЪЭЧOЉЧJNВ€ЫЫњЭШШ][ЩРЫЫ\ЩYЩ]Ш][ЩРЫЫ\ЩYHH\ЩTЭ]J[ЩJNВ€ЫЫњЭЪ[њЬXЭЬђЫЫ\ЩYЩ][њЬXЭЬђЫЫ\ЩYHH\ЩTЭ]JќYJNВ€ЫЫњЭЪ[њЭќ[Y[ќРЫЫ\ЩYЩ][њЭќ[Y[ќРЫЫ\ЩYHH\ЩTЭ]J[ЩJNВ€ЫЫњЭЩ]X\ЩKЩ]]X\ЩWHH\ЩTЭ]OШ][ЩС]X\ЩTЭ]\ПЉИЫЭ\ЩN€	Щ[X™YY	ЛЫЭ[ќ€SP‘QQРРUSСЛ›[™ЭJNВ€ЫЫњЭЭљY]ЬЬќЩ]љY]ЬЬќHH\ЩTЭ]OљY]ЬЬќЭ]OЉИ€ЋLN€ЌМШШ[N€ЌОJNВ€ЫЫњЭЬШ]™Y™]љ\Ъ[Ы‹Щ]Ш]™Y™]љ\Ъ[Ы—HH\ЩTЭ]J[љ]X[ќ\]Y]
-NВ€ЫЫњЭЭШ\ЭЩ]Ш\ЭHH\ЩTЭ]OИ\N€	ЫЪЙИ	Щ\њ›Ь‰ОИY\ЬШYЩN€Эљ[™ИOЉ
-NВ€ЫЫњЭЪ[Ь[‹Щ][Ь[—HH\ЩTЭ]J[ЩJNВ€ЫЫњЭШX›Э]Ь[‹Щ]X›Э]Ь[—HH\ЩTЭ]J[ЩJNВ€ЫЫњЭЫЩ™›[™SЬ[‹Щ]Щ™›[™SЬ[—HH\ЩTЭ]J[ЩJNВ€ЫЫњЭШЫЫќ^\™Щ]Щ]ЫЫќ^\™Щ]HH\ЩTЭ]OЫЫќ^\™Щ]Љ
-NВ€ЫЫњЭЪ[њЭќ[Y[ќЪ[™ЭЬЛЩ][њЭќ[Y[ќЪ[™ЭЬЧHH\ЩTЭ]O[њЭќ[Y[ќЪ[™ЭФЭ]VЧOЉЧJNВ€ЫЫњЭЭ[YKЩ][YWHH\ЩTЭ]O[YOЉШY[YT™Y™\™[ЩJNВ€ЫЫњЭЭ[YPЫШЪЛЩ][YPЫШЪЧHH\ЩTЭ]J
+  useEffect(() => {
+    verifyCatalogDatabase().then(setDatabase);
+    const worker = new Worker(new URL('./engine/simulator.worker.ts', import.meta.url), { type: 'module' });
+    worker.onmessage = event => {
+      if (event.data?.type !== 'snapshot') return;
+      const next = event.data.snapshot as SimulationSnapshot;
+      setSnapshot(next);
+      setSamples(current => [...current.slice(-149), next]);
+    };
+    worker.onerror = () => setToast({ type: 'error', message: 'El motor de simulaciГіn se ha detenido; recarga para reiniciarlo.' });
+    workerRef.current = worker;
+    return () => worker.terminate();
+  }, []);
+  useEffect(() => {
+    const preventNativeMenu = (event:MouseEvent) => event.preventDefault();
+    document.addEventListener('contextmenu',preventNativeMenu);
+    return () => document.removeEventListener('contextmenu',preventNativeMenu);
+  },[]);
 
-HO€]K››ЭК
-JNВ€ЫЫњЭЫЬљЩ\”™Y€H\ЩT™YЏЫЬљЩ\€ќ[Љќ[
-NВ€ЫЫњЭ[\Ьќ™Y€H\ЩT™YЏS[њ][[Y[ќЉќ[
-NВ€ЫЫњЭ[Щ[R[\Ьќ™Y€H\ЩT™YЏS[њ][[Y[ќЉќ[
-NВ€ЫЫњЭЪ[™ЭЦ€H\ЩT™YЉLЊ
-NВ‚€ЫЫњЭЪ[][][Ы”›Ъ™XЭH\ЩPШ[XЪК
-ЫЭ\ЩN€љ]Ъ\™T›Ъ™XЭ
-HO€В€ЫЫњЭ™^HЭќXЭ\™YЫЫ™JЫЭ\ЩJNВ€›Ь€
-ЫЫњЭ[Щ[HЩ€™^›[Щ[\КHВ€Y€
-[[Щ[K™[X›Y
-H›Ь€
-ЫЫњЭYЩ€[Щ[K›Y[X™\’YКHВ€ЫЫњЭЫЫ\Ы™[ќH™^ЫЫ\Ы™[ќЛ™љ[™
-][HO€][KљYOOHY
-NВ€Y€
-ЫЫ\Ы™[ќ
-HЫЫ\Ы™[ќ™[X›YH[ЩNВ€B€B€™]\›€™^В€KЧJNВ‚€\ЩQY™™XЭ
+  useEffect(() => { workerRef.current?.postMessage({ type: 'project', project: simulationProject(project) }); }, [project, simulationProject]);
+  useEffect(() => { workerRef.current?.postMessage({ type: 'control', running, speed }); }, [running, speed]);
+  useEffect(() => { if (!toast) return; const id = window.setTimeout(() => setToast(undefined), 3200); return () => clearTimeout(id); }, [toast]);
+  useEffect(() => {
+    if (theme !== 'auto') return;
+    const refresh = () => setThemeClock(Date.now());
+    const id = window.setInterval(refresh, 60_000);
+    document.addEventListener('visibilitychange', refresh);
+    return () => { window.clearInterval(id); document.removeEventListener('visibilitychange', refresh); };
+  }, [theme]);
 
+  const changeTheme = useCallback((next: Theme) => {
+    saveThemePreference(next);
+    setTheme(next);
+    setThemeClock(Date.now());
+  }, []);
 
-HO€В€™\љYћPШ][ЩС]X\ЩJ
-Kќ[ЉЩ]]X\ЩJNВ€ЫЫњЭЫЬљЩ\€H™]ИЫЬљЩ\Љ™]ИT“
-	Л‹Щ[™Ъ[™KЬЪ[][]Ь‹ќЫЬљЩ\‹ќЙЛ[\Ьќ›Y]Kќ\›
-KИ\N€	Ы[Щ[IИJNВ€ЫЬљЩ\‹›Ы›Y\ЬШYЩHH]™[ќO€В€Y€
-]™[ќ™]OЛќ\HOOH	ЬЫ\ЪЭ	КH™]\›ЋВ€ЫЫњЭ™^H]™[ќ™]KњЫ\ЪЭ\ИЪ[][][Ы”Ы\ЪЭВ€Щ]Ы\ЪЭ
-™^
-NВ€Щ]Ш[\\КЭ\њ™[ќO€Л‹‹Э\њ™[ќњЫXЩJLMJK™^JNВ€NВ€ЫЬљЩ\‹›Ы™\њ›Ь€H
+  const save = useCallback(() => {
+    saveProjectLocally(project); setSavedRevision(project.updatedAt);
+    setToast({ type: 'ok', message: 'Proyecto guardado en este dispositivo.' });
+  }, [project]);
 
-HO€Щ]Ш\Э
-И\N€	Щ\њ›Ь‰ЛY\ЬШYЩN€	С[[ЭЬ€HЪ[][XЪpмЫ€ЩHH][љYОИ™XШ\™ШH\H™Z[љXЪX\›Л‰ИJNВ€ЫЬљЩ\”™Y‹Э\њ™[ќHЫЬљЩ\ЋВ€™]\›€
+  const newProject = useCallback(() => {
+    if (project.updatedAt !== savedRevision && !window.confirm('Hay cambios sin guardar. ВїCrear un proyecto nuevo?')) return;
+    reset(createBlankProject()); setSelected([]); setSelectedModuleId(undefined); setActiveModuleId(undefined); setRunning(false); setInstrumentWindows([]);
+  }, [project.updatedAt, savedRevision, reset]);
 
-HO€ЫЬљЩ\‹ќ\›Z[]J
-NВ€KЧJNВ€\ЩQY™™XЭ
+  const doImport = async (file?: File) => {
+    if (!file) return;
+    try {
+      const next = await importProject(file); reset(next); setSelected([]); setSelectedModuleId(undefined); setActiveModuleId(undefined); setRunning(false); setInstrumentWindows([]); setToast({ type: 'ok', message: `Proyecto В«${next.name}В» importado.` });
+    } catch (error) { setToast({ type: 'error', message: error instanceof Error ? error.message : 'No se pudo importar el proyecto.' }); }
+  };
 
+  const addDefinition = (definition: ComponentDefinition) => {
+    const world = { x: (window.innerWidth * .5 - viewport.x) / viewport.scale, y: (window.innerHeight * .45 - viewport.y) / viewport.scale };
+    const instanceScale = Math.max(1e-9,Math.min(20,1/viewport.scale));
+    const component = createInstance(definition.id, world.x - definition.width*instanceScale/2, world.y - definition.height*instanceScale/2, uid('node'), instanceScale);
+    update(draft => { draft.components.push(component); if(activeModuleId) draft.modules.find(module=>module.id===activeModuleId)?.memberIds.push(component.id); });
+    setSelected([component.id]); setSelectedModuleId(undefined);
+  };
 
-HO€В€ЫЫњЭ™]™[ќ]]™SY[ќHH
-]™[ќ“[Э\ЩQ]™[ќ
-HO€]™[ќњ™]™[ќY][
+  const saveSelectedModule = () => {
+    if (!selectedModule) return;
+    setModuleLibrary(saveModuleToLibrary(project,selectedModule));
+    setToast({type:'ok',message:`В«${selectedModule.name}В» guardado en la biblioteca de encapsulados.`});
+  };
 
-NВ€ШЭ[Y[ќY]™[ќ\Э[™\Љ	ШЫЫќ^Y[ќIЛ™]™[ќ]]™SY[ќJNВ€™]\›€
+  const insertModule = (saved: SavedModule) => {
+    const world = { x:(window.innerWidth*.5-viewport.x)/viewport.scale, y:(window.innerHeight*.45-viewport.y)/viewport.scale };
+    let insertedId='';
+    update(draft=>{ const module=insertSavedModule(draft,saved,world.x-saved.width/2,world.y-saved.height/2,activeModuleId); insertedId=module.id; });
+    queueMicrotask(()=>{ if(insertedId){ setSelected([]); setSelectedModuleId(insertedId); } });
+  };
 
-HO€ШЭ[Y[ќњ™[[Э™Q]™[ќ\Э[™\Љ	ШЫЫќ^Y[ќIЛ™]™[ќ]]™SY[ќJNВ€KЧJNВ‚€\ЩQY™™XЭ
+  const doImportModule = async(file?:File) => {
+    if(!file)return;
+    try{ const saved=await importModule(file); setModuleLibrary(loadModuleLibrary()); setToast({type:'ok',message:`Encapsulado В«${saved.name}В» importado.`}); }
+    catch(error){setToast({type:'error',message:error instanceof Error?error.message:'No se pudo importar el encapsulado.'});}
+  };
 
+  const deleteSelection = useCallback(() => {
+    if (selectedModuleId) {
+      const moduleIds = new Set([selectedModuleId]);
+      let changed = true;
+      while (changed) { changed = false; for (const module of project.modules) if (module.parentModuleId && moduleIds.has(module.parentModuleId) && !moduleIds.has(module.id)) { moduleIds.add(module.id); changed = true; } }
+      update(draft => {
+        const componentIds = new Set(draft.modules.filter(module=>moduleIds.has(module.id)).flatMap(module=>module.memberIds));
+        draft.modules = draft.modules.filter(module => !moduleIds.has(module.id));
+        draft.components = draft.components.filter(component=>!componentIds.has(component.id));
+        draft.wires = draft.wires.filter(wire=>!moduleIds.has(wire.from.componentId)&&!moduleIds.has(wire.to.componentId)&&!componentIds.has(wire.from.componentId)&&!componentIds.has(wire.to.componentId));
+        for (const module of draft.modules) module.memberIds = module.memberIds.filter(id=>!componentIds.has(id));
+      });
+      if(activeModuleId && moduleIds.has(activeModuleId))setActiveModuleId(undefined);
+      setSelectedModuleId(undefined); return;
+    }
+    if (!selected.length) return;
+    const ids = new Set(selected);
+    update(draft => {
+      draft.components = draft.components.filter(component => !ids.has(component.id));
+      draft.wires = draft.wires.filter(wire => !ids.has(wire.from.componentId) && !ids.has(wire.to.componentId));
+      for (const module of draft.modules) module.memberIds = module.memberIds.filter(id => !ids.has(id));
+    });
+    setSelected([]);
+  }, [selected, selectedModuleId, activeModuleId, update, project.modules]);
 
-HO€ИЫЬљЩ\”™Y‹Э\њ™[ќЛњЬЭY\ЬШYЩJИ\N€	Ь›Ъ™XЭ	Л›Ъ™XЭ€Ъ[][][Ы”›Ъ™XЭ
-›Ъ™XЭ
-HJNИKЬ›Ъ™XЭЪ[][][Ы”›Ъ™XЭJNВ€\ЩQY™™XЭ
+  const duplicateSelection = useCallback(() => {
+    if (!selected.length) return;
+    let duplicated: string[] = [];
+    update(draft => { duplicated = duplicateComponents(draft, selected); });
+    setSelected(duplicated);
+  }, [selected, update]);
 
+  const patchModule = (patch: Partial<ModuleArea>) => {
+    if (!selectedModuleId) return;
+    update(draft => { const module = draft.modules.find(item => item.id === selectedModuleId); if (module) Object.assign(module, patch); });
+  };
 
-HO€ИЫЬљЩ\”™Y‹Э\њ™[ќЛњЬЭY\ЬШYЩJИ\N€	ШЫЫќ›Ы	Лќ[›љ[™ЛЬYYJNИKЬќ[›љ[™ЛЬYYJNВ€\ЩQY™™XЭ
+  const focusInstrumentWindow = useCallback((id:string) => {
+    const z=++windowZ.current;
+    setInstrumentWindows(current=>current.map(item=>item.id===id?{...item,z}:item));
+  },[]);
 
+  const openInstrumentWindow = useCallback((componentId:string) => {
+    const component=project.components.find(item=>item.id===componentId);
+    const definition=component&&EMBEDDED_CATALOG.find(item=>item.id===component.definitionId);
+    if(!component||!definition?.customGui)return;
+    setInstrumentWindows(current=>{
+      const existing=current.find(item=>item.componentId===componentId);
+      const z=++windowZ.current;
+      if(existing)return current.map(item=>item.id===existing.id?{...item,z,minimized:false}:item);
+      const expanded=localStorage.getItem('bitwire:instrument-professional-view')==='1';
+      const offset=(current.length%6)*24,width=expanded?960:580,height=expanded?610:370;
+      return [...current,{id:`instrument-window-${componentId}`,componentId,x:Math.max(8,Math.min(window.innerWidth-width-16,310+offset)),y:Math.max(58,Math.min(window.innerHeight-height-32,82+offset)),width,height,z,expanded,minimized:false,maximized:false}];
+    });
+  },[project.components]);
 
-HO€ИY€
-]Ш\Э
-H™]\›ЋИЫЫњЭYHЪ[™ЭЛњЩ][Y[Э]
+  const deleteModuleDirect = useCallback((moduleId:string) => {
+    const moduleIds=new Set([moduleId]);let changed=true;
+    while(changed){changed=false;for(const module of project.modules)if(module.parentModuleId&&moduleIds.has(module.parentModuleId)&&!moduleIds.has(module.id)){moduleIds.add(module.id);changed=true;}}
+    const componentIds=new Set(project.modules.filter(module=>moduleIds.has(module.id)).flatMap(module=>module.memberIds));
+    update(draft=>{draft.modules=draft.modules.filter(module=>!moduleIds.has(module.id));draft.components=draft.components.filter(component=>!componentIds.has(component.id));draft.wires=draft.wires.filter(wire=>!moduleIds.has(wire.from.componentId)&&!moduleIds.has(wire.to.componentId)&&!componentIds.has(wire.from.componentId)&&!componentIds.has(wire.to.componentId));for(const module of draft.modules)module.memberIds=module.memberIds.filter(id=>!componentIds.has(id));});
+    setInstrumentWindows(current=>current.filter(item=>!componentIds.has(item.componentId)));
+    if(activeModuleId&&moduleIds.has(activeModuleId))setActiveModuleId(undefined);setSelectedModuleId(undefined);
+  },[activeModuleId,project.modules,update]);
 
+  const runContextAction = useCallback((action:ContextAction) => {
+    const target=contextTarget;if(!target)return;
+    if(target.kind==='canvas'){
+      if(action==='select-tool')setTool('select');if(action==='wire-tool')setTool('wire');if(action==='module-tool')setTool('module');return;
+    }
+    if(target.kind==='wire'){
+      if(action==='delete')update(draft=>{draft.wires=draft.wires.filter(wire=>wire.id!==target.id);});return;
+    }
+    if(target.kind==='component'){
+      const id=target.id;
+      if(action==='instrument'){openInstrumentWindow(id);return;}
+      if(action==='inspect'){setSelected([id]);setSelectedModuleId(undefined);setInspectorCollapsed(false);return;}
+      if(action==='duplicate'){let duplicated:string[]=[];update(draft=>{duplicated=duplicateComponents(draft,[id]);});if(duplicated.length)setSelected(duplicated);return;}
+      if(action==='delete'){update(draft=>{draft.components=draft.components.filter(item=>item.id!==id);draft.wires=draft.wires.filter(wire=>wire.from.componentId!==id&&wire.to.componentId!==id);for(const module of draft.modules)module.memberIds=module.memberIds.filter(member=>member!==id);});setInstrumentWindows(current=>current.filter(item=>item.componentId!==id));setSelected([]);return;}
+      update(draft=>{const item=draft.components.find(component=>component.id===id);if(!item)return;if(action==='rotate')item.rotation=(item.rotation+90)%360;if(action==='toggle')item.enabled=!item.enabled;if(action==='lock')item.locked=!item.locked;});return;
+    }
+    const module=project.modules.find(item=>item.id===target.id);if(!module)return;
+    if(action==='inspect'){setSelected([]);setSelectedModuleId(module.id);setInspectorCollapsed(false);return;}
+    if(action==='enter-module'){setActiveModuleId(module.id);setSelected([]);setSelectedModuleId(module.id);return;}
+    if(action==='save-module'){setModuleLibrary(saveModuleToLibrary(project,module));setToast({type:'ok',message:`В«${module.name}В» guardado en la biblioteca.`});return;}
+    if(action==='delete'){deleteModuleDirect(module.id);return;}
+    update(draft=>{const item=draft.modules.find(candidate=>candidate.id===module.id);if(!item)return;if(action==='toggle')item.enabled=!item.enabled;if(action==='collapse-module')item.collapsed=!item.collapsed;});
+  },[contextTarget,deleteModuleDirect,openInstrumentWindow,project,update]);
 
-HO€Щ]Ш\Э
-[™Yљ[™Y
-KМЊ
-NИ™]\›€
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      const typing = event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') { event.preventDefault(); save(); return; }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'n') { event.preventDefault(); newProject(); return; }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') { event.preventDefault(); event.shiftKey ? redo() : undo(); return; }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'y') { event.preventDefault(); redo(); return; }
+      if (typing) return;
+      if (event.key === 'Delete' || event.key === 'Backspace') deleteSelection();
+      else if (event.key.toLowerCase() === 'v') setTool('select');
+      else if (event.key.toLowerCase() === 'w') setTool('wire');
+      else if (event.key.toLowerCase() === 'h') setTool('pan');
+      else if (event.key === 'Escape') { setSelected([]); setSelectedModuleId(undefined); setActiveModuleId(undefined); setTool('select'); }
+    };
+    window.addEventListener('keydown', handler); return () => window.removeEventListener('keydown', handler);
+  }, [deleteSelection, newProject, redo, save, undo]);
 
-HO€ЫX\•[Y[Э]
-Y
-NИKЭШ\ЭJNВ€\ЩQY™™XЭ
+  const selectedModule = project.modules.find(module => module.id === selectedModuleId);
+  const activeWarnings = snapshot?.warnings.length ?? 0;
+  const resolvedTheme = resolveTheme(theme, new Date(themeClock));
 
-
-HO€В€Y€
-[YHOOH	Ш]]ЙКH™]\›ЋВ€ЫЫњЭ™Yњ™\ЪH
-
-HO€Щ][YPЫШЪК]K››ЭК
-JNВ€ЫЫњЭYHЪ[™ЭЛњЩ][ќ\ќ[
-™Yњ™\ЪЊМ
-NВ€ШЭ[Y[ќY]™[ќ\Э[™\Љ	Эљ\ЪXљ[]XЪ[™ЩIЛ™Yњ™\Ъ
-NВ€™]\›€
-
-HO€ИЪ[™ЭЛЫX\’[ќ\ќ[
-Y
-NИШЭ[Y[ќњ™[[Э™Q]™[ќ\Э[™\Љ	Эљ\ЪXљ[]XЪ[™ЩIЛ™Yњ™\Ъ
-NИNВ€KЭ[YWJNВ‚€ЫЫњЭЪ[™ЩU[YHH\ЩPШ[XЪК
-™^€[YJHO€В€Ш]™U[YT™Y™\™[ЩJ™^
-NВ€Щ][YJ™^
-NВ€Щ][YPЫШЪК]K››ЭК
-JNВ€KЧJNВ‚€ЫЫњЭШ]™HH\ЩPШ[XЪК
-
-HO€В€Ш]™T›Ъ™XЭШШ[J›Ъ™XЭ
-NИЩ]Ш]™Y™]љ\Ъ[ЫЉ›Ъ™XЭќ\]Y]
-NВ€Щ]Ш\Э
-И\N€	ЫЪЙЛY\ЬШYЩN€	Ф›ЮYXЭИЭX\™YИ[€\ЭH\ЬЬЪ]]›Л‰ИJNВ€KЬ›Ъ™XЭJNВ‚€ЫЫњЭ™]Ф›Ъ™XЭH\ЩPШ[XЪК
-
-HO€В€Y€
-›Ъ™XЭќ\]Y]OOHШ]™Y™]љ\Ъ[Ы€	‰€]Ъ[™ЭЛЫЫ™љ\›J	Т^HШ[Xљ[ЬИЪ[€ЭX\™\‹€0ЇРЬ™X\€[€›ЮYXЭИќY]›ПЙКJH™]\›ЋВ€™\Щ]
-Ь™X]P›[љФ›Ъ™XЭ
-
-JNИЩ]Щ[XЭY
-ЧJNИЩ]Щ[XЭY[Щ[RY
-[™Yљ[™Y
-NИЩ]XЭ]™S[Щ[RY
-[™Yљ[™Y
-NИЩ]ќ[›љ[™К[ЩJNИЩ][њЭќ[Y[ќЪ[™ЭЬКЧJNВ€KЬ›Ъ™XЭќ\]Y]Ш]™Y™]љ\Ъ[Ы‹™\Щ]JNВ‚€ЫЫњЭТ[\ЬќH\Ю[И
-љ[OО€љ[JHO€В€Y€
-Yљ[JH™]\›ЋВ€ћHВ€ЫЫњЭ™^H]ШZ][\Ьќ›Ъ™XЭ
-љ[JNИ™\Щ]
-™^
-NИЩ]Щ[XЭY
-ЧJNИЩ]Щ[XЭY[Щ[RY
-[™Yљ[™Y
-NИЩ]XЭ]™S[Щ[RY
-[™Yљ[™Y
-NИЩ]ќ[›љ[™К[ЩJNИЩ][њЭќ[Y[ќЪ[™ЭЬКЧJNИЩ]Ш\Э
-И\N€	ЫЪЙЛY\ЬШYЩN€›ЮYXЭИ0ЄЙЫ™^›[Y_p®И[\ЬќYЛJNВ€HШ]Ъ
-\њ›ЬЉHИЩ]Ш\Э
-И\N€	Щ\њ›Ь‰ЛY\ЬШYЩN€\њ›Ь€[њЭ[Щ[Щ€\њ›Ь€И\њ›Ь‹›Y\ЬШYЩH€	У›ИЩHYИ[\Ьќ\€[›ЮYXЭЛ‰ИJNИB€NВ‚€ЫЫњЭYYљ[љ][Ы€H
-Yљ[љ][ЫЋ€ЫЫ\Ы™[ќYљ[љ][ЫЉHO€В€ЫЫњЭЫЬ›HИ€
-Ъ[™ЭЛљ[›™\•ЪY
-€ЌHHљY]ЬЬќћ
-HИљY]ЬЬќњШШ[KN€
-Ъ[™ЭЛљ[›™\’ZYЪ
-€ЌHHљY]ЬЬќћJHИљY]ЬЬќњШШ[HNВ€ЫЫњЭ[њЭ[ЩTШШ[HHX]›X^
-YKNKX]›Z[ЉЊKЭљY]ЬЬќњШШ[JJNВ€ЫЫњЭЫЫ\Ы™[ќHЬ™X]R[њЭ[ЩJYљ[љ][Ы‹љYЫЬ›ћHYљ[љ][Ы‹ќЪY
-љ[њЭ[ЩTШШ[KМ‹ЫЬ›ћHHYљ[љ][Ы‹љZYЪ
-љ[њЭ[ЩTШШ[KМ‹ZY
-	Ы›ЩIКK[њЭ[ЩTШШ[JNВ€\]JYќO€ИYќЫЫ\Ы™[ќЛњ\Ъ
-ЫЫ\Ы™[ќ
-NИYЉXЭ]™S[Щ[RY
-HYќ›[Щ[\Л™љ[™
-[Щ[OO›[Щ[KљYOOXXЭ]™S[Щ[RY
-OЛ›Y[X™\’YЛњ\Ъ
-ЫЫ\Ы™[ќљY
-NИJNВ€Щ]Щ[XЭY
-ШЫЫ\Ы™[ќљYJNИЩ]Щ[XЭY[Щ[RY
-[™Yљ[™Y
-NВ€NВ‚€ЫЫњЭШ]™TЩ[XЭY[Щ[HH
-
-HO€В€Y€
-\Щ[XЭY[Щ[JH™]\›ЋВ€Щ][Щ[SXњ\ћJШ]™S[Щ[UУXњ\ћJ›Ъ™XЭЩ[XЭY[Щ[JJNВ€Щ]Ш\Э
-Э\N‰ЫЪЙЛY\ЬШYЩN0ЄЙЬЩ[XЭY[Щ[K›[Y_p®ИЭX\™YИ[€HљX›[ЭXШHH[Ш\Э[YЬЛJNВ€NВ‚€ЫЫњЭ[њЩ\ќ[Щ[HH
-Ш]™Y€Ш]™Y[Щ[JHO€В€ЫЫњЭЫЬ›HИЉЪ[™ЭЛљ[›™\•ЪY
-‹ЌK]љY]ЬЬќћ
-KЭљY]ЬЬќњШШ[KNЉЪ[™ЭЛљ[›™\’ZYЪ
-‹ЌK]љY]ЬЬќћJKЭљY]ЬЬќњШШ[HNВ€][њЩ\ќYYIЙОВ€\]JYќOћИЫЫњЭ[Щ[OZ[њЩ\ќШ]™Y[Щ[JYќШ]™YЫЬ›ћ\Ш]™YќЪYМ‹ЫЬ›ћK\Ш]™YљZYЪМ‹XЭ]™S[Щ[RY
-NИ[њЩ\ќYY[[Щ[KљYИJNВ€]Y]YSZXЬ›Э\ЪК
-
-OOћИYЉ[њЩ\ќYY
-^ИЩ]Щ[XЭY
-ЧJNИЩ]Щ[XЭY[Щ[RY
-[њЩ\ќYY
-NИHJNВ€NВ‚€ЫЫњЭТ[\Ьќ[Щ[HH\Ю[Кљ[OО‘љ[JHO€В€YЉYљ[J\™]\›ЋВ€ћ^ИЫЫњЭШ]™YX]ШZ][\Ьќ[Щ[Jљ[JNИЩ][Щ[SXњ\ћJШY[Щ[SXњ\ћJ
-JNИЩ]Ш\Э
-Э\N‰ЫЪЙЛY\ЬШYЩN[Ш\Э[YИ0ЄЙЬШ]™Y›[Y_p®И[\ЬќYЛJNИB€Ш]Ъ
-\њ›ЬЉ^ЬЩ]Ш\Э
-Э\N‰Щ\њ›Ь‰ЛY\ЬШYЩN™\њ›Ь€[њЭ[Щ[Щ€\њ›ЬЏЩ\њ›Ь‹›Y\ЬШYЩN‰У›ИЩHYИ[\Ьќ\€[[Ш\Э[YЛ‰ЯJNЯB€NВ‚€ЫЫњЭ[]TЩ[XЭ[Ы€H\ЩPШ[XЪК
-
-HO€В€Y€
-Щ[XЭY[Щ[RY
-HВ€ЫЫњЭ[Щ[RYИH™]ИЩ]
-ЬЩ[XЭY[Щ[RYJNВ€]Ъ[™ЩYHќYNВ€Ъ[H
-Ъ[™ЩY
-HИЪ[™ЩYH[ЩNИ›Ь€
-ЫЫњЭ[Щ[HЩ€›Ъ™XЭ›[Щ[\КHY€
-[Щ[Kњ\™[ќ[Щ[RY	‰€[Щ[RYЛљ\К[Щ[Kњ\™[ќ[Щ[RY
-H	‰€[[Щ[RYЛљ\К[Щ[KљY
-JHИ[Щ[RYЛY
-[Щ[KљY
-NИЪ[™ЩYHќYNИHB€\]JYќO€В€ЫЫњЭЫЫ\Ы™[ќYИH™]ИЩ]
-Yќ›[Щ[\Л™љ[\Љ[Щ[OO›[Щ[RYЛљ\К[Щ[KљY
-JK™›]X\
-[Щ[OO›[Щ[K›Y[X™\’YКJNВ€Yќ›[Щ[\ИHYќ›[Щ[\Л™љ[\Љ[Щ[HO€[[Щ[RYЛљ\К[Щ[KљY
-JNВ€YќЫЫ\Ы™[ќИHYќЫЫ\Ы™[ќЛ™љ[\ЉЫЫ\Ы™[ќO€XЫЫ\Ы™[ќYЛљ\КЫЫ\Ы™[ќљY
-JNВ€YќќЪ\™\ИHYќќЪ\™\Л™љ[\ЉЪ\™OO€[[Щ[RYЛљ\КЪ\™K™њ›ЫKЫЫ\Ы™[ќY
-I‰€[[Щ[RYЛљ\КЪ\™KќЛЫЫ\Ы™[ќY
-I‰€XЫЫ\Ы™[ќYЛљ\КЪ\™K™њ›ЫKЫЫ\Ы™[ќY
-I‰€XЫЫ\Ы™[ќYЛљ\КЪ\™KќЛЫЫ\Ы™[ќY
-JNВ€›Ь€
-ЫЫњЭ[Щ[HЩ€Yќ›[Щ[\КH[Щ[K›Y[X™\’YИH[Щ[K›Y[X™\’YЛ™љ[\ЉYO€XЫЫ\Ы™[ќYЛљ\КY
-JNВ€JNВ€YЉXЭ]™S[Щ[RY	‰€[Щ[RYЛљ\КXЭ]™S[Щ[RY
-J\Щ]XЭ]™S[Щ[RY
-[™Yљ[™Y
-NВ€Щ]Щ[XЭY[Щ[RY
-[™Yљ[™Y
-NИ™]\›ЋВ€B€Y€
-\Щ[XЭY›[™Э
-H™]\›ЋВ€ЫЫњЭYИH™]ИЩ]
-Щ[XЭY
-NВ€\]JYќO€В€YќЫЫ\Ы™[ќИHYќЫЫ\Ы™[ќЛ™љ[\ЉЫЫ\Ы™[ќO€ZYЛљ\КЫЫ\Ы™[ќљY
-JNВ€YќќЪ\™\ИHYќќЪ\™\Л™љ[\ЉЪ\™HO€ZYЛљ\КЪ\™K™њ›ЫKЫЫ\Ы™[ќY
-H	‰€ZYЛљ\КЪ\™KќЛЫЫ\Ы™[ќY
-JNВ€›Ь€
-ЫЫњЭ[Щ[HЩ€Yќ›[Щ[\КH[Щ[K›Y[X™\’YИH[Щ[K›Y[X™\’YЛ™љ[\ЉYO€ZYЛљ\КY
-JNВ€JNВ€Щ]Щ[XЭY
-ЧJNВ€KЬЩ[XЭYЩ[XЭY[Щ[RYXЭ]™S[Щ[RY\]K›Ъ™XЭ›[Щ[\ЧJNВ‚€ЫЫњЭ\XШ]TЩ[XЭ[Ы€H\ЩPШ[XЪК
-
-HO€В€Y€
-\Щ[XЭY›[™Э
-H™]\›ЋВ€]\XШ]Y€Эљ[™ЦЧHHЧNВ€\]JYќO€И\XШ]YH\XШ]PЫЫ\Ы™[ќКYќЩ[XЭY
-NИJNВ€Щ]Щ[XЭY
-\XШ]Y
-NВ€KЬЩ[XЭY\]WJNВ‚€ЫЫњЭ]Ъ[Щ[HH
-]Ъ€\ќX[[Щ[P\™XOЉHO€В€Y€
-\Щ[XЭY[Щ[RY
-H™]\›ЋВ€\]JYќO€ИЫЫњЭ[Щ[HHYќ›[Щ[\Л™љ[™
-][HO€][KљYOOHЩ[XЭY[Щ[RY
-NИY€
-[Щ[JHШљ™XЭ\ЬЪYЫЉ[Щ[K]Ъ
-NИJNВ€NВ‚€ЫЫњЭ›ШЭ\Т[њЭќ[Y[ќЪ[™ЭИH\ЩPШ[XЪК
-YњЭљ[™КHO€В€ЫЫњЭЏJКЭЪ[™ЭЦ‹Э\њ™[ќВ€Щ][њЭќ[Y[ќЪ[™ЭЬКЭ\њ™[ќOЭ\њ™[ќ›X\
-][OOљ][KљYOOZYЮЛ‹‹љ][KџNљ][JJNВ€KЧJNВ‚€ЫЫњЭЬ[’[њЭќ[Y[ќЪ[™ЭИH\ЩPШ[XЪК
-ЫЫ\Ы™[ќYњЭљ[™КHO€В€ЫЫњЭЫЫ\Ы™[ќ\›Ъ™XЭЫЫ\Ы™[ќЛ™љ[™
-][OOљ][KљYOOXЫЫ\Ы™[ќY
-NВ€ЫЫњЭYљ[љ][ЫЏXЫЫ\Ы™[ќ	‰‘SP‘QQРРUSСЛ™љ[™
-][OOљ][KљYOOXЫЫ\Ы™[ќ™Yљ[љ][Ы’Y
-NВ€YЉXЫЫ\Ы™[ќYYљ[љ][ЫЏЛЭ\ЭЫQЭZJ\™]\›ЋВ€Щ][њЭќ[Y[ќЪ[™ЭЬКЭ\њ™[ќOћВ€ЫЫњЭ^\Э[™ПXЭ\њ™[ќ™љ[™
-][OOљ][KЫЫ\Ы™[ќYOOXЫЫ\Ы™[ќY
-NВ€ЫЫњЭЏJКЭЪ[™ЭЦ‹Э\њ™[ќВ€YЉ^\Э[™К\™]\›€Э\њ™[ќ›X\
-][OOљ][KљYOOY^\Э[™ЛљYЮЛ‹‹љ][K‹Z[љ[Z^™Y™[Щ_Nљ][JNВ€ЫЫњЭ^[™Y[ШШ[ЭЬYЩK™Щ]][J	Шљ]Ъ\™Nљ[њЭќ[Y[ќ\›Щ™\ЬЪ[Ы[]љY]ЙКOOOIМIОВ€ЫЫњЭЩ™њЩ]JЭ\њ™[ќ›[™Э	MЉJЊЌЪYY^[™YОMЊЌNZYЪY^[™YНЊLЊНМВ€™]\›€Л‹‹Э\њ™[ќЪY[њЭќ[Y[ќ]Ъ[™ЭЛIШЫЫ\Ы™[ќYXЫЫ\Ы™[ќY“X]›X^
-X]›Z[ЉЪ[™ЭЛљ[›™\•ЪY]ЪYLM‹МL
-ЫЩ™њЩ]
-JKN“X]›X^
-NX]›Z[ЉЪ[™ЭЛљ[›™\’ZYЪZZYЪLМ‹ЉЫЩ™њЩ]
-JKЪYZYЪ‹^[™YZ[љ[Z^™Y™[ЩKX^[Z^™Y™[Щ_WNВ€JNВ€KЬ›Ъ™XЭЫЫ\Ы™[ќЧJNВ‚€ЫЫњЭ[]S[Щ[Q\™XЭH\ЩPШ[XЪК
-[Щ[RYњЭљ[™КHO€В€ЫЫњЭ[Щ[RYП[™]ИЩ]
-Ы[Щ[RYJNЫ]Ъ[™ЩY]ќYNВ€Ъ[JЪ[™ЩY
-^ШЪ[™ЩYY[ЩNЩ›ЬЉЫЫњЭ[Щ[HЩ€›Ъ™XЭ›[Щ[\КZYЉ[Щ[Kњ\™[ќ[Щ[RY	‰›[Щ[RYЛљ\К[Щ[Kњ\™[ќ[Щ[RY
-I‰€[[Щ[RYЛљ\К[Щ[KљY
-J^Ы[Щ[RYЛY
-[Щ[KљY
-NШЪ[™ЩY]ќYNЯ_B€ЫЫњЭЫЫ\Ы™[ќYП[™]ИЩ]
-›Ъ™XЭ›[Щ[\Л™љ[\Љ[Щ[OO›[Щ[RYЛљ\К[Щ[KљY
-JK™›]X\
-[Щ[OO›[Щ[K›Y[X™\’YКJNВ€\]JYќOћЩYќ›[Щ[\ПYYќ›[Щ[\Л™љ[\Љ[Щ[OO€[[Щ[RYЛљ\К[Щ[KљY
-JNЩYќЫЫ\Ы™[ќПYYќЫЫ\Ы™[ќЛ™љ[\ЉЫЫ\Ы™[ќO€XЫЫ\Ы™[ќYЛљ\КЫЫ\Ы™[ќљY
-JNЩYќќЪ\™\ПYYќќЪ\™\Л™љ[\ЉЪ\™OO€[[Щ[RYЛљ\КЪ\™K™њ›ЫKЫЫ\Ы™[ќY
-I‰€[[Щ[RYЛљ\КЪ\™KќЛЫЫ\Ы™[ќY
-I‰€XЫЫ\Ы™[ќYЛљ\КЪ\™K™њ›ЫKЫЫ\Ы™[ќY
-I‰€XЫЫ\Ы™[ќYЛљ\КЪ\™KќЛЫЫ\Ы™[ќY
-JNЩ›ЬЉЫЫњЭ[Щ[HЩ€Yќ›[Щ[\К[[Щ[K›Y[X™\’YП[[Щ[K›Y[X™\’YЛ™љ[\ЉYO€XЫЫ\Ы™[ќYЛљ\КY
-JNЯJNВ€Щ][њЭќ[Y[ќЪ[™ЭЬКЭ\њ™[ќOЭ\њ™[ќ™љ[\Љ][OO€XЫЫ\Ы™[ќYЛљ\К][KЫЫ\Ы™[ќY
-JJNВ€YЉXЭ]™S[Щ[RY	‰›[Щ[RYЛљ\КXЭ]™S[Щ[RY
-J\Щ]XЭ]™S[Щ[RY
-[™Yљ[™Y
-NЬЩ]Щ[XЭY[Щ[RY
-[™Yљ[™Y
-NВ€KШXЭ]™S[Щ[RY›Ъ™XЭ›[Щ[\Л\]WJNВ‚€ЫЫњЭќ[ђЫЫќ^XЭ[Ы€H\ЩPШ[XЪК
-XЭ[ЫЋђЫЫќ^XЭ[ЫЉHO€В€ЫЫњЭ\™Щ]XЫЫќ^\™Щ]ЪYЉ]\™Щ]
-\™]\›ЋВ€YЉ\™Щ]љЪ[™OOIШШ[ќ\ЙК^В€YЉXЭ[ЫЏOOIЬЩ[XЭ]ЫЫ	К\Щ]ЫЫ
-	ЬЩ[XЭ	КNЪYЉXЭ[ЫЏOOIЭЪ\™K]ЫЫ	К\Щ]ЫЫ
-	ЭЪ\™IКNЪYЉXЭ[ЫЏOOIЫ[Щ[K]ЫЫ	К\Щ]ЫЫ
-	Ы[Щ[IКNЬ™]\›ЋВ€B€YЉ\™Щ]љЪ[™OOIЭЪ\™IК^В€YЉXЭ[ЫЏOOIЩ[]IК]\]JYќOћЩYќќЪ\™\ПYYќќЪ\™\Л™љ[\ЉЪ\™OOќЪ\™KљYOO]\™Щ]љY
-NЯJNЬ™]\›ЋВ€B€YЉ\™Щ]љЪ[™OOIШЫЫ\Ы™[ќ	К^В€ЫЫњЭY]\™Щ]љYВ€YЉXЭ[ЫЏOOIЪ[њЭќ[Y[ќ	К^ЫЬ[’[њЭќ[Y[ќЪ[™ЭКY
-NЬ™]\›ЋЯB€YЉXЭ[ЫЏOOIЪ[њЬXЭ	К^ЬЩ]Щ[XЭY
-ЪYJNЬЩ]Щ[XЭY[Щ[RY
-[™Yљ[™Y
-NЬЩ][њЬXЭЬђЫЫ\ЩY
-[ЩJNЬ™]\›ЋЯB€YЉXЭ[ЫЏOOIЩ\XШ]IК^Ы]\XШ]YњЭљ[™ЦЧOVЧNЭ\]JYќOћЩ\XШ]YY\XШ]PЫЫ\Ы™[ќКYќЪYJNЯJNЪYЉ\XШ]Y›[™Э
-\Щ]Щ[XЭY
-\XШ]Y
-NЬ™]\›ЋЯB€YЉXЭ[ЫЏOOIЩ[]IК^Э\]JYќOћЩYќЫЫ\Ы™[ќПYYќЫЫ\Ы™[ќЛ™љ[\Љ][OOљ][KљYOOZY
-NЩYќќЪ\™\ПYYќќЪ\™\Л™љ[\ЉЪ\™OOќЪ\™K™њ›ЫKЫЫ\Ы™[ќYOOZY	‰ќЪ\™KќЛЫЫ\Ы™[ќYOOZY
-NЩ›ЬЉЫЫњЭ[Щ[HЩ€Yќ›[Щ[\К[[Щ[K›Y[X™\’YП[[Щ[K›Y[X™\’YЛ™љ[\ЉY[X™\ЏO›Y[X™\€OOZY
-NЯJNЬЩ][њЭќ[Y[ќЪ[™ЭЬКЭ\њ™[ќOЭ\њ™[ќ™љ[\Љ][OOљ][KЫЫ\Ы™[ќYOOZY
-JNЬЩ]Щ[XЭY
-ЧJNЬ™]\›ЋЯB€\]JYќOћШЫЫњЭ][OYYќЫЫ\Ы™[ќЛ™љ[™
-ЫЫ\Ы™[ќOЫЫ\Ы™[ќљYOOZY
-NЪYЉZ][J\™]\›ЋЪYЉXЭ[ЫЏOOIЬ›Э]IКZ][Kњ›Э][ЫЏJ][Kњ›Э][ЫЉОL
-ILНЊЪYЉXЭ[ЫЏOOIЭЩЩЫIКZ][K™[X›YHZ][K™[X›YЪYЉXЭ[ЫЏOOIЫШЪЙКZ][K›ШЪЩYHZ][K›ШЪЩYЯJNЬ™]\›ЋВ€B€ЫЫњЭ[Щ[O\›Ъ™XЭ›[Щ[\Л™љ[™
-][OOљ][KљYOO]\™Щ]љY
-NЪYЉ[[Щ[J\™]\›ЋВ€YЉXЭ[ЫЏOOIЪ[њЬXЭ	К^ЬЩ]Щ[XЭY
-ЧJNЬЩ]Щ[XЭY[Щ[RY
-[Щ[KљY
-NЬЩ][њЬXЭЬђЫЫ\ЩY
-[ЩJNЬ™]\›ЋЯB€YЉXЭ[ЫЏOOIЩ[ќ\‹[[Щ[IК^ЬЩ]XЭ]™S[Щ[RY
-[Щ[KљY
-NЬЩ]Щ[XЭY
-ЧJNЬЩ]Щ[XЭY[Щ[RY
-[Щ[KљY
-NЬ™]\›ЋЯB€YЉXЭ[ЫЏOOIЬШ]™K[[Щ[IК^ЬЩ][Щ[SXњ\ћJШ]™S[Щ[UУXњ\ћJ›Ъ™XЭ[Щ[JJNЬЩ]Ш\Э
-Э\N‰ЫЪЙЛY\ЬШYЩN0ЄЙЫ[Щ[K›[Y_p®ИЭX\™YИ[€HљX›[ЭXШKJNЬ™]\›ЋЯB€YЉXЭ[ЫЏOOIЩ[]IК^Щ[]S[Щ[Q\™XЭ
-[Щ[KљY
-NЬ™]\›ЋЯB€\]JYќOћШЫЫњЭ][OYYќ›[Щ[\Л™љ[™
-Ш[™Y]OOШ[™Y]KљYOO[[Щ[KљY
-NЪYЉZ][J\™]\›ЋЪYЉXЭ[ЫЏOOIЭЩЩЫIКZ][K™[X›YHZ][K™[X›YЪYЉXЭ[ЫЏOOIШЫЫ\ЩK[[Щ[IКZ][KЫЫ\ЩYHZ][KЫЫ\ЩYЯJNВ€KШЫЫќ^\™Щ][]S[Щ[Q\™XЭЬ[’[њЭќ[Y[ќЪ[™ЭЛ›Ъ™XЭ\]WJNВ‚€\ЩQY™™XЭ
-
-
-HO€В€ЫЫњЭ[™\€H
-]™[ќ€Щ^X›Ш\™]™[ќ
-HO€В€ЫЫњЭ\[™ИH]™[ќќ\™Щ][њЭ[Щ[Щ€S[њ][[Y[ќ]™[ќќ\™Щ][њЭ[Щ[Щ€S^\™XQ[[Y[ќ]™[ќќ\™Щ][њЭ[Щ[Щ€SЩ[XЭ[[Y[ќВ€Y€
-
-]™[ќЭ›Щ^H]™[ќ›Y]RЩ^JH	‰€]™[ќљЩ^KќУЭЩ\ђШ\ЩJ
-HOOH	ЬЙКHИ]™[ќњ™]™[ќY][
-
-NИШ]™J
-NИ™]\›ЋИB€Y€
-
-]™[ќЭ›Щ^H]™[ќ›Y]RЩ^JH	‰€]™[ќљЩ^KќУЭЩ\ђШ\ЩJ
-HOOH	Ы‰КHИ]™[ќњ™]™[ќY][
-
-NИ™]Ф›Ъ™XЭ
-
-NИ™]\›ЋИB€Y€
-
-]™[ќЭ›Щ^H]™[ќ›Y]RЩ^JH	‰€]™[ќљЩ^KќУЭЩ\ђШ\ЩJ
-HOOH	Ю‰КHИ]™[ќњ™]™[ќY][
-
-NИ]™[ќњЪYќЩ^HИ™YК
-H€[™К
-NИ™]\›ЋИB€Y€
-
-]™[ќЭ›Щ^H]™[ќ›Y]RЩ^JH	‰€]™[ќљЩ^KќУЭЩ\ђШ\ЩJ
-HOOH	ЮIКHИ]™[ќњ™]™[ќY][
-
-NИ™YК
-NИ™]\›ЋИB€Y€
-\[™КH™]\›ЋВ€Y€
-]™[ќљЩ^HOOH	С[]IИ]™[ќљЩ^HOOH	РXЪЬЬXЩIКH[]TЩ[XЭ[ЫЉ
-NВ€[ЩHY€
-]™[ќљЩ^KќУЭЩ\ђШ\ЩJ
-HOOH	Э‰КHЩ]ЫЫ
-	ЬЩ[XЭ	КNВ€[ЩHY€
-]™[ќљЩ^KќУЭЩ\ђШ\ЩJ
-HOOH	ЭЙКHЩ]ЫЫ
-	ЭЪ\™IКNВ€[ЩHY€
-]™[ќљЩ^KќУЭЩ\ђШ\ЩJ
-HOOH	Ъ	КHЩ]ЫЫ
-	Ь[‰КNВ€[ЩHY€
-]™[ќљЩ^HOOH	С\ШШ\IКHИЩ]Щ[XЭY
-ЧJNИЩ]Щ[XЭY[Щ[RY
-[™Yљ[™Y
-NИЩ]XЭ]™S[Щ[RY
-[™Yљ[™Y
-NИЩ]ЫЫ
-	ЬЩ[XЭ	КNИB€NВ€Ъ[™ЭЛY]™[ќ\Э[™\Љ	ЪЩ^YЭЫ‰Л[™\ЉNИ™]\›€
-
-HO€Ъ[™ЭЛњ™[[Э™Q]™[ќ\Э[™\Љ	ЪЩ^YЭЫ‰Л[™\ЉNВ€KЩ[]TЩ[XЭ[Ы‹™]Ф›Ъ™XЭ™YЛШ]™K[™ЧJNВ‚€ЫЫњЭЩ[XЭY[Щ[HH›Ъ™XЭ›[Щ[\Л™љ[™
-[Щ[HO€[Щ[KљYOOHЩ[XЭY[Щ[RY
-NВ€ЫЫњЭXЭ]™UШ\›љ[™ЬИHЫ\ЪЭЛќШ\›љ[™ЬЛ›[™ЭПИВ€ЫЫњЭ™\ЫЫ™Y[YHH™\ЫЫ™U[YJ[YK™]И]J[YPЫШЪКJNВ‚€™]\›€]€Ы\ЬУ[YO^Ш\\Ъ[[YKIЬ™\ЫЫ™Y[Y_XH]K][YK[[ЩO^Э[Y_O‚€]€Ы\ЬУ[YO^ШY]Ь‹YЬљY	ШШ][ЩРЫЫ\ЩYИ	ЫYќXЫЫ\ЩY	И€	ЙЯH	Ъ[њЬXЭЬђЫЫ\ЩYИ	ЬљYЪXЫЫ\ЩY	И€	ЙЯH	Ъ[њЭќ[Y[ќРЫЫ\ЩYИ	Ш›ЭЫKXЫЫ\ЩY	И€	ЙЯXO‚€Ь\€›Ъ™XЭ[YO^Ь›Ъ™XЭ›[Y_Hќ[›љ[™П^Ьќ[›љ[™ЯHЬYY^ЬЬYYHЩ][™ЬП^Ь›Ъ™XЭњЩ][™ЬЯHШ[•[™П^ШШ[•[™ЯHШ[”™YП^ШШ[”™YЯH\ќO^ЬШ]™Y™]љ\Ъ[Ы€OOH›Ъ™XЭќ\]Y]B€[YO^Э[Y_HЫ•[YO^ШЪ[™ЩU[Y_B€Ы”ќ[Џ^К
-HO€Щ]ќ[›љ[™К[YHO€][YJ_HЫ”Э\^К
-HO€ЫЬљЩ\”™Y‹Э\њ™[ќЛњЬЭY\ЬШYЩJИ\N€	ЬЭ\	ИJ_HЫ”ЬYY^ЬЩ]ЬYYB€Ы”Щ][™ЬП^Ь]ЪO€\]JYќO€ИШљ™XЭ\ЬЪYЫЉYќњЩ][™ЬЛ]Ъ
-NИJ_B€Ы“™]П^Ы™]Ф›Ъ™XЭHЫ”Ш]™O^ЬШ]™_HЫ’[\Ьќ^К
-HO€[\Ьќ™Y‹Э\њ™[ќЛЫXЪК
-_HЫ‘^Ьќ^К
-HO€^Ьќ›Ъ™XЭ
-›Ъ™XЭ
-_HЫ“Щ™›[™O^К
-OOњЩ]Щ™›[™SЬ[ЉќYJ_HЫ•[™П^Э[™ЯHЫ”™YП^Ь™YЯKП‚€Ш][ЩФ[™[ЫЫ\ЩY^ШШ][ЩРЫЫ\ЩYH]X\ЩO^Щ]X\Щ_HЫ•ЩЩЫO^К
-HO€Щ]Ш][ЩРЫЫ\ЩY
-[YHO€][YJ_HЫђY^ШYYљ[љ][ЫџH[Щ[\П^Ы[Щ[SXњ\ћ_HЫ’[њЩ\ќ[Щ[O^Ъ[њЩ\ќ[Щ[_HЫ’[\Ьќ[Щ[O^К
-OO›[Щ[R[\Ьќ™Y‹Э\њ™[ќЛЫXЪК
-_HЫ‘[]S[Щ[O^ЪYOњЩ][Щ[SXњ\ћJ[]TШ]™Y[Щ[JY
-J_KП‚€ЫЬљЬЬXЩH›Ъ™XЭ^Ь›Ъ™XЭH™\ЫЫ™Y[YO^Ь™\ЫЫ™Y[Y_H\]O^Э\]_HЩ[XЭY^ЬЩ[XЭYHЫ”Щ[XЭY^ЬЩ]Щ[XЭYHЩ[XЭY[Щ[RY^ЬЩ[XЭY[Щ[RYHЫ”Щ[XЭY[Щ[O^ЬЩ]Щ[XЭY[Щ[RYHЫЫ^ЭЫЫHЫ•ЫЫ^ЬЩ]ЫЫHЫ\ЪЭ^ЬЫ\ЪЭHќ[›љ[™П^Ьќ[›љ[™ЯHЫ•љY]ЬЬќ^ЬЩ]љY]ЬЬќHXЭ]™S[Щ[RY^ШXЭ]™S[Щ[RYHЫђXЭ]™S[Щ[O^ЪYOћЬЩ]XЭ]™S[Щ[RY
-Y
-NЪYЉY
-^ЬЩ]Щ[XЭY
-ЧJNЬЩ]Щ[XЭY[Щ[RY
-Y
-NЯ__HЫ“Ь[’[њЬXЭЬЏ^К
-OOњЩ][њЬXЭЬђЫЫ\ЩY
-[ЩJ_HЫђЫЫќ^\™Щ]^ЬЩ]ЫЫќ^\™Щ]KП‚€[њЬXЭЬ€›Ъ™XЭ^Ь›Ъ™XЭHЩ[XЭY^ЬЩ[XЭYHЫЫ\ЩY^Ъ[њЬXЭЬђЫЫ\ЩYHЫ•ЩЩЫO^К
-HO€Щ][њЬXЭЬђЫЫ\ЩY
-[YHO€][YJ_HЩ[XЭY[Щ[O^ЬЩ[XЭY[Щ[_B€Ы”›Ь\ќO^КYЩ^K[YN€›Ь\ќU[YJHO€\]JYќO€ИЫЫњЭ][HHYќЫЫ\Ы™[ќЛ™љ[™
-ЫЫ\Ы™[ќO€ЫЫ\Ы™[ќљYOOHY
-NИY€
-][JH][Kњ›Ь\ќY\ЦЪЩ^WHH[YNИJ_B€Ы”]Ъ^КY]Ъ
-HO€\]JYќO€ИЫЫњЭ][HHYќЫЫ\Ы™[ќЛ™љ[™
-ЫЫ\Ы™[ќO€ЫЫ\Ы™[ќљYOOHY
-NИY€
-][JHШљ™XЭ\ЬЪYЫЉ][K]Ъ
-NИJ_B€Ы”›Ъ™XЭ^Ь]ЪO€\]JYќO€ИШљ™XЭ\ЬЪYЫЉYќ]Ъ
-NИJ_HЫ‘[]O^Щ[]TЩ[XЭ[ЫџHЫ‘\XШ]O^Щ\XШ]TЩ[XЭ[ЫџB€Ы”Щ[XЭ[Щ[O^ЪYO€ИЩ]Щ[XЭY
-ЧJNИЩ]Щ[XЭY[Щ[RY
-Y
-NИ_HЫ“[Щ[O^Ь]Ъ[Щ[_HXЭ]™S[Щ[RY^ШXЭ]™S[Щ[RYHЫ‘[ќ\“[Щ[O^ЪYOћЬЩ]XЭ]™S[Щ[RY
-Y
-NЪYЉY
-\Щ]Щ[XЭY[Щ[RY
-Y
-NЯ_HЫ”Ш]™S[Щ[O^ЬШ]™TЩ[XЭY[Щ[_HЫ‘^Ьќ[Щ[O^К
-OOњЩ[XЭY[Щ[I‰™^Ьќ[Щ[J›Ъ™XЭЩ[XЭY[Щ[J_KП‚€[њЭќ[Y[ќ^HЫЫ\ЩY^Ъ[њЭќ[Y[ќРЫЫ\ЩYHШ[\\П^ЬШ[\\ЯHЫ•ЩЩЫO^К
-HO€Щ][њЭќ[Y[ќРЫЫ\ЩY
-[YHO€][YJ_KП‚€›ЫЭ\€Ы\ЬУ[YOHњЭ]\Ш\€Џ‚€]ЏЏЬ[€Ы\ЬУ[YO^Ш[™Ъ[™K[YЪ	Ьќ[›љ[™ИИ	Ьќ[›љ[™ЙИ€	ЙЯXKПЏЏћЬќ[›љ[™ИИТSUSS‘И	ЬЬYYpеШ€	УSХФ€S€UTРIЯOШЏЏЬ[ЏћЬЫ\ЪЭИH	ЬЫ\ЪЭќ[YKќСљ^Y
-К_HИ0­ИXЪИ	ЬЫ\ЪЭќXЪЯX€	Т[љXЪX[^[™И[ЭЬё )‰ЯOЬЬ[ЏЏЩ]Џ‚€]ЏЏЬ[ЏћЬ›Ъ™XЭЫЫ\Ы™[ќЛ›[™ЭHЫЫ\Ы™[ќ\ПЬЬ[ЏЏЬ[ЏћЬ›Ъ™XЭќЪ\™\Л›[™ЭH™Y\ПЬЬ[ЏЏЬ[ЏћЬЩ[XЭY›[™ЭИ	ЬЩ[XЭY›[™ЭHЩ[XШЪ[ЫYЬШ€	ФЪ[€Щ[XШЪpмЫ‰ЯOЬЬ[ЏЏЩ]Џ‚€]€Ы\ЬУ[YOHњЭ]\ЛXXЭ[ЫњИЏ‚€Ь[€Ы\ЬУ[YOHќ[YK\Э]\ИЏ•SPH0­ИЭ[YQYљ[љ][ЫЉ[YJKњЪЬќX™[ќХ\\ђШ\ЩJ
-_OЬЬ[Џ‚€ќ]Ы€ЫђЫXЪП^К
-HO€Щ]X›Э]Ь[ЉќYJ_OЏ[™›ИЪ^™O^МMKПђXЩ\ШHOШќ]ЫЏ‚€ќ]Ы€ЫђЫXЪП^К
-HO€Щ][Ь[ЉќYJ_OЏ[Ъ\ЫHЪ^™O^МMKП‘ЭpлXOШќ]ЫЏ‚€Ь[€Ы\ЬУ[YO^ШXЭ]™UШ\›љ[™ЬИИ	ЭШ\›љ[™ЛXЫЭ[ќXЭ]™IИ€	ЭШ\›љ[™ЛXЫЭ[ќ	ЯOЏЪ\ЫP[\ќЪ^™O^МLЯKПћШXЭ]™UШ\›љ[™ЬЯOЬЬ[Џ‚€Щ]Џ‚€Щ›ЫЭ\Џ‚€Щ]Џ‚€Ъ[њЭќ[Y[ќЪ[™ЭЬЛ›X\
-Ъ[™ЭФЭ]OOћШЫЫњЭЫЫ\Ы™[ќ\›Ъ™XЭЫЫ\Ы™[ќЛ™љ[™
-][OOљ][KљYOO]Ъ[™ЭФЭ]KЫЫ\Ы™[ќY
-NЬ™]\›€ЫЫ\Ы™[ќП[њЭќ[Y[ќЪ[™ЭИЩ^O^ЭЪ[™ЭФЭ]KљYHЭ]O^ЭЪ[™ЭФЭ]_HЫЫ\Ы™[ќ^ШЫЫ\Ы™[ќH›Ъ™XЭ^Ь›Ъ™XЭHШ[\\П^ЬШ[\\ЯHЫ‘›ШЭ\П^К
-OO™›ШЭ\Т[њЭќ[Y[ќЪ[™ЭКЪ[™ЭФЭ]KљY
-_HЫ”Э]O^Ь]ЪOњЩ][њЭќ[Y[ќЪ[™ЭЬКЭ\њ™[ќOЭ\њ™[ќ›X\
-][OOљ][KљYOO]Ъ[™ЭФЭ]KљYЮЛ‹‹љ][K‹‹њ]ЪNљ][JJ_HЫ”]Ъ^Ь›Ь\ќY\ПOќ\]JYќOћШЫЫњЭ][OYYќЫЫ\Ы™[ќЛ™љ[™
-Ш[™Y]OOШ[™Y]KљYOOXЫЫ\Ы™[ќљY
-NЪYЉ][JSШљ™XЭ\ЬЪYЫЉ][Kњ›Ь\ќY\Л›Ь\ќY\КNЯJ_HЫђЫЬЩO^К
-OOњЩ][њЭќ[Y[ќЪ[™ЭЬКЭ\њ™[ќOЭ\њ™[ќ™љ[\Љ][OOљ][KљYOO]Ъ[™ЭФЭ]KљY
-J_KПЋ›ќ[ЯJ_B€ШЫЫќ^\™Щ]	‰ЏЫЫќ^Y[ќH\™Щ]^ШЫЫќ^\™Щ]H›Ъ™XЭ^Ь›Ъ™XЭHЫђXЭ[ЫЏ^Ьќ[ђЫЫќ^XЭ[ЫџHЫђЫЬЩO^К
-OOњЩ]ЫЫќ^\™Щ]
-[™Yљ[™Y
-_KПџH€[њ]™YЏ^Ъ[\Ьќ™YџH\OH™љ[H€XШЩ\H‹љ]Ъ\™KљњЫЫ‹\XШ][Ы‹ЪњЫЫ€€Y[€ЫђЪ[™ЩO^Щ]™[ќO€И›ЪYТ[\Ьќ
-]™[ќќ\™Щ]™љ[\ПЛ–МJNИ]™[ќЭ\њ™[ќ\™Щ]ќ[YHH	ЙОИ_KП‚€[њ]™YЏ^Ы[Щ[R[\Ьќ™YџH\OH™љ[H€XШЩ\H‹љ]Ъ\™K[[Щ[KљњЫЫ‹\XШ][Ы‹ЪњЫЫ€€Y[€ЫђЪ[™ЩO^Щ]™[ќOћЭ›ЪYТ[\Ьќ[Щ[J]™[ќќ\™Щ]™љ[\ПЛ–МJNЩ]™[ќЭ\њ™[ќ\™Щ]ќ[YOIЙОЯ_KП‚€ЭШ\Э	‰€]€Ы\ЬУ[YO^ШШ\Э	ЭШ\Эќ\_XOћЭШ\Эќ\HOOH	ЫЪЙИИЪXЪРЪ\ЫL€Ъ^™O^МNKП€€Ъ\ЫP[\ќЪ^™O^МNKПџOЬ[ЏћЭШ\Э›Y\ЬШYЩ_OЬЬ[ЏЏќ]Ы€ЫђЫXЪП^К
-HO€Щ]Ш\Э
-[™Yљ[™Y
-_OЏЪ^™O^МM_KПЏШќ]ЫЏЏЩ]ЏџB€Ъ[Ь[€	‰€[ЭZYHЫђЫЬЩO^К
-HO€Щ][Ь[Љ[ЩJ_KПџH€ШX›Э]Ь[€	‰€X›Э]X[ЩИЫђЫЬЩO^К
-OOњЩ]X›Э]Ь[Љ[ЩJ_HЫ“Щ™›[™O^К
-OOњЩ]Щ™›[™SЬ[ЉќYJ_KПџH€ЫЩ™›[™SЬ[€	‰€Щ™›[™QX[ЩИЫђЫЬЩO^К
-OOњЩ]Щ™›[™SЬ[Љ[ЩJ_KПџH€Щ]ЏЋВџB
+  return <div className={`app-shell theme-${resolvedTheme}`} data-theme-mode={theme}>
+    <div className={`editor-grid ${catalogCollapsed ? 'left-collapsed' : ''} ${inspectorCollapsed ? 'right-collapsed' : ''} ${instrumentsCollapsed ? 'bottom-collapsed' : ''}`}>
+      <Topbar projectName={project.name} running={running} speed={speed} settings={project.settings} canUndo={canUndo} canRedo={canRedo} dirty={savedRevision !== project.updatedAt}
+      theme={theme} onTheme={changeTheme}
+      onRun={() => setRunning(value => !value)} onStep={() => workerRef.current?.postMessage({ type: 'step' })} onSpeed={setSpeed}
+      onSettings={patch => update(draft => { Object.assign(draft.settings, patch); })}
+      onNew={newProject} onSave={save} onImport={() => importRef.current?.click()} onExport={() => exportProject(project)} onOffline={()=>setOfflineOpen(true)} onUndo={undo} onRedo={redo}/>
+      <CatalogPanel collapsed={catalogCollapsed} database={database} onToggle={() => setCatalogCollapsed(value => !value)} onAdd={addDefinition} modules={moduleLibrary} onInsertModule={insertModule} onImportModule={()=>moduleImportRef.current?.click()} onDeleteModule={id=>setModuleLibrary(deleteSavedModule(id))}/>
+      <Workspace project={project} resolvedTheme={resolvedTheme} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} running={running} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>setInspectorCollapsed(false)} onContextTarget={setContextTarget}/>
+      <Inspector project={project} selected={selected} collapsed={inspectorCollapsed} onToggle={() => setInspectorCollapsed(value => !value)} selectedModule={selectedModule}
+        onProperty={(id, key, value: PropertyValue) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) item.properties[key] = value; })}
+        onPatch={(id, patch) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) Object.assign(item, patch); })}
+        onProject={patch => update(draft => { Object.assign(draft, patch); })} onDelete={deleteSelection} onDuplicate={duplicateSelection}
+        onSelectModule={id => { setSelected([]); setSelectedModuleId(id); }} onModule={patchModule} activeModuleId={activeModuleId} onEnterModule={id=>{setActiveModuleId(id);if(id)setSelectedModuleId(id);}} onSaveModule={saveSelectedModule} onExportModule={()=>selectedModule&&exportModule(project,selectedModule)}/>
+      <InstrumentTray collapsed={instrumentsCollapsed} samples={samples} onToggle={() => setInstrumentsCollapsed(value => !value)}/>
+      <footer className="statusbar">
+        <div><span className={`engine-light ${running ? 'running' : ''}`}/><b>{running ? `SIMULANDO ${speed}Г—` : 'MOTOR EN PAUSA'}</b><span>{snapshot ? `t = ${snapshot.time.toFixed(3)} s В· tick ${snapshot.tick}` : 'Inicializando motorвЂ¦'}</span></div>
+        <div><span>{project.components.length} componentes</span><span>{project.wires.length} redes</span><span>{selected.length ? `${selected.length} seleccionados` : 'Sin selecciГіn'}</span></div>
+        <div className="status-actions">
+          <span className="theme-status">TEMA В· {themeDefinition(theme).shortLabel.toUpperCase()}</span>
+          <button onClick={() => setAboutOpen(true)}><Info size={14}/>Acerca de</button>
+          <button onClick={() => setHelpOpen(true)}><HelpCircle size={14}/>GuГ­a</button>
+          <span className={activeWarnings ? 'warning-count active' : 'warning-count'}><CircleAlert size={13}/>{activeWarnings}</span>
+        </div>
+      </footer>
+    </div>
+    {instrumentWindows.map(windowState=>{const component=project.components.find(item=>item.id===windowState.componentId);return component?<InstrumentWindow key={windowState.id} state={windowState} component={component} project={project} samples={samples} onFocus={()=>focusInstrumentWindow(windowState.id)} onState={patch=>setInstrumentWindows(current=>current.map(item=>item.id===windowState.id?{...item,...patch}:item))} onPatch={properties=>update(draft=>{const item=draft.components.find(candidate=>candidate.id===component.id);if(item)Object.assign(item.properties,properties);})} onClose={()=>setInstrumentWindows(current=>current.filter(item=>item.id!==windowState.id))}/>:null;})}
+    {contextTarget&&<ContextMenu target={contextTarget} project={project} onAction={runContextAction} onClose={()=>setContextTarget(undefined)}/>} 
+    <input ref={importRef} type="file" accept=".bitwire,.json,application/json" hidden onChange={event => { void doImport(event.target.files?.[0]); event.currentTarget.value = ''; }}/>
+    <input ref={moduleImportRef} type="file" accept=".bitwire-module,.json,application/json" hidden onChange={event=>{void doImportModule(event.target.files?.[0]);event.currentTarget.value='';}}/>
+    {toast && <div className={`toast ${toast.type}`}>{toast.type === 'ok' ? <CheckCircle2 size={18}/> : <CircleAlert size={18}/>}<span>{toast.message}</span><button onClick={() => setToast(undefined)}><X size={15}/></button></div>}
+    {helpOpen && <HelpGuide onClose={() => setHelpOpen(false)}/>} 
+    {aboutOpen && <AboutDialog onClose={()=>setAboutOpen(false)} onOffline={()=>setOfflineOpen(true)}/>} 
+    {offlineOpen && <OfflineDialog onClose={()=>setOfflineOpen(false)}/>} 
+  </div>;
+}
