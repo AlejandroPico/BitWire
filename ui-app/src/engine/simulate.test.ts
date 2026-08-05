@@ -1,73 +1,82 @@
-þº(·úk¡ø¥zX§{ßÝzÿçºYOz¹¢²È¨×§‰çZ[\ÜÈ\ØÜšX™K^XÝ]Hœ›ÛH	Ýš]\Ý	ÎÂš[\ÜÈÜ™X]P›[šÔ›Ú™XÝÜ™X]Q[[Ô›Ú™XÝÜ™X]R[œÝ[˜ÙHHœ›ÛH	Ë‹‹ÜÝ]KÜ›Ú™XÝ	ÎÂš[\ÜÈ]˜[X]PÚ\˜ÝZ]Hœ›ÛH	Ë‹ÜÚ[][]IÎÂ‚™\ØÜšX™J	Ðš]Ú\™HÚ[][][ÛˆÛÜ™IË
+import { describe, expect, it } from 'vitest';
+import { createBlankProject, createDemoProject, createInstance } from '../state/project';
+import { evaluateCircuit } from './simulate';
 
-HOˆÂˆ]
-	Ü›ÜYØ]\ÈH[XÝšXØ[[[È›ÛYÙH›ÝYÚHÛÜÙYÝÚ]Ú	Ë
+describe('BitWire simulation core', () => {
+  it('propagates the electrical demo voltage through the closed switch', () => {
+    const project = createDemoProject();
+    const snapshot = evaluateCircuit(project, 0, 1);
+    expect(snapshot.wireSignals.w_power.voltage).toBe(5);
+    expect(snapshot.wireSignals.w_load.active).toBe(true);
+    expect(snapshot.wireSignals.w_return.active).toBe(true);
+    expect(snapshot.wireSignals.w_ground.active).toBe(true);
+    expect(snapshot.wireSignals.w_ground_external.active).toBe(true);
+    expect(snapshot.wireSignals.w_return.current).toBeGreaterThan(0);
+  });
 
-HOˆÂˆÛÛœÝ›Ú™XÝHÜ™X]Q[[Ô›Ú™XÝ
+  it('evaluates the AND gate deterministically', () => {
+    const project = createDemoProject();
+    const snapshot = evaluateCircuit(project, 0, 1);
+    expect(snapshot.wireSignals.w_gate_out.logic).toBe(1);
+  });
 
-NÂˆÛÛœÝÛ˜\ÚÝH]˜[X]PÚ\˜ÝZ]
-›Ú™XÝJNÂˆ^XÝ
-Û˜\ÚÝÚ\™TÚYÛ˜[Ë×ÜÝÙ\‹›ÛYÙJKÐ™JJNÂˆ^XÝ
-Û˜\ÚÝÚ\™TÚYÛ˜[Ë×ÛØY˜XÝ]™JKÐ™JYJNÂˆ^XÝ
-Û˜\ÚÝÚ\™TÚYÛ˜[Ë×Ü™]\›‹˜XÝ]™JKÐ™JYJNÂˆ^XÝ
-Û˜\ÚÝÚ\™TÚYÛ˜[Ë×ÙÜ›Ý[™˜XÝ]™JKÐ™JYJNÂˆ^XÝ
-Û˜\ÚÝÚ\™TÚYÛ˜[Ë×ÙÜ›Ý[™Ù^\›˜[˜XÝ]™JKÐ™JYJNÂˆ^XÝ
-Û˜\ÚÝÚ\™TÚYÛ˜[Ë×Ü™]\›‹˜Ý\œ™[
-KÐ™QÜ™X]\•[Š
-NÂˆJNÂ‚ˆ]
-	Ù]˜[X]\ÈHS‘Ø]H]\›Z[š\ÝXØ[IË
+  it('blocks a circuit when its switch is open', () => {
+    const project = createDemoProject();
+    const switchNode = project.components.find(node => node.id === 'switch_main')!;
+    switchNode.properties.closed = false;
+    const snapshot = evaluateCircuit(project, 0, 1);
+    expect(snapshot.wireSignals.w_load.active).toBe(false);
+    expect(snapshot.wireSignals.w_return.active).toBe(false);
+  });
 
-HOˆÂˆÛÛœÝ›Ú™XÝHÜ™X]Q[[Ô›Ú™XÝ
+  it('passes a signal through an encapsulation boundary pin', () => {
+    const project = createBlankProject('Boundary test');
+    project.components.push(
+      createInstance('dc_source',0,0,'source'),
+      createInstance('resistor',300,0,'inside_resistor'),
+      createInstance('lamp',520,0,'inside_lamp'),
+    );
+    project.modules.push({
+      id:'module',name:'Chip',x:240,y:-80,width:500,height:220,color:'#2be4c4',
+      memberIds:['inside_resistor','inside_lamp'],enabled:true,collapsed:true,
+      pins:[{id:'vin',name:'VIN',kind:'POWER',domain:'POWER',side:'left',position:.5,nominalVoltage:5}],
+    });
+    project.wires.push(
+      {id:'outside',from:{componentId:'source',pinId:'pos'},to:{componentId:'module',pinId:'vin'},routing:'orthogonal'},
+      {id:'boundary',from:{componentId:'module',pinId:'vin'},to:{componentId:'inside_resistor',pinId:'a'},routing:'orthogonal'},
+      {id:'inside',from:{componentId:'inside_resistor',pinId:'b'},to:{componentId:'inside_lamp',pinId:'a'},routing:'orthogonal'},
+    );
+    const snapshot=evaluateCircuit(project,0,1);
+    expect(snapshot.wireSignals.boundary.voltage).toBe(5);
+    expect(snapshot.wireSignals.inside.active).toBe(true);
+  });
 
-NÂˆÛÛœÝÛ˜\ÚÝH]˜[X]PÚ\˜ÝZ]
-›Ú™XÝJNÂˆ^XÝ
-Û˜\ÚÝÚ\™TÚYÛ˜[Ë×ÙØ]WÛÝ]›ÙÚXÊKÐ™JJNÂˆJNÂ‚ˆ]
-	Ø›ØÚÜÈHÚ\˜ÝZ]Ú[ˆ]ÈÝÚ]Ú\ÈÜ[‰Ë
+  it('evaluates every input of a three-input gate', () => {
+    const project=createBlankProject('Three input gate');
+    project.components.push(createInstance('logic_input',0,0,'a'),createInstance('logic_input',0,100,'b'),createInstance('logic_input',0,200,'c'),createInstance('gate_and_3',300,100,'gate'));
+    project.wires.push(
+      {id:'a',from:{componentId:'a',pinId:'out'},to:{componentId:'gate',pinId:'a'},routing:'straight'},
+      {id:'b',from:{componentId:'b',pinId:'out'},to:{componentId:'gate',pinId:'b'},routing:'straight'},
+      {id:'c',from:{componentId:'c',pinId:'out'},to:{componentId:'gate',pinId:'c'},routing:'straight'},
+    );
+    expect(evaluateCircuit(project).componentSignals.gate.outputs.out.logic).toBe(1);
+    project.components.find(item=>item.id==='c')!.properties.state=0;
+    expect(evaluateCircuit(project).componentSignals.gate.outputs.out.logic).toBe(0);
+  });
 
-HOˆÂˆÛÛœÝ›Ú™XÝHÜ™X]Q[[Ô›Ú™XÝ
-
-NÂˆÛÛœÝÝÚ]Ú›ÙHH›Ú™XÝ˜ÛÛ\Û™[Ë™š[™
-›ÙHOˆ›ÙKšYOOH	ÜÝÚ]ÚÛXZ[‰ÊHNÂˆÝÚ]Ú›ÙKœ›Ü\Y\Ë˜ÛÜÙYH˜[ÙNÂˆÛÛœÝÛ˜\ÚÝH]˜[X]PÚ\˜ÝZ]
-›Ú™XÝJNÂˆ^XÝ
-Û˜\ÚÝÚ\™TÚYÛ˜[Ë×ÛØY˜XÝ]™JKÐ™J˜[ÙJNÂˆ^XÝ
-Û˜\ÚÝÚ\™TÚYÛ˜[Ë×Ü™]\›‹˜XÝ]™JKÐ™J˜[ÙJNÂˆJNÂ‚ˆ]
-	Ü\ÜÙ\ÈHÚYÛ˜[›ÝYÚ[ˆ[˜Ø\Ý[][Ûˆ›Ý[™\žH[‰Ë
-
-HOˆÂˆÛÛœÝ›Ú™XÝHÜ™X]P›[šÔ›Ú™XÝ
-	Ð›Ý[™\žH\Ý	ÊNÂˆ›Ú™XÝ˜ÛÛ\Û™[Ëœ\Ú
-ˆÜ™X]R[œÝ[˜ÙJ	Ù×ÜÛÝ\˜ÙIË	ÜÛÝ\˜ÙIÊKˆÜ™X]R[œÝ[˜ÙJ	Ü™\Ú\ÝÜ‰ËÌ	Ú[œÚYWÜ™\Ú\ÝÜ‰ÊKˆÜ™X]R[œÝ[˜ÙJ	Û[\	ËLŒ	Ú[œÚYWÛ[\	ÊKˆ
-NÂˆ›Ú™XÝ›[Ù[\Ëœ\Ú
-ÂˆY‰Û[Ù[IË˜[YN‰ÐÚ\	ËŒN‹NÚYLZYÚŒŒŒÛÛÜŽ‰ÈÌ˜™MÍ	ËˆY[X™\’YÎ–ÉÚ[œÚYWÜ™\Ú\ÝÜ‰Ë	Ú[œÚYWÛ[\	×K[˜X›YYKÛÛ\ÙYYKˆ[œÎ–ÞÚY‰Ýš[‰Ë˜[YN‰Õ’S‰ËÚ[™‰ÔÕÑT‰ËÛXZ[Ž‰ÔÕÑT‰ËÚYN‰ÛY	ËÜÚ][ÛŽ‹K›ÛZ[˜[›ÛYÙN_WKˆJNÂˆ›Ú™XÝÚ\™\Ëœ\Ú
-ˆÚY‰ÛÝ]ÚYIËœ›ÛNžØÛÛ\Û™[Y‰ÜÛÝ\˜ÙIË[’Y‰ÜÜÉßKÎžØÛÛ\Û™[Y‰Û[Ù[IË[’Y‰Ýš[‰ßK›Ý][™Î‰ÛÜÙÛÛ˜[	ßKˆÚY‰Ø›Ý[™\žIËœ›ÛNžØÛÛ\Û™[Y‰Û[Ù[IË[’Y‰Ýš[‰ßKÎžØÛÛ\Û™[Y‰Ú[œÚYWÜ™\Ú\ÝÜ‰Ë[’Y‰ØIßK›Ý][™Î‰ÛÜÙÛÛ˜[	ßKˆÚY‰Ú[œÚYIËœ›ÛNžØÛÛ\Û™[Y‰Ú[œÚYWÜ™\Ú\ÝÜ‰Ë[’Y‰Ø‰ßKÎžØÛÛ\Û™[Y‰Ú[œÚYWÛ[\	Ë[’Y‰ØIßK›Ý][™Î‰ÛÜÙÛÛ˜[	ßKˆ
-NÂˆÛÛœÝÛ˜\ÚÝY]˜[X]PÚ\˜ÝZ]
-›Ú™XÝJNÂˆ^XÝ
-Û˜\ÚÝÚ\™TÚYÛ˜[Ë˜›Ý[™\žK›ÛYÙJKÐ™JJNÂˆ^XÝ
-Û˜\ÚÝÚ\™TÚYÛ˜[Ëš[œÚYK˜XÝ]™JKÐ™JYJNÂˆJNÂ‚ˆ]
-	Ù]˜[X]\È]™\žH[œ]ÙˆH™YKZ[œ]Ø]IË
-
-HOˆÂˆÛÛœÝ›Ú™XÝXÜ™X]P›[šÔ›Ú™XÝ
-	Õ™YH[œ]Ø]IÊNÂˆ›Ú™XÝ˜ÛÛ\Û™[Ëœ\Ú
-Ü™X]R[œÝ[˜ÙJ	ÛÙÚX×Ú[œ]	Ë	ØIÊKÜ™X]R[œÝ[˜ÙJ	ÛÙÚX×Ú[œ]	ËL	Ø‰ÊKÜ™X]R[œÝ[˜ÙJ	ÛÙÚX×Ú[œ]	ËŒ	ØÉÊKÜ™X]R[œÝ[˜ÙJ	ÙØ]WØ[™ÌÉËÌL	ÙØ]IÊJNÂˆ›Ú™XÝÚ\™\Ëœ\Ú
-ˆÚY‰ØIËœ›ÛNžØÛÛ\Û™[Y‰ØIË[’Y‰ÛÝ]	ßKÎžØÛÛ\Û™[Y‰ÙØ]IË[’Y‰ØIßK›Ý][™Î‰ÜÝ˜ZYÚ	ßKˆÚY‰Ø‰Ëœ›ÛNžØÛÛ\Û™[Y‰Ø‰Ë[’Y‰ÛÝ]	ßKÎžØÛÛ\Û™[Y‰ÙØ]IË[’Y‰Ø‰ßK›Ý][™Î‰ÜÝ˜ZYÚ	ßKˆÚY‰ØÉËœ›ÛNžØÛÛ\Û™[Y‰ØÉË[’Y‰ÛÝ]	ßKÎžØÛÛ\Û™[Y‰ÙØ]IË[’Y‰ØÉßK›Ý][™Î‰ÜÝ˜ZYÚ	ßKˆ
-NÂˆ^XÝ
-]˜[X]PÚ\˜ÝZ]
-›Ú™XÝ
-K˜ÛÛ\Û™[ÚYÛ˜[Ë™Ø]K›Ý]]Ë›Ý]›ÙÚXÊKÐ™JJNÂˆ›Ú™XÝ˜ÛÛ\Û™[Ë™š[™
-][OOš][KšYOOIØÉÊHKœ›Ü\Y\ËœÝ]OLÂˆ^XÝ
-]˜[X]PÚ\˜ÝZ]
-›Ú™XÝ
-K˜ÛÛ\Û™[ÚYÛ˜[Ë™Ø]K›Ý]]Ë›Ý]›ÙÚXÊKÐ™J
-NÂˆJNÂ‚ˆ]
-	Ù^ÜÙ\ÈH™\ÛÛ™Y[œ]ÈÙˆQ\Ü^\ÈÈZ\ˆš\ÝX[[Ù[	Ë
-
-OOžÂˆÛÛœÝ›Ú™XÝXÜ™X]P›[šÔ›Ú™XÝ
-	Ñ\Ü^H[œ]ÉÊNÂˆÛÛœÝÛÝ\˜ÙPOXÜ™X]R[œÝ[˜ÙJ	ÛÙÚX×Ú[œ]	Ë	ÜÛÝ\˜ÙWØIÊNÂˆÛÛœÝÛÝ\˜ÙPXÜ™X]R[œÝ[˜ÙJ	ÛÙÚX×Ú[œ]	ËL	ÜÛÝ\˜ÙWØ‰ÊNÂˆÛÝ\˜ÙP‹œ›Ü\Y\ËœÝ]OLÂˆ›Ú™XÝ˜ÛÛ\Û™[Ëœ\Ú
-ÛÝ\˜ÙPKÛÝ\˜ÙP‹Ü™X]R[œÝ[˜ÙJ	ÜÙ]™[—ÜÙYÛY[	ËÌ	Ù\Ü^IÊJNÂˆ›Ú™XÝÚ\™\Ëœ\Ú
-ˆÚY‰ÜÙYÛY[ØIËœ›ÛNžØÛÛ\Û™[Y‰ÜÛÝ\˜ÙWØIË[’Y‰ÛÝ]	ßKÎžØÛÛ\Û™[Y‰Ù\Ü^IË[’Y‰ØIßK›Ý][™Î‰ÜÝ˜ZYÚ	ßKˆÚY‰ÜÙYÛY[Ø‰Ëœ›ÛNžØÛÛ\Û™[Y‰ÜÛÝ\˜ÙWØ‰Ë[’Y‰ÛÝ]	ßKÎžØÛÛ\Û™[Y‰Ù\Ü^IË[’Y‰Ø‰ßK›Ý][™Î‰ÜÝ˜ZYÚ	ßKˆ
-NÂˆÛÛœÝ\Ü^OY]˜[X]PÚ\˜ÝZ]
-›Ú™XÝ
-K˜ÛÛ\Û™[ÚYÛ˜[Ë™\Ü^NÂˆ^XÝ
-\Ü^Kš[œ]ÏË˜K›ÙÚXÊKÐ™JJNÂˆ^XÝ
-\Ü^Kš[œ]ÏË˜‹›ÙÚXÊKÐ™J
-NÂˆ^XÝ
-\Ü^K˜XÝ]™JKÐ™JYJNÂˆJNÂŸJNÂ
+  it('exposes the resolved inputs of LED displays to their visual model',()=>{
+    const project=createBlankProject('Display inputs');
+    const sourceA=createInstance('logic_input',0,0,'source_a');
+    const sourceB=createInstance('logic_input',0,100,'source_b');
+    sourceB.properties.state=0;
+    project.components.push(sourceA,sourceB,createInstance('seven_segment',300,0,'display'));
+    project.wires.push(
+      {id:'segment_a',from:{componentId:'source_a',pinId:'out'},to:{componentId:'display',pinId:'a'},routing:'straight'},
+      {id:'segment_b',from:{componentId:'source_b',pinId:'out'},to:{componentId:'display',pinId:'b'},routing:'straight'},
+    );
+    const display=evaluateCircuit(project).componentSignals.display;
+    expect(display.inputs?.a.logic).toBe(1);
+    expect(display.inputs?.b.logic).toBe(0);
+    expect(display.active).toBe(true);
+  });
+});
