@@ -18,21 +18,21 @@
     "prepare:assets": "node -e \"require('fs').copyFileSync('node_modules/sql.js/dist/sql-wasm.wasm','public/sql-wasm.wasm')\""
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "sql.js": "latest",
-    "vite": "latest"
+    "sql.js": "latest"
   },
   "devDependencies": {
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@types/sql.js": "latest",
+    "@vitejs/plugin-react": "^6.0.5",
     "electron": "^43.3.0",
     "electron-builder": "^26.15.3",
     "typescript": "latest",
+    "vite": "^8.2.0",
     "vitest": "latest"
   },
   "build": {
