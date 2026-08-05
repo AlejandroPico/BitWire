@@ -315,7 +315,9 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
     event.stopPropagation();
     if (event.button === 2) return;
     onSelected([]); onSelectedModule(module.id); setSelectedWireId(undefined);
-    if (tool !== 'select' || activeModuleId === module.id) return;
+    // The second press of a double click must not start another SVG pointer
+    // capture: doing so can swallow the subsequent double-click navigation.
+    if (tool !== 'select' || activeModuleId === module.id || event.detail > 1) return;
     const world = screenToWorld(localPoint(event), viewport);
     setCurrentInteraction({ type: 'module-drag', start: world, origin: { x: module.x, y: module.y }, moduleId: module.id, recorded: false });
     svgRef.current?.setPointerCapture(event.pointerId);
