@@ -113,6 +113,8 @@ export interface ProjectSettings {
   showValues: boolean;
   /** Draw moving current markers while the simulation is running. */
   animateCurrent: boolean;
+  /** Render each virtual instrument's current capture inside its canvas symbol. */
+  liveInstrumentScreens: boolean;
 }
 
 export interface BitWireProject {

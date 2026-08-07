@@ -4,9 +4,12 @@ import { createBlankProject,createDemoProject,duplicateComponents,validateProjec
 describe('project state helpers',()=>{
   it('enables current animation by default and migrates older projects',()=>{
     expect(createBlankProject().settings.animateCurrent).toBe(true);
+    expect(createBlankProject().settings.liveInstrumentScreens).toBe(true);
     const legacy=structuredClone(createBlankProject()) as any;
     delete legacy.settings.animateCurrent;
+    delete legacy.settings.liveInstrumentScreens;
     expect(validateProject(legacy).settings.animateCurrent).toBe(true);
+    expect(validateProject(legacy).settings.liveInstrumentScreens).toBe(true);
   });
 
   it('duplicates a component inside its current encapsulation',()=>{

@@ -16,6 +16,7 @@ import type {
   ModulePin, PropertyValue, SimulationSnapshot, Theme, ToolMode, ViewportState, Wire, WireSignal,
 } from '../model/types';
 import { createInstance, uid } from '../state/project';
+import { captureInstrument, instrumentDisplayName } from './instrumentData';
 
 type Update = (recipe: (draft: BitWireProject) => void, record?: boolean) => void;
 
@@ -30,6 +31,7 @@ interface Props {
   tool: ToolMode;
   onTool(tool: ToolMode): void;
   snapshot?: SimulationSnapshot;
+  samples: SimulationSnapshot[];
   running: boolean;
   onViewport(viewport: ViewportState): void;
   activeModuleId?: string;
@@ -48,7 +50,7 @@ type Interaction =
   | { type: 'marquee' | 'module'; start: Point; current: Point }
   | null;
 
-export function Workspace({ project, resolvedTheme, update, selected, onSelected, selectedModuleId, onSelectedModule, tool, onTool, snapshot, running, onViewport, activeModuleId, onActiveModule, onOpenInspector, onContextTarget }: Props) {
+export function Workspace({ project, resolvedTheme, update, selected, onSelected, selectedModuleId, onSelectedModule, tool, onTool, snapshot, samples, running, onViewport, activeModuleId, onActiveModule, onOpenInspector, onContextTarget }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [viewport, setViewportState] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
   const [interaction, setInteraction] = useState<Interaction>(null);
@@ -413,7 +415,8 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
           const definition = CATALOG_BY_ID.get(component.definitionId);
           if (!definition) return null;
           const componentLod = lodForScale(viewport.scale * (component.scale || 1));
-          return <CircuitSymbol key={component.id} component={component} definition={definition} selected={selected.includes(component.id)} lod={componentLod.level} signal={snapshot?.componentSignals[component.id]} onPointerDown={onComponentDown} onDoubleClick={openComponentInspector} onContextMenu={componentContext} onPin={onPin} onQuickToggle={quickToggle} onProperty={(item,key,value) => update(draft => { const target=draft.components.find(node=>node.id===item.id); if(target) target.properties[key]=value; })}/>;
+          const instrumentCapture = definition.customGui && project.settings.liveInstrumentScreens ? captureInstrument(project,component,samples) : undefined;
+          return <CircuitSymbol key={component.id} component={component} definition={definition} selected={selected.includes(component.id)} lod={componentLod.level} signal={snapshot?.componentSignals[component.id]} instrumentCapture={instrumentCapture} instrumentLabel={definition.customGui?instrumentDisplayName(project,component):undefined} onPointerDown={onComponentDown} onDoubleClick={openComponentInspector} onContextMenu={componentContext} onPin={onPin} onQuickToggle={quickToggle} onProperty={(item,key,value) => update(draft => { const target=draft.components.find(node=>node.id===item.id); if(target) target.properties[key]=value; })}/>;
         })}</g>
         {marquee && <rect className={interaction?.type === 'module' ? 'module-marquee' : 'selection-marquee'} x={marquee.x} y={marquee.y} width={marquee.width} height={marquee.height}/>} 
       </g>

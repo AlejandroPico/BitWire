@@ -1,6 +1,8 @@
 import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 import type { ComponentDefinition, ComponentInstance, ComponentSignal, PinDefinition, PropertyValue } from '../model/types';
 import type { LodLevel } from '../canvas/LODManager';
+import type { InstrumentCapture } from './instrumentData';
+import { formatFrequency } from './instrumentData';
 
 interface Props {
   component: ComponentInstance;
@@ -8,6 +10,8 @@ interface Props {
   selected: boolean;
   lod: LodLevel;
   signal?: ComponentSignal;
+  instrumentCapture?: InstrumentCapture;
+  instrumentLabel?: string;
   onPointerDown(event: ReactPointerEvent<SVGGElement>, component: ComponentInstance): void;
   onDoubleClick(component: ComponentInstance): void;
   onContextMenu(event: ReactMouseEvent<SVGGElement>, component: ComponentInstance): void;
@@ -16,7 +20,7 @@ interface Props {
   onProperty(component: ComponentInstance, key: string, value: PropertyValue): void;
 }
 
-export function CircuitSymbol({ component, definition, selected, lod, signal, onPointerDown, onDoubleClick, onContextMenu, onPin, onQuickToggle, onProperty }: Props) {
+export function CircuitSymbol({ component, definition, selected, lod, signal, instrumentCapture, instrumentLabel, onPointerDown, onDoubleClick, onContextMenu, onPin, onQuickToggle, onProperty }: Props) {
   const w = definition.width;
   const h = definition.height;
   const active = Boolean(signal?.active);
@@ -32,7 +36,7 @@ export function CircuitSymbol({ component, definition, selected, lod, signal, on
   >
     <rect className="component-hitbox" x="-8" y="-8" width={w + 16} height={h + 16}/>
     {lod === 0 ? <MacroSymbol definition={definition}/> : <>
-      {!gateInternal && !semiconductorInternal && <g className="symbol-artwork">{symbolArtwork(definition, component, signal)}</g>}
+      {!gateInternal && !semiconductorInternal && <g className="symbol-artwork">{symbolArtwork(definition, component, signal, instrumentCapture, instrumentLabel)}</g>}
       {gateInternal && (lod >= 4 ? <GateCmosNetwork definition={definition}/> : <GateInternalNetwork definition={definition}/>)} 
       {semiconductorInternal && <SemiconductorInternal definition={definition} lod={lod}/>} 
       <text className="symbol-title" x={w / 2} y={h + 20} textAnchor="middle">{definition.name}</text>
@@ -64,7 +68,7 @@ function MacroSymbol({ definition }: { definition: ComponentDefinition }) {
   return <g className="macro-symbol"><rect width={definition.width} height={definition.height}/><text x={definition.width / 2} y={definition.height / 2 + 5} textAnchor="middle">{definition.name}</text></g>;
 }
 
-function symbolArtwork(definition: ComponentDefinition, component: ComponentInstance, signal?: ComponentSignal): ReactNode {
+function symbolArtwork(definition: ComponentDefinition, component: ComponentInstance, signal?: ComponentSignal, instrumentCapture?: InstrumentCapture, instrumentLabel?: string): ReactNode {
   const w = definition.width;
   const h = definition.height;
   const s = definition.symbol;
@@ -92,7 +96,7 @@ function symbolArtwork(definition: ComponentDefinition, component: ComponentInst
   if (s === 'jfet_n' || s === 'jfet_p') return <JfetSymbol type={s}/>;
   if (s === 'igbt_n' || s === 'igbt_p') return <IgbtSymbol type={s}/>;
   if (s === 'opamp' || s === 'comparator') return <><path className="symbol-body" d="M35 8v64l88-32z"/><path className="lead" d={`M0 28H35 M0 52H35 M123 40H${w}`}/><text className="op-sign" x="45" y="31">+</text><text className="op-sign" x="45" y="57">−</text></>;
-  if (['oscilloscope','analyzer','multimeter','spectrum','power_monitor','frequency_counter'].includes(s)) return <InstrumentSymbol definition={definition}/>;
+  if (['oscilloscope','analyzer','multimeter','spectrum','power_monitor','frequency_counter'].includes(s)) return <InstrumentSymbol definition={definition} capture={instrumentCapture} label={instrumentLabel}/>;
   if (s === 'display7') return <SevenSegmentDisplay width={w} height={h} inputs={signal?.inputs} common={String(component.properties.common??'cathode')}/>;
   if (s === 'display4') return <FourDigitDisplay width={w} height={h} inputs={signal?.inputs} common={String(component.properties.common??'cathode')}/>;
   if (s === 'lcd16x2') return <LcdDisplay width={w} height={h} text={String(component.properties.text??'BITWIRE READY')}/>;
@@ -108,10 +112,36 @@ function inputLeadPath(definition:ComponentDefinition,endX:number) {
   return definition.pins.filter(pin=>pin.x===0&&pin.kind==='INPUT').map(pin=>`M0 ${pin.y*definition.height}H${endX}`).join(' ');
 }
 
-function InstrumentSymbol({ definition }: { definition: ComponentDefinition }) {
+function InstrumentSymbol({ definition, capture, label }: { definition: ComponentDefinition; capture?: InstrumentCapture; label?: string }) {
   const w = definition.width, h = definition.height;
   const screenRight = w - 65;
-  return <><rect className="instrument-body" x="8" y="6" width={w - 16} height={h - 12}/><rect className="instrument-screen" x="25" y="20" width={w - 85} height={h - 45}/><path className="scope-trace" d={`M30 ${h/2}H43l8-18 12 36 12-26 10 8H${screenRight}`}/><circle className="dial" cx={w - 38} cy="36" r="12"/><circle className="dial" cx={w - 38} cy="74" r="12"/><text className="instrument-name" x="25" y={h - 12}>{definition.name.toUpperCase()}</text></>;
+  const screen = { x:25,y:20,width:w-85,height:h-45 };
+  return <><rect className="instrument-body" x="8" y="6" width={w - 16} height={h - 12}/><rect className="instrument-screen" {...screen}/><g className="instrument-live-screen">
+    {capture ? <LiveInstrumentScreen type={definition.id} capture={capture} screen={screen}/> : <path className="scope-trace" d={`M30 ${h/2}H43l8-18 12 36 12-26 10 8H${screenRight}`}/>} 
+  </g><circle className="dial" cx={w - 38} cy="36" r="12"/><circle className="dial" cx={w - 38} cy="74" r="12"/><text className="instrument-name" x="25" y={h - 12}>{(label ?? definition.name).toUpperCase()}</text></>;
+}
+
+function LiveInstrumentScreen({ type, capture, screen }: { type:string; capture:InstrumentCapture; screen:{x:number;y:number;width:number;height:number} }) {
+  const primary = capture.pins.find(pin=>pin.wireId&&pin.pinId!=='gnd') ?? capture.pins[0];
+  const values = primary?.values ?? [];
+  const trace = compactTrace(values,screen.x+4,screen.y+4,screen.width-8,screen.height-8);
+  if (type==='multimeter') return <><text className="instrument-live-value" x={screen.x+screen.width/2} y={screen.y+screen.height/2+5} textAnchor="middle">{capture.voltage.toFixed(3)} V</text><text className="instrument-live-caption" x={screen.x+5} y={screen.y+9}>DC · AUTO</text></>;
+  if (type==='power_monitor') return <><rect className="instrument-live-meter" x={screen.x+5} y={screen.y+screen.height-13} width={(screen.width-10)*Math.min(1,Math.abs(capture.power)/Math.max(.001,Math.abs(capture.power)+.02))} height="6"/><text className="instrument-live-value" x={screen.x+screen.width/2} y={screen.y+screen.height/2} textAnchor="middle">{capture.power.toFixed(3)} W</text></>;
+  if (type==='frequency_counter') return <><text className="instrument-live-value" x={screen.x+screen.width/2} y={screen.y+screen.height/2+4} textAnchor="middle">{formatFrequency(capture.frequency)}</text><text className="instrument-live-caption" x={screen.x+5} y={screen.y+9}>{capture.transitions} FLANCOS</text></>;
+  if (type==='spectrum_analyzer') return <>{capture.spectrum.slice(0,16).map((value,index)=><rect key={index} className="instrument-live-bar" x={screen.x+4+index*(screen.width-8)/16} y={screen.y+screen.height-5-value*(screen.height-12)} width={Math.max(1,(screen.width-8)/16-1)} height={value*(screen.height-12)}/>)}</>;
+  if (type==='logic_analyzer') return <polyline className="instrument-live-logic" points={compactLogic(primary?.logic ?? [],screen.x+4,screen.y+5,screen.width-8,screen.height-10)}/>;
+  return <><path className="instrument-live-grid" d={`M${screen.x+screen.width/2} ${screen.y+3}V${screen.y+screen.height-3}M${screen.x+3} ${screen.y+screen.height/2}H${screen.x+screen.width-3}`}/><polyline className="instrument-live-trace" points={trace}/></>;
+}
+
+function compactTrace(values:number[],x:number,y:number,width:number,height:number) {
+  const source=values.slice(-80); if(!source.length)return `${x},${y+height/2} ${x+width},${y+height/2}`;
+  const minimum=Math.min(...source),maximum=Math.max(...source),range=Math.max(.001,maximum-minimum);
+  return source.map((value,index)=>`${x+index*width/Math.max(1,source.length-1)},${y+height-(value-minimum)/range*height}`).join(' ');
+}
+
+function compactLogic(values:Array<0|1|'X'|'Z'>,x:number,y:number,width:number,height:number) {
+  const source=values.slice(-80); if(!source.length)return `${x},${y+height} ${x+width},${y+height}`;
+  return source.map((value,index)=>`${x+index*width/Math.max(1,source.length-1)},${value===1?y:y+height}`).join(' ');
 }
 
 function BjtSymbol({ type }: { type:'npn'|'pnp' }) {

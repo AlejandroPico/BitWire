@@ -13,6 +13,7 @@ export const DEFAULT_SETTINGS: ProjectSettings = {
   signalView: 'voltage',
   showValues: true,
   animateCurrent: true,
+  liveInstrumentScreens: true,
 };
 
 export function createInstance(definitionId: string, x: number, y: number, id = uid('node'), scale = 1): ComponentInstance {

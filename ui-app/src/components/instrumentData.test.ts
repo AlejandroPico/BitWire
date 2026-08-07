@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { captureInstrument, spectrumBins } from './instrumentData';
+import { captureInstrument, instrumentComponents, instrumentDisplayName, spectrumBins } from './instrumentData';
 import { createBlankProject, createInstance } from '../state/project';
 import type { SimulationSnapshot, Wire } from '../model/types';
 
@@ -36,5 +36,17 @@ describe('captura individual de instrumentos',() => {
   it('genera un espectro normalizado',() => {
     const bins=spectrumBins(Array.from({length:64},(_,i)=>Math.sin(i*Math.PI/4)),16);
     expect(Math.max(...bins)).toBeCloseTo(1);
+  });
+
+  it('identifica por separado cada aparato colocado',() => {
+    const project=createBlankProject();
+    const scopeA=createInstance('oscilloscope',0,0,'scope_a');
+    const meter=createInstance('multimeter',0,0,'meter_a');
+    const scopeB=createInstance('oscilloscope',0,0,'scope_b');
+    project.components.push(scopeA,meter,scopeB,createInstance('resistor',0,0,'resistor'));
+    expect(instrumentComponents(project).map(item=>item.id)).toEqual(['scope_a','meter_a','scope_b']);
+    expect(instrumentDisplayName(project,scopeA)).toBe('Osciloscopio 1');
+    expect(instrumentDisplayName(project,scopeB)).toBe('Osciloscopio 2');
+    expect(instrumentDisplayName(project,meter)).toBe('Multímetro 1');
   });
 });

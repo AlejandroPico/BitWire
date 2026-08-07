@@ -1,6 +1,6 @@
 import {
   Activity, Binary, Cable, Check, ChevronDown, CircleGauge, CornerDownRight, Download,
-  Eye, FilePlus2, FolderOpen, Gauge, Grid3X3, Laptop, Minus, Pause, Play, Redo2,
+  Eye, FilePlus2, FolderOpen, Gauge, Grid3X3, Laptop, Minus, MonitorDot, Pause, Play, Redo2,
   Route, Save, Settings2, Spline, StepForward, Tags, Undo2, Zap,
 } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
@@ -112,6 +112,7 @@ function SettingsMenu({ settings, theme, onSettings, onTheme }: {
       <header><span><Settings2 size={15}/>CONFIGURACIÓN</span><small>LIENZO Y VISUALIZACIÓN</small></header>
       <div className="settings-toggles">
         <ToggleRow icon={<Activity size={15}/>} label="Animación de corriente" detail="Pulsos móviles en conductores activos" checked={settings.animateCurrent} onChange={checked=>onSettings({animateCurrent:checked})}/>
+        <ToggleRow icon={<MonitorDot size={15}/>} label="Instrumentos en vivo" detail="Lectura real dentro de cada aparato" checked={settings.liveInstrumentScreens} onChange={checked=>onSettings({liveInstrumentScreens:checked})}/>
         <ToggleRow icon={<Tags size={15}/>} label="Valores sobre cables" detail="Muestra la magnitud seleccionada" checked={settings.showValues} onChange={checked=>onSettings({showValues:checked})}/>
         <ToggleRow icon={<Grid3X3 size={15}/>} label="Ajustar a cuadrícula" detail="Alineación precisa al desplazar" checked={settings.snapToGrid} onChange={checked=>onSettings({snapToGrid:checked})}/>
       </div>
@@ -136,7 +137,7 @@ function ToggleRow({icon,label,detail,checked,onChange}:{icon:ReactNode;label:st
 
 function SettingsOptions<T extends string>({title,icon,options,value,onChange}:{title:string;icon:ReactNode;options:MenuOption<T>[];value:T;onChange(value:T):void}){
   return <div className="settings-section"><h3><span>{icon}{title}</span></h3><div className="settings-option-grid">
-    {options.map(option=><button key={option.value} type="button" className={option.value===value?'active':''} onClick={()=>onChange(option.value)}><span>{option.icon}</span><strong>{option.label}</strong><small>{option.detail}</small>{option.value===value&&<Check size={12}/>}</button>)}
+    {options.map(option=><button key={option.value} type="button" className={option.value===value?'active':''} onClick={()=>onChange(option.value)}><span className="settings-option-icon">{option.icon}</span><span className="settings-option-copy"><strong>{option.label}</strong><small>{option.detail}</small></span>{option.value===value&&<Check className="settings-option-check" size={12}/>}</button>)}
   </div></div>;
 }
 

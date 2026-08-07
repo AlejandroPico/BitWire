@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe,expect,it } from 'vitest';
 import { CATALOG_BY_ID } from '../catalog/catalog';
 import type { ComponentSignal, WireSignal } from '../model/types';
+import type { InstrumentCapture } from './instrumentData';
 import { createInstance } from '../state/project';
 import { CircuitSymbol } from './CircuitSymbol';
 
@@ -34,5 +35,13 @@ describe('functional display rendering',()=>{
     const bar=render('bargraph_10',{s1:high,s2:low,s3:high});
     expect(bar).toContain('data-segment="1" class="bargraph-led on"');
     expect(bar).toContain('data-segment="2" class="bargraph-led"');
+  });
+
+  it('renders a real instrument capture inside its canvas screen',()=>{
+    const definition=CATALOG_BY_ID.get('oscilloscope')!;
+    const capture:InstrumentCapture={pins:[{pinId:'ch1',pinName:'CH1',wireId:'wire',values:[0,2,1,4],currents:[0,0,0,0],logic:[0,1,1,1]}],duration:.1,voltage:4,current:0,power:0,minimum:0,maximum:4,average:1.75,rms:2.29,frequency:10,period:.1,dutyCycle:75,transitions:2,energy:0,spectrum:[]};
+    const markup=renderToStaticMarkup(<CircuitSymbol component={createInstance('oscilloscope',0,0,'scope')} definition={definition} selected={false} lod={2} instrumentCapture={capture} instrumentLabel="Osciloscopio 1" onPointerDown={()=>{}} onDoubleClick={()=>{}} onContextMenu={()=>{}} onPin={()=>{}} onQuickToggle={()=>{}} onProperty={()=>{}}/>);
+    expect(markup).toContain('instrument-live-trace');
+    expect(markup).toContain('OSCILOSCOPIO 1');
   });
 });

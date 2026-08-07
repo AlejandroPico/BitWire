@@ -32,6 +32,20 @@ export interface InstrumentCapture {
   spectrum: number[];
 }
 
+export function instrumentComponents(project: BitWireProject) {
+  return project.components.filter(component => CATALOG_BY_ID.get(component.definitionId)?.customGui);
+}
+
+/** Human-readable, deterministic identity among instruments of the same kind. */
+export function instrumentDisplayName(project: BitWireProject, component: ComponentInstance) {
+  const customName = String(component.properties.instrumentName ?? '').trim();
+  if (customName) return customName;
+  const definition = CATALOG_BY_ID.get(component.definitionId);
+  const siblings = project.components.filter(item => item.definitionId === component.definitionId);
+  const index = Math.max(0,siblings.findIndex(item => item.id === component.id)) + 1;
+  return `${definition?.name ?? 'Instrumento'} ${index}`;
+}
+
 export function captureInstrument(
   project: BitWireProject,
   component: ComponentInstance,

@@ -5,7 +5,7 @@ import {
 import { useMemo, useRef } from 'react';
 import { CATALOG_BY_ID } from '../catalog/catalog';
 import type { BitWireProject, ComponentInstance, PropertyValue, SimulationSnapshot } from '../model/types';
-import { captureInstrument, formatFrequency, formatPeriod } from './instrumentData';
+import { captureInstrument, formatFrequency, formatPeriod, instrumentDisplayName } from './instrumentData';
 
 export interface InstrumentWindowState {
   id: string;
@@ -39,6 +39,7 @@ export function InstrumentWindow({ state,component,project,samples,onState,onPat
   const operation=useRef<PointerOperation|undefined>(undefined);
   const Icon=iconFor(component.definitionId);
   const connected=capture.pins.filter(pin=>pin.wireId).length;
+  const displayName=instrumentDisplayName(project,component);
 
   const begin=(event:React.PointerEvent,mode:'drag'|'resize')=>{
     if(state.maximized)return;
@@ -58,10 +59,10 @@ export function InstrumentWindow({ state,component,project,samples,onState,onPat
     onState({expanded,minimized:false,width:expanded?Math.max(900,state.width):Math.min(640,state.width),height:expanded?Math.max(590,state.height):Math.min(410,state.height)});
   };
 
-  return <section className={`floating-instrument ${state.expanded?'expanded':''} ${state.minimized?'minimized':''} ${state.maximized?'maximized':''}`} style={{left:state.x,top:state.y,width:state.width,height:state.height,zIndex:state.z}} onPointerDown={onFocus} onPointerMove={move} onPointerUp={finish} onPointerCancel={finish} aria-label={`${definition?.name ?? 'Instrumento'} ${component.id}`}>
+  return <section className={`floating-instrument ${state.expanded?'expanded':''} ${state.minimized?'minimized':''} ${state.maximized?'maximized':''}`} style={{left:state.x,top:state.y,width:state.width,height:state.height,zIndex:state.z}} onPointerDown={onFocus} onPointerMove={move} onPointerUp={finish} onPointerCancel={finish} aria-label={displayName}>
     <header className="floating-instrument-titlebar" onPointerDown={event=>begin(event,'drag')}>
       <span className="instrument-title-icon"><Icon size={16}/></span>
-      <div><strong>{definition?.name ?? 'Instrumento virtual'}</strong><small>{component.id} · {connected}/{capture.pins.length} terminales conectados</small></div>
+      <div><strong>{displayName}</strong><small>{component.id} · {connected}/{capture.pins.length} terminales conectados</small></div>
       <span className={component.enabled?'instrument-online':'instrument-offline'}>{component.enabled?'ADQUISICIÓN':'DESACTIVADO'}</span>
       <nav onPointerDown={event=>event.stopPropagation()}>
         <button className={state.expanded?'active':''} onClick={toggleExpanded} title={state.expanded?'Ocultar controles profesionales':'Extender controles profesionales'}>{state.expanded?<ChevronDown size={15}/>:<ChevronUp size={15}/>}</button>
