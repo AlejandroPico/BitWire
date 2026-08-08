@@ -29,6 +29,7 @@ def pins_for(profile: str) -> list[dict]:
         "probe2": [pin("plus", "+", "INPUT", "ANALOG", 0, .35), pin("minus", "−", "INPUT", "ANALOG", 0, .65)],
         "scope": [pin("ch1", "CH1", "INPUT", "ANALOG", 0, .35), pin("ch2", "CH2", "INPUT", "ANALOG", 0, .65), pin("gnd", "GND", "GND", "POWER", 1, .8)],
         "connector2": [pin("p1", "1", "BIDIRECTIONAL", "MIXED", 0, .35), pin("p2", "2", "BIDIRECTIONAL", "MIXED", 0, .65)],
+        "junction": [pin("node", "●", "BIDIRECTIONAL", "MIXED", .5, .5)],
     }
     if profile in profiles:
         return profiles[profile]

@@ -1,239 +1,380 @@
-import { CATALOG_BY_ID } from '../catalog/catalog';
+import { CATALOG_BY_ID, effectiveDefinition } from '../catalog/catalog';
 import { respectsModuleBoundaries } from '../model/moduleScope';
 import type {
-  BitWireProject, ComponentInstance, ComponentSignal, LogicValue,
-  SimulationSnapshot, WireSignal,
+  BitWireProject, ComponentInstance, ComponentSignal, LogicValue, PinDefinition,
+  SimulationSnapshot, Wire, WireSignal,
 } from '../model/types';
 import { EMPTY_SIGNAL } from '../model/types';
+import { formatSI } from '../utils/si';
 
-const cloneSignal = (signal: Partial<WireSignal> = {}): WireSignal => ({ ...EMPTY_SIGNAL, ...signal });
-const keyOf = (componentId: string, pinId: string) => `${componentId}:${pinId}`;
+const EPSILON_CURRENT=1e-9;
+const LOGIC_MODELS=new Set(['and','or','not','nand','nor','xor','xnor']);
+const SUPPORTED_MODELS=new Set([
+  'source_dc','source_ac','current_source','ground','resistor','potentiometer','capacitor','inductor',
+  'switch','analog_switch','fuse','connector','lamp','motor','speaker','buzzer','diode','zener','led',
+  'nmos','pmos','bjt_npn','bjt_pnp','opamp','comparator','logic_input','clock','mux','instrument','probe',
+  'seven_segment','display',...LOGIC_MODELS,
+]);
 
-function truth(value: WireSignal | undefined): LogicValue {
-  if (!value || value.logic === 'X' || value.logic === 'Z') return 'X';
-  return value.logic;
+export interface SimulationState {
+  lastTime:number;
+  capacitors:Record<string,number>;
+  inductors:Record<string,number>;
 }
 
-function logicSignal(value: LogicValue, highVoltage = 5): WireSignal {
-  return cloneSignal({
-    logic: value,
-    voltage: value === 1 ? highVoltage : 0,
-    active: value === 0 || value === 1,
-    floating: value === 'X' || value === 'Z',
-    current: value === 1 ? .002 : 0,
-  });
+export function createSimulationState():SimulationState {
+  return {lastTime:0,capacitors:{},inductors:{}};
 }
 
-function gateResult(model: string, inputs: LogicValue[]): LogicValue {
-  if (inputs.some(value => value === 'X' || value === 'Z')) return 'X';
-  const bits = inputs as Array<0 | 1>;
-  switch (model) {
-    case 'and': return bits.every(Boolean) ? 1 : 0;
-    case 'nand': return bits.every(Boolean) ? 0 : 1;
-    case 'or': return bits.some(Boolean) ? 1 : 0;
-    case 'nor': return bits.some(Boolean) ? 0 : 1;
-    case 'xor': return bits.filter(Boolean).length % 2 ? 1 : 0;
-    case 'xnor': return bits.filter(Boolean).length % 2 ? 0 : 1;
-    case 'not': return bits[0] ? 0 : 1;
-    default: return 'X';
+const cloneSignal=(signal:Partial<WireSignal>={}):WireSignal=>({...EMPTY_SIGNAL,...signal});
+const keyOf=(componentId:string,pinId:string)=>`${componentId}:${pinId}`;
+
+class UnionFind {
+  private parents=new Map<string,string>();
+  add(value:string){if(!this.parents.has(value))this.parents.set(value,value);}
+  find(value:string):string{this.add(value);const parent=this.parents.get(value)!;if(parent===value)return value;const root=this.find(parent);this.parents.set(value,root);return root;}
+  union(a:string,b:string){const left=this.find(a),right=this.find(b);if(left!==right)this.parents.set(right,left);}
+  values(){return [...this.parents.keys()];}
+}
+
+interface NetworkContext {
+  union:UnionFind;
+  validWires:Wire[];
+  invalidWires:Wire[];
+  referenceRoot:string;
+  roots:string[];
+  pinsByComponent:Map<string,PinDefinition[]>;
+}
+
+interface DigitalDriver { logic:LogicValue; voltage:number; endpoint:string }
+interface Branch { componentId:string; a:string; b:string; current:number }
+interface SolveResult { voltages:Map<string,number>; sourceCurrents:Map<string,number>; warnings:string[] }
+
+export function evaluateCircuit(project:BitWireProject,time=0,tick=0,state?:SimulationState):SimulationSnapshot {
+  const runtime=state??createSimulationState();
+  const dt=Math.max(1e-6,time>runtime.lastTime?time-runtime.lastTime:1/60);
+  const network=buildNetwork(project);
+  const digital=resolveDigital(project,network,time);
+  const solved=solveElectrical(project,network,digital,time,dt,runtime);
+  const branches=calculateBranches(project,network,digital,solved,time,dt,runtime);
+  const endpointCurrents=branchInjections(branches,project,network);
+  const wireCurrents=solveWireCurrents(network.validWires,endpointCurrents);
+  const componentSignals=buildComponentSignals(project,network,digital,solved,branches,endpointCurrents);
+  const wireSignals:Record<string,WireSignal>={};
+
+  for(const wire of network.invalidWires)wireSignals[wire.id]=cloneSignal();
+  for(const wire of network.validWires){
+    const root=network.union.find(keyOf(wire.from.componentId,wire.from.pinId));
+    const voltage=solved.voltages.get(root)??0;
+    const current=wireCurrents.get(wire.id)??0;
+    const driver=digital.get(root);
+    const logic=driver?.logic??logicFromVoltage(voltage);
+    const floating=!driver&&!Number.isFinite(solved.voltages.get(root));
+    wireSignals[wire.id]=cloneSignal({
+      voltage,current,logic,floating,
+      active:Math.abs(current)>EPSILON_CURRENT||driver?.logic===1,
+    });
   }
-}
 
-function evaluateComponent(
-  component: ComponentInstance,
-  inputs: Record<string, WireSignal>,
-  time: number,
-): Record<string, WireSignal> {
-  const definition = CATALOG_BY_ID.get(component.definitionId);
-  if (!definition || !component.enabled) return {};
-  const props = { ...definition.defaults, ...component.properties };
-  const output: Record<string, WireSignal> = {};
-  const voltageHigh = Number(props.voltageHigh ?? 5);
-  const model = definition.model;
-
-  if (model === 'source_dc') {
-    const voltage = Number(props.voltage ?? 5);
-    output.pos = cloneSignal({ logic: voltage >= 2.5 ? 1 : 0, voltage, current: .01, active: true, floating: false });
-    output.neg = cloneSignal({ logic: 0, voltage: 0, active: true, floating: false });
-  } else if (model === 'source_ac') {
-    const peak = Number(props.voltage ?? 12) * Math.SQRT2;
-    const voltage = peak * Math.sin(time * Math.PI * 2 * Number(props.frequency ?? 50));
-    output.pos = cloneSignal({ logic: voltage >= 2.5 ? 1 : 0, voltage, current: Math.abs(voltage) / 1000, active: true, floating: false });
-    output.neg = cloneSignal({ logic: 0, voltage: 0, active: true, floating: false });
-  } else if (model === 'ground') {
-    output.gnd = cloneSignal({ logic: 0, voltage: 0, active: true, floating: false });
-  } else if (model === 'logic_input') {
-    output.out = logicSignal(Number(props.state) ? 1 : 0, voltageHigh);
-  } else if (model === 'clock') {
-    const frequency = Math.max(.001, Number(props.frequency ?? 1));
-    const duty = Math.max(1, Math.min(99, Number(props.dutyCycle ?? 50))) / 100;
-    output.out = logicSignal((time * frequency) % 1 < duty ? 1 : 0, voltageHigh);
-  } else if (['and','or','not','nand','nor','xor','xnor'].includes(model)) {
-    const ids = definition.pins.filter(pin => pin.kind === 'INPUT').map(pin => pin.id);
-    output.out = logicSignal(gateResult(model, ids.map(id => truth(inputs[id]))), voltageHigh);
-  } else if (model === 'mux') {
-    const selected = truth(inputs.sel) === 1 ? inputs.b : inputs.a;
-    output.out = selected ? { ...selected } : logicSignal('X', voltageHigh);
-  } else if (model === 'dff') {
-    const initial = Number(props.initialState ?? 0) ? 1 : 0;
-    const q = inputs.d && truth(inputs.clk) === 1 ? truth(inputs.d) : initial;
-    output.q = logicSignal(q, voltageHigh);
-    output.nq = logicSignal(q === 1 ? 0 : 1, voltageHigh);
-  } else if (model === 'comparator') {
-    const result = (inputs.plus?.voltage ?? 0) > (inputs.minus?.voltage ?? 0) ? 1 : 0;
-    output.out = logicSignal(result, Number(props.highVoltage ?? 5));
-  } else if (model === 'switch') {
-    if (Boolean(props.closed)) {
-      if (inputs.a) output.b = { ...inputs.a };
-      if (inputs.b) output.a = { ...inputs.b };
-    }
-  } else if (['resistor','capacitor','inductor','fuse','connector'].includes(model)) {
-    if (model === 'fuse' && Boolean(props.blown)) return {};
-    if (inputs.a) output.b = { ...inputs.a };
-    if (inputs.b) output.a = { ...inputs.b };
-    if (inputs.p1) output.p2 = { ...inputs.p1 };
-    if (inputs.p2) output.p1 = { ...inputs.p2 };
-  } else if (['diode','zener','led','lamp','motor','buzzer'].includes(model)) {
-    // Loads consume a net but must not behave as ideal voltage sources on the return net.
-    // Their visual activity is derived from the input below.
-  } else if (model === 'opamp') {
-    const supply = Number(props.supply ?? 12);
-    const voltage = Math.max(-supply, Math.min(supply,
-      ((inputs.plus?.voltage ?? 0) - (inputs.minus?.voltage ?? 0)) * Number(props.gain ?? 100000)));
-    output.out = cloneSignal({ voltage, logic: voltage >= 2.5 ? 1 : 0, active: true, floating: false, current: Math.abs(voltage) / 10000 });
+  for(const component of project.components){
+    const definition=CATALOG_BY_ID.get(component.definitionId);
+    if(!definition||definition.model!=='capacitor')continue;
+    const pins=network.pinsByComponent.get(component.id)??definition.pins;
+    const [a,b]=pins;
+    if(a&&b)runtime.capacitors[component.id]=voltageBetween(solved,network,component.id,a.id,b.id);
   }
-  return output;
+  for(const branch of branches){
+    const definition=CATALOG_BY_ID.get(project.components.find(item=>item.id===branch.componentId)?.definitionId??'');
+    if(definition?.model==='inductor')runtime.inductors[branch.componentId]=branch.current;
+  }
+  runtime.lastTime=time;
+
+  const warnings=[
+    ...network.invalidWires.map(wire=>`Cable ${wire.label??wire.id} aislado: atraviesa un encapsulado sin patilla`),
+    ...solved.warnings,
+    ...electricalLimitWarnings(project,componentSignals,branches),
+  ];
+  return {tick,time,wireSignals,componentSignals,warnings:[...new Set(warnings)].slice(0,8)};
 }
 
-export function evaluateCircuit(project: BitWireProject, time = 0, tick = 0): SimulationSnapshot {
-  const endpointSignals = new Map<string, WireSignal>();
-  const componentSignals: Record<string, ComponentSignal> = {};
+function electricalLimitWarnings(project:BitWireProject,signals:Record<string,ComponentSignal>,branches:Branch[]){
+  const warnings:string[]=[];
+  for(const component of project.components){
+    const definition=CATALOG_BY_ID.get(component.definitionId);if(!definition||!component.enabled)continue;
+    const props={...definition.defaults,...component.properties};
+    const powerRating=Number(props.powerRating??0),power=signals[component.id]?.power??0;
+    if(powerRating>0&&power>powerRating*1.0001)warnings.push(`${definition.name}: ${formatSI(power,'W')} supera su potencia nominal de ${formatSI(powerRating,'W')}`);
+    const currentLimit=Number(props.currentLimit??props.currentRating??0);
+    const current=Math.max(0,...branches.filter(branch=>branch.componentId===component.id).map(branch=>Math.abs(branch.current)));
+    if(currentLimit>0&&current>currentLimit*1.0001)warnings.push(`${definition.name}: ${formatSI(current,'A')} supera su límite de ${formatSI(currentLimit,'A')}`);
+  }
+  return warnings;
+}
+
+function buildNetwork(project:BitWireProject):NetworkContext {
+  const union=new UnionFind(),pinsByComponent=new Map<string,PinDefinition[]>();
+  for(const component of project.components){
+    const base=CATALOG_BY_ID.get(component.definitionId);if(!base)continue;
+    const definition=effectiveDefinition(base,component.properties);
+    pinsByComponent.set(component.id,definition.pins);
+    for(const pin of definition.pins)union.add(keyOf(component.id,pin.id));
+  }
+  for(const module of project.modules)for(const pin of module.pins)union.add(keyOf(module.id,pin.id));
   const validWires=project.wires.filter(wire=>respectsModuleBoundaries(project,wire));
   const invalidWires=project.wires.filter(wire=>!respectsModuleBoundaries(project,wire));
-
-  const connectedTo = new Map<string, string[]>();
-  for (const wire of validWires) {
-    const from = keyOf(wire.from.componentId, wire.from.pinId);
-    const to = keyOf(wire.to.componentId, wire.to.pinId);
-    connectedTo.set(from, [...(connectedTo.get(from) ?? []), to]);
-    connectedTo.set(to, [...(connectedTo.get(to) ?? []), from]);
-  }
-
-  const signalOnNet = (start: string): WireSignal | undefined => {
-    const queue = [start], visited = new Set<string>();
-    let fallback: WireSignal | undefined;
-    while (queue.length) {
-      const endpoint = queue.shift()!;
-      if (visited.has(endpoint)) continue;
-      visited.add(endpoint);
-      const value = endpointSignals.get(endpoint);
-      if (value?.active && Math.abs(value.voltage) > .001) return value;
-      if (value?.active) fallback = value;
-      else if (value && !fallback) fallback = value;
-      for (const peer of connectedTo.get(endpoint) ?? []) queue.push(peer);
-    }
-    return fallback;
-  };
-
-  for (let pass = 0; pass < Math.max(6, project.components.length * 2); pass += 1) {
-    let changed = false;
-    for (const component of project.components) {
-      const definition = CATALOG_BY_ID.get(component.definitionId);
-      if (!definition) continue;
-      const inputs: Record<string, WireSignal> = {};
-      for (const pinDef of definition.pins) {
-        const endpoint = keyOf(component.id, pinDef.id);
-        const signal = signalOnNet(endpoint);
-        if (signal) inputs[pinDef.id] = signal;
-      }
-      const outputs = evaluateComponent(component, inputs, time);
-      let active = false;
-      let power = 0;
-      for (const [pinId, signal] of Object.entries(outputs)) {
-        const endpoint = keyOf(component.id, pinId);
-        const previous = endpointSignals.get(endpoint);
-        if (!previous || previous.logic !== signal.logic || Math.abs(previous.voltage - signal.voltage) > 1e-9) changed = true;
-        endpointSignals.set(endpoint, signal);
-        active ||= signal.active && Math.abs(signal.voltage) > .001;
-        power += Math.abs(signal.voltage * signal.current);
-      }
-      if (['diode','zener','led','lamp','motor','buzzer'].includes(definition.model)) {
-        const input = Object.values(inputs).find(signal => signal.active && Math.abs(signal.voltage) > .001);
-        if (input) { active = true; power = Math.abs(input.voltage * Math.max(input.current,.002)); }
-      }
-      const displayInputs=definition.symbol==='display7'||definition.symbol==='display4'||definition.symbol==='matrix8'||definition.symbol==='bargraph';
-      if(displayInputs){
-        active=Object.values(inputs).some(signal=>signal.active&&signal.logic===1);
-        power=Object.values(inputs).filter(signal=>signal.active&&signal.logic===1).length*.01;
-      }
-      componentSignals[component.id] = { inputs, outputs, active, power };
-    }
-    if (!changed) break;
-  }
-
-  const wireSignals: Record<string, WireSignal> = {};
-  const warnings: string[] = invalidWires.map(wire=>`Cable ${wire.label ?? wire.id} aislado: atraviesa un encapsulado sin patilla`);
-  for (const wire of invalidWires) wireSignals[wire.id]=cloneSignal();
-
-  // A return conductor sits at 0 V by definition, but it can still carry the same
-  // current as the live side of a closed circuit. Derive those return nets from
-  // energized loads instead of mistaking zero potential for an inactive cable.
-  const loadModels=new Set(['diode','zener','led','lamp','motor','buzzer']);
-  const returnCurrent = new Map<string, number>();
-  const blockedReturnEndpoints=new Set<string>();
+  for(const wire of validWires)union.union(keyOf(wire.from.componentId,wire.from.pinId),keyOf(wire.to.componentId,wire.to.pinId));
+  const groundRoots:string[]=[];
   for(const component of project.components){
     const definition=CATALOG_BY_ID.get(component.definitionId);
-    const state=componentSignals[component.id];
-    if(!definition||!loadModels.has(definition.model)||!state||state.active)continue;
-    for(const [pinId,signal] of Object.entries(state.inputs??{})){
-      if(signal.active&&Math.abs(signal.voltage)<=.001)blockedReturnEndpoints.add(keyOf(component.id,pinId));
-    }
+    if(definition?.model==='ground')groundRoots.push(union.find(keyOf(component.id,'gnd')));
   }
-  const markReturnNet = (start:string,current:number) => {
-    const queue=[start],visited=new Set<string>();
-    while(queue.length){
-      const endpoint=queue.shift()!;
-      if(visited.has(endpoint))continue;
-      visited.add(endpoint);
-      if(blockedReturnEndpoints.has(endpoint)&&endpoint!==start)continue;
-      returnCurrent.set(endpoint,Math.max(returnCurrent.get(endpoint)??0,current));
-      for(const peer of connectedTo.get(endpoint)??[])queue.push(peer);
-    }
+  let referenceRoot=groundRoots[0];
+  if(!referenceRoot){
+    const source=project.components.find(component=>['source_dc','source_ac'].includes(CATALOG_BY_ID.get(component.definitionId)?.model??''));
+    if(source)referenceRoot=union.find(keyOf(source.id,'neg'));
+  }
+  referenceRoot??=union.find(union.values()[0]??'__reference__:gnd');
+  for(const root of groundRoots)union.union(referenceRoot,root);
+  referenceRoot=union.find(referenceRoot);
+  const roots=[...new Set(union.values().map(value=>union.find(value)))];
+  return {union,validWires,invalidWires,referenceRoot,roots,pinsByComponent};
+}
+
+function resolveDigital(project:BitWireProject,network:NetworkContext,time:number) {
+  const drivers=new Map<string,DigitalDriver>();
+  const drive=(root:string,logic:LogicValue,voltage:number,endpoint:string)=>{
+    const previous=drivers.get(root);
+    if(previous&&previous.logic!==logic)drivers.set(root,{logic:'X',voltage:0,endpoint});
+    else drivers.set(root,{logic,voltage,endpoint});
   };
   for(const component of project.components){
-    const definition=CATALOG_BY_ID.get(component.definitionId);
-    const state=componentSignals[component.id];
-    if(!definition||!loadModels.has(definition.model)||!state||!state.active)continue;
-    const inputs=state.inputs??{};
-    const drive=Object.values(inputs).find(signal=>signal.active&&Math.abs(signal.voltage)>.001);
-    if(!drive)continue;
-    const amperage=Math.max(Math.abs(drive.current),.002);
-    for(const [pinId,signal] of Object.entries(inputs)){
-      if(signal.active&&Math.abs(signal.voltage)<=.001)markReturnNet(keyOf(component.id,pinId),amperage);
+    if(!component.enabled)continue;
+    const definition=CATALOG_BY_ID.get(component.definitionId);if(!definition)continue;
+    const props={...definition.defaults,...component.properties};
+    if(definition.model==='logic_input'){
+      const logic=Number(props.state)?1:0,voltage=logic?Number(props.voltageHigh??5):0;
+      drive(network.union.find(keyOf(component.id,'out')),logic,voltage,keyOf(component.id,'out'));
+    } else if(definition.model==='clock'){
+      const frequency=Math.max(.001,Number(props.frequency??1)),duty=Math.max(1,Math.min(99,Number(props.dutyCycle??50)))/100;
+      const logic:(0|1)=(time*frequency)%1<duty?1:0;
+      drive(network.union.find(keyOf(component.id,'out')),logic,logic?Number(props.voltageHigh??5):0,keyOf(component.id,'out'));
     }
   }
-
-  for (const wire of validWires) {
-    const left = signalOnNet(keyOf(wire.from.componentId, wire.from.pinId));
-    const right = signalOnNet(keyOf(wire.to.componentId, wire.to.pinId));
-    const signal = left?.active ? left : right?.active ? right : left ?? right ?? cloneSignal();
-    const destination = project.components.find(c => c.id === wire.to.componentId);
-    const destinationDef = destination && CATALOG_BY_ID.get(destination.definitionId);
-    const source = project.components.find(c => c.id === wire.from.componentId);
-    const sourceDef = source && CATALOG_BY_ID.get(source.definitionId);
-    const isDigital = sourceDef?.pins.find(pin => pin.id === wire.from.pinId)?.domain === 'DIGITAL'
-      || destinationDef?.pins.find(pin => pin.id === wire.to.pinId)?.domain === 'DIGITAL';
-    const resistance = destinationDef?.model === 'resistor'
-      ? Math.max(.001, Number(destination?.properties.resistance ?? destinationDef.defaults.resistance ?? 1000))
-      : 1000;
-    const fromReturn=returnCurrent.get(keyOf(wire.from.componentId,wire.from.pinId))??0;
-    const toReturn=returnCurrent.get(keyOf(wire.to.componentId,wire.to.pinId))??0;
-    const returnAmperage=fromReturn>0&&toReturn>0?Math.max(fromReturn,toReturn):0;
-    const active = signal.active && (isDigital || Math.abs(signal.voltage) > .001 || returnAmperage > 0);
-    const forwardAmperage=Math.max(Math.abs(signal.current),Math.abs(signal.voltage)/resistance);
-    wireSignals[wire.id] = { ...signal, active, current: active ? Math.max(returnAmperage,forwardAmperage) : 0 };
-    if (!left && !right) warnings.push(`Cable ${wire.label ?? wire.id} sin señal definida`);
+  for(let pass=0;pass<Math.max(8,project.components.length*2);pass++){
+    let changed=false;
+    for(const component of project.components){
+      if(!component.enabled)continue;
+      const base=CATALOG_BY_ID.get(component.definitionId);if(!base)continue;
+      const definition=effectiveDefinition(base,component.properties);
+      if(!LOGIC_MODELS.has(definition.model)&&definition.model!=='mux')continue;
+      const inputs=definition.pins.filter(pin=>pin.kind==='INPUT').map(pin=>drivers.get(network.union.find(keyOf(component.id,pin.id)))?.logic??'X');
+      let result:LogicValue;
+      if(definition.model==='mux')result=inputs[2]===1?inputs[1]??'X':inputs[2]===0?inputs[0]??'X':'X';
+      else result=gateResult(definition.model,inputs);
+      const high=Number(component.properties.voltageHigh??5);
+      for(const pin of definition.pins.filter(pin=>pin.kind==='OUTPUT')){
+        const root=network.union.find(keyOf(component.id,pin.id)),previous=drivers.get(root);
+        if(previous?.logic!==result)changed=true;
+        drive(root,result,result===1?high:0,keyOf(component.id,pin.id));
+      }
+    }
+    if(!changed)break;
   }
+  return drivers;
+}
 
-  return { tick, time, wireSignals, componentSignals, warnings: warnings.slice(0, 8) };
+function solveElectrical(project:BitWireProject,network:NetworkContext,digital:Map<string,DigitalDriver>,time:number,dt:number,state:SimulationState):SolveResult {
+  const nodeRoots=network.roots.filter(root=>root!==network.referenceRoot);
+  const nodeIndex=new Map(nodeRoots.map((root,index)=>[root,index]));
+  const sources=project.components.filter(component=>component.enabled&&['source_dc','source_ac'].includes(CATALOG_BY_ID.get(component.definitionId)?.model??''));
+  const sourceIndex=new Map(sources.map((component,index)=>[component.id,nodeRoots.length+index]));
+  const size=nodeRoots.length+sources.length;
+  let guess=new Map<string,number>(network.roots.map(root=>[root,0]));
+  const warnings:string[]=[];
+  let solution=Array.from({length:size},()=>0);
+
+  for(let iteration=0;iteration<10;iteration++){
+    const matrix=Array.from({length:size},()=>Array.from({length:size},()=>0));
+    const rhs=Array.from({length:size},()=>0);
+    const idx=(root:string)=>root===network.referenceRoot?undefined:nodeIndex.get(root);
+    const rootFor=(componentId:string,pinId:string)=>network.union.find(keyOf(componentId,pinId));
+    const stampG=(a:string,b:string,g:number)=>{const ia=idx(a),ib=idx(b);if(ia!==undefined)matrix[ia][ia]+=g;if(ib!==undefined)matrix[ib][ib]+=g;if(ia!==undefined&&ib!==undefined){matrix[ia][ib]-=g;matrix[ib][ia]-=g;}};
+    const stampI=(a:string,b:string,current:number)=>{const ia=idx(a),ib=idx(b);if(ia!==undefined)rhs[ia]-=current;if(ib!==undefined)rhs[ib]+=current;};
+    const stampAffine=(a:string,b:string,g:number,offset:number)=>{stampG(a,b,g);const history=g*offset;const ia=idx(a),ib=idx(b);if(ia!==undefined)rhs[ia]+=history;if(ib!==undefined)rhs[ib]-=history;};
+    const stampNorton=(out:string,target:number,resistance=.05)=>{const g=1/Math.max(1e-9,resistance);stampG(out,network.referenceRoot,g);stampI(network.referenceRoot,out,target*g);};
+    const voltage=(root:string)=>guess.get(root)??0;
+    for(let index=0;index<nodeRoots.length;index++)matrix[index][index]+=1e-12;
+
+    for(const component of project.components){
+      if(!component.enabled)continue;
+      const base=CATALOG_BY_ID.get(component.definitionId);if(!base)continue;
+      const definition=effectiveDefinition(base,component.properties),props={...definition.defaults,...component.properties},pins=definition.pins;
+      const a=pins[0]?rootFor(component.id,pins[0].id):network.referenceRoot,b=pins[1]?rootFor(component.id,pins[1].id):network.referenceRoot;
+      const model=definition.model;
+      if(model==='resistor')stampG(a,b,1/resistanceFor(props,1000));
+      else if(model==='potentiometer'){
+        const ra=rootFor(component.id,'a'),rw=rootFor(component.id,'w'),rb=rootFor(component.id,'b'),position=Math.max(.001,Math.min(.999,Number(props.position??50)/100)),total=resistanceFor(props,10000);
+        stampG(ra,rw,1/(total*position));stampG(rw,rb,1/(total*(1-position)));
+      } else if(model==='switch'||model==='analog_switch'){if(Boolean(props.closed))stampG(a,b,1/Math.max(.001,Number(props.onResistance??.001)));}
+      else if(model==='fuse'){if(!Boolean(props.blown))stampG(a,b,1000);}
+      else if(model==='connector'&&pins.length>=2)stampG(a,b,1000);
+      else if(['lamp','motor','speaker','buzzer'].includes(model))stampG(a,b,1/resistanceFor(props,model==='motor'?8:220));
+      else if(model==='capacitor'){
+        const g=Math.max(1e-15,Number(props.capacitance??1e-6))/dt;
+        stampAffine(a,b,g,state.capacitors[component.id]??0);
+      } else if(model==='inductor'){
+        const g=dt/Math.max(1e-12,Number(props.inductance??.01));stampG(a,b,g);stampI(a,b,state.inductors[component.id]??0);
+        const series=Math.max(0,Number(props.seriesResistance??0));if(series)stampG(a,b,1/series);
+      } else if(['diode','zener','led'].includes(model)){
+        const params=diodeLinearization(model,props,voltage(a)-voltage(b));stampAffine(a,b,params.g,params.offset);
+      } else if(model==='current_source')stampI(a,b,Number(props.current??.01));
+      else if(model==='nmos'||model==='pmos'){
+        const gate=rootFor(component.id,'b'),drain=rootFor(component.id,'c'),source=rootFor(component.id,'e');
+        const threshold=Math.abs(Number(props.threshold??2.5)),drive=model==='nmos'?voltage(gate)-voltage(source):voltage(source)-voltage(gate);
+        stampG(drain,source,1/(drive>=threshold?Math.max(.01,Number(props.onResistance??.05)):1e9));
+      } else if(model==='bjt_npn'||model==='bjt_pnp'){
+        const baseRoot=rootFor(component.id,'b'),collector=rootFor(component.id,'c'),emitter=rootFor(component.id,'e');
+        const drive=model==='bjt_npn'?voltage(baseRoot)-voltage(emitter):voltage(emitter)-voltage(baseRoot);
+        stampG(baseRoot,emitter,1/(drive>.62?Math.max(100,10000/Math.max(1,Number(props.beta??100))):1e9));
+        stampG(collector,emitter,1/(drive>.62?Math.max(.05,10/Math.max(1,Number(props.beta??100))):1e9));
+      } else if(model==='opamp'||model==='comparator'){
+        const plus=rootFor(component.id,'plus'),minus=rootFor(component.id,'minus'),out=rootFor(component.id,'out');
+        const supply=Number(props.supply??props.highVoltage??12),gain=model==='comparator'?1e6:Number(props.gain??100000);
+        const target=Math.max(model==='comparator'?0:-supply,Math.min(supply,(voltage(plus)-voltage(minus))*gain));stampNorton(out,target,.05);
+      }
+    }
+    for(const driver of digital.values())if(driver.logic===0||driver.logic===1)stampNorton(network.union.find(driver.endpoint),driver.voltage,.05);
+    for(const source of sources){
+      const definition=CATALOG_BY_ID.get(source.definitionId)!,props={...definition.defaults,...source.properties};
+      const pos=rootFor(source.id,'pos'),neg=rootFor(source.id,'neg'),row=sourceIndex.get(source.id)!;
+      const voltageSource=definition.model==='source_ac'?Number(props.voltage??12)*Math.sin(time*Math.PI*2*Number(props.frequency??50)):Number(props.voltage??5);
+      const ip=idx(pos),ineg=idx(neg);
+      if(ip!==undefined){matrix[ip][row]+=1;matrix[row][ip]+=1;}if(ineg!==undefined){matrix[ineg][row]-=1;matrix[row][ineg]-=1;}rhs[row]+=voltageSource;
+    }
+    try{solution=gaussianSolve(matrix,rhs);}catch(error){warnings.push(`Matriz eléctrica singular: ${error instanceof Error?error.message:String(error)}`);solution=Array.from({length:size},()=>0);break;}
+    const next=new Map<string,number>([[network.referenceRoot,0]]);
+    for(const [root,index] of nodeIndex)next.set(root,solution[index]??0);
+    const delta=Math.max(...network.roots.map(root=>Math.abs((next.get(root)??0)-(guess.get(root)??0))),0);
+    guess=next;if(delta<1e-7)break;
+  }
+  const sourceCurrents=new Map<string,number>();for(const [id,index] of sourceIndex)sourceCurrents.set(id,solution[index]??0);
+  for(const component of project.components){
+    const definition=CATALOG_BY_ID.get(component.definitionId);if(!definition||SUPPORTED_MODELS.has(definition.model)||!component.enabled)continue;
+    const connected=project.wires.some(wire=>wire.from.componentId===component.id||wire.to.componentId===component.id);
+    if(connected)warnings.push(`${definition.name}: modelo eléctrico todavía aproximado/no implementado`);
+  }
+  return {voltages:guess,sourceCurrents,warnings};
+}
+
+function calculateBranches(project:BitWireProject,network:NetworkContext,digital:Map<string,DigitalDriver>,solved:SolveResult,time:number,dt:number,state:SimulationState):Branch[]{
+  const branches:Branch[]=[];
+  const add=(componentId:string,aPin:string,bPin:string,current:number)=>branches.push({componentId,a:keyOf(componentId,aPin),b:keyOf(componentId,bPin),current:Number.isFinite(current)?current:0});
+  const root=(id:string,pin:string)=>network.union.find(keyOf(id,pin));
+  const v=(id:string,pin:string)=>solved.voltages.get(root(id,pin))??0;
+  for(const component of project.components){
+    if(!component.enabled)continue;const base=CATALOG_BY_ID.get(component.definitionId);if(!base)continue;
+    const definition=effectiveDefinition(base,component.properties),props={...definition.defaults,...component.properties},pins=definition.pins,model=definition.model;
+    const a=pins[0]?.id,b=pins[1]?.id;if(!a||!b)continue;const difference=v(component.id,a)-v(component.id,b);
+    if(model==='resistor')add(component.id,a,b,difference/resistanceFor(props,1000));
+    else if(model==='potentiometer'){
+      const position=Math.max(.001,Math.min(.999,Number(props.position??50)/100)),total=resistanceFor(props,10000);
+      add(component.id,'a','w',(v(component.id,'a')-v(component.id,'w'))/(total*position));add(component.id,'w','b',(v(component.id,'w')-v(component.id,'b'))/(total*(1-position)));
+    } else if((model==='switch'||model==='analog_switch')&&Boolean(props.closed))add(component.id,a,b,difference/Math.max(.001,Number(props.onResistance??.001)));
+    else if(model==='fuse'&&!Boolean(props.blown))add(component.id,a,b,difference/.001);
+    else if(model==='connector'&&pins.length>=2)add(component.id,a,b,difference/.001);
+    else if(['lamp','motor','speaker','buzzer'].includes(model))add(component.id,a,b,difference/resistanceFor(props,model==='motor'?8:220));
+    else if(model==='capacitor')add(component.id,a,b,Number(props.capacitance??1e-6)/dt*(difference-(state.capacitors[component.id]??0)));
+    else if(model==='inductor')add(component.id,a,b,dt/Math.max(1e-12,Number(props.inductance??.01))*difference+(state.inductors[component.id]??0));
+    else if(['diode','zener','led'].includes(model)){const p=diodeLinearization(model,props,difference);add(component.id,a,b,p.g*(difference-p.offset));}
+    else if(model==='current_source')add(component.id,a,b,Number(props.current??.01));
+    else if(model==='source_dc'||model==='source_ac')add(component.id,'pos','neg',solved.sourceCurrents.get(component.id)??0);
+    else if(model==='nmos'||model==='pmos'||model==='bjt_npn'||model==='bjt_pnp')add(component.id,'c','e',(v(component.id,'c')-v(component.id,'e'))/transistorResistance(model,props,v(component.id,'b'),v(component.id,'e')));
+  }
+  for(const driver of digital.values()){
+    if(driver.logic!==0&&driver.logic!==1)continue;
+    const endpoint=driver.endpoint,[componentId,pinId]=splitEndpoint(endpoint),actual=solved.voltages.get(network.union.find(endpoint))??0;
+    branches.push({componentId,a:endpoint,b:'__reference__:gnd',current:(actual-driver.voltage)/.05});
+  }
+  return branches;
+}
+
+function branchInjections(branches:Branch[],project:BitWireProject,network:NetworkContext){
+  const injections=new Map<string,number>();
+  const groundEndpoint=project.components.map(component=>({component,definition:CATALOG_BY_ID.get(component.definitionId)})).find(item=>item.definition?.model==='ground')?.component.id;
+  const referenceEndpoint=groundEndpoint?keyOf(groundEndpoint,'gnd'):network.union.values().find(endpoint=>network.union.find(endpoint)===network.referenceRoot)??'__reference__:gnd';
+  for(const branch of branches){
+    const a=branch.a.startsWith('__reference__:')?referenceEndpoint:branch.a,b=branch.b.startsWith('__reference__:')?referenceEndpoint:branch.b;
+    injections.set(a,(injections.get(a)??0)+branch.current);injections.set(b,(injections.get(b)??0)-branch.current);
+  }
+  // The reference node has no MNA row. Attach its residual current to the
+  // physical ground terminal so wire flows still obey Kirchhoff exactly.
+  const totals=new Map<string,number>();
+  for(const [endpoint,current] of injections){const root=network.union.find(endpoint);totals.set(root,(totals.get(root)??0)+current);}
+  for(const [root,total] of totals){if(Math.abs(total)<1e-10)continue;const endpoint=root===network.referenceRoot?referenceEndpoint:network.union.values().find(item=>network.union.find(item)===root);if(endpoint)injections.set(endpoint,(injections.get(endpoint)??0)-total);}
+  return injections;
+}
+
+function solveWireCurrents(wires:Wire[],injections:Map<string,number>){
+  const adjacency=new Map<string,Array<{wire:Wire;other:string}>>();
+  for(const wire of wires){const a=keyOf(wire.from.componentId,wire.from.pinId),b=keyOf(wire.to.componentId,wire.to.pinId);adjacency.set(a,[...(adjacency.get(a)??[]),{wire,other:b}]);adjacency.set(b,[...(adjacency.get(b)??[]),{wire,other:a}]);}
+  const currents=new Map<string,number>(),visited=new Set<string>();
+  const walk=(node:string,parent?:string):number=>{
+    visited.add(node);let total=injections.get(node)??0;
+    for(const edge of adjacency.get(node)??[]){if(edge.other===parent||visited.has(edge.other)){if(visited.has(edge.other)&&edge.other!==parent&&!currents.has(edge.wire.id))currents.set(edge.wire.id,0);continue;}const subtree=walk(edge.other,node);const actualFrom=keyOf(edge.wire.from.componentId,edge.wire.from.pinId);currents.set(edge.wire.id,actualFrom===node?subtree:-subtree);total+=subtree;}
+    return total;
+  };
+  for(const node of adjacency.keys())if(!visited.has(node))walk(node);
+  return currents;
+}
+
+function buildComponentSignals(project:BitWireProject,network:NetworkContext,digital:Map<string,DigitalDriver>,solved:SolveResult,branches:Branch[],endpointCurrents:Map<string,number>){
+  const result:Record<string,ComponentSignal>={};
+  for(const component of project.components){
+    const base=CATALOG_BY_ID.get(component.definitionId);if(!base)continue;const definition=effectiveDefinition(base,component.properties);
+    const inputs:Record<string,WireSignal>={},outputs:Record<string,WireSignal>={};
+    for(const pin of definition.pins){
+      const endpoint=keyOf(component.id,pin.id),root=network.union.find(endpoint),voltage=solved.voltages.get(root)??0,driver=digital.get(root);
+      const signal=cloneSignal({voltage,current:endpointCurrents.get(endpoint)??0,logic:driver?.logic??logicFromVoltage(voltage),active:Boolean(driver)||Math.abs(endpointCurrents.get(endpoint)??0)>EPSILON_CURRENT,floating:false});
+      if(pin.kind==='OUTPUT')outputs[pin.id]=signal;else inputs[pin.id]=signal;
+    }
+    const ownBranches=branches.filter(branch=>branch.componentId===component.id);
+    const power=ownBranches.reduce((sum,branch)=>{const [aid,apin]=splitEndpoint(branch.a),[bid,bpin]=splitEndpoint(branch.b);const va=aid==='__reference__'?0:solved.voltages.get(network.union.find(keyOf(aid,apin)))??0;const vb=bid==='__reference__'?0:solved.voltages.get(network.union.find(keyOf(bid,bpin)))??0;return sum+Math.abs((va-vb)*branch.current);},0);
+    const active=ownBranches.some(branch=>Math.abs(branch.current)>EPSILON_CURRENT)||Object.values(outputs).some(signal=>signal.logic===1)||Object.values(inputs).some(signal=>signal.logic===1);
+    result[component.id]={inputs,outputs,active,power};
+  }
+  return result;
+}
+
+function gateResult(model:string,inputs:LogicValue[]):LogicValue {
+  if(inputs.some(value=>value==='X'||value==='Z'))return 'X';const bits=inputs as Array<0|1>;
+  if(model==='and')return bits.every(Boolean)?1:0;if(model==='nand')return bits.every(Boolean)?0:1;
+  if(model==='or')return bits.some(Boolean)?1:0;if(model==='nor')return bits.some(Boolean)?0:1;
+  if(model==='xor')return bits.filter(Boolean).length%2?1:0;if(model==='xnor')return bits.filter(Boolean).length%2?0:1;
+  if(model==='not')return bits[0]?0:1;return 'X';
+}
+
+function resistanceFor(props:Record<string,unknown>,fallback:number){
+  return Math.max(1e-9,Number(props.resistance??props.coilResistance??props.impedance??props.darkResistance??fallback));
+}
+function diodeLinearization(model:string,props:Record<string,unknown>,voltage:number){
+  const forward=Math.max(.01,Number(props.forwardVoltage??(model==='led'?2:.7))),zener=Number(props.zenerVoltage??props.breakdownVoltage??Number.POSITIVE_INFINITY);
+  if(voltage>forward)return{g:50,offset:forward};if(voltage< -zener)return{g:50,offset:-zener};return{g:1e-9,offset:0};
+}
+function transistorResistance(model:string,props:Record<string,unknown>,gate:number,source:number){
+  const threshold=Math.abs(Number(props.threshold??(model.startsWith('bjt')?.65:2.5))),drive=model==='pmos'||model==='bjt_pnp'?source-gate:gate-source;
+  return drive>=threshold?Math.max(.01,Number(props.onResistance??(model.startsWith('bjt')?.1:.05))):1e9;
+}
+function voltageBetween(solved:SolveResult,network:NetworkContext,id:string,a:string,b:string){return(solved.voltages.get(network.union.find(keyOf(id,a)))??0)-(solved.voltages.get(network.union.find(keyOf(id,b)))??0);}
+function logicFromVoltage(voltage:number):LogicValue{return voltage>=2.5?1:voltage<=.8?0:'X';}
+function splitEndpoint(endpoint:string):[string,string]{const index=endpoint.lastIndexOf(':');return[endpoint.slice(0,index),endpoint.slice(index+1)];}
+
+function gaussianSolve(matrix:number[][],rhs:number[]){
+  const n=rhs.length;if(!n)return[];const a=matrix.map((row,index)=>[...row,rhs[index]]);
+  for(let column=0;column<n;column++){
+    let pivot=column;for(let row=column+1;row<n;row++)if(Math.abs(a[row][column])>Math.abs(a[pivot][column]))pivot=row;
+    if(Math.abs(a[pivot][column])<1e-18)throw new Error(`pivote nulo en nodo ${column+1}`);
+    [a[column],a[pivot]]=[a[pivot],a[column]];const divisor=a[column][column];for(let item=column;item<=n;item++)a[column][item]/=divisor;
+    for(let row=0;row<n;row++){if(row===column)continue;const factor=a[row][column];if(!factor)continue;for(let item=column;item<=n;item++)a[row][item]-=factor*a[column][item];}
+  }
+  return a.map(row=>row[n]);
 }

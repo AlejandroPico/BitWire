@@ -295,6 +295,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .module-preview .component-hitbox,.module-preview .symbol-title,.module-preview .symbol-model,.module-preview .pin-label,.module-preview .quick-toggle { display: none; }
 .module-preview .module-preview-wire { fill: none; stroke: color-mix(in srgb,var(--canvas-line),transparent 45%); stroke-width: 1.35; vector-effect: non-scaling-stroke; }
 .module-preview .module-preview-wire.active { stroke: var(--cyan); opacity: .9; }
+.module-preview .module-preview-flow { fill:none; stroke:var(--wire-flow-color,var(--cyan)); stroke-width:2.1; stroke-dasharray:9 7; opacity:.95; filter:url(#wireGlow); vector-effect:non-scaling-stroke; }
 .module-preview-child > rect { fill: color-mix(in srgb,var(--module-fill),transparent 32%); fill-opacity: .42; stroke-width: 1.2; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
 .module-preview-child > text { font: 600 7px "IBM Plex Mono",monospace; letter-spacing: .08em; opacity: .66; }
 .module-preview-frame { fill:none; stroke:color-mix(in srgb,var(--canvas-line),transparent 52%); stroke-width:1; vector-effect:non-scaling-stroke; }
@@ -315,10 +316,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .wire .wire-signal { stroke: color-mix(in srgb,var(--canvas-line),var(--canvas-bg) 48%); stroke-width: 1.8; transition: stroke .18s ease,opacity .18s ease; }
 .wire.active .wire-signal { stroke: var(--amber); stroke-width: 3.2; opacity: .48; filter: url(#wireGlow); }
 .wire.active.logic-1 .wire-signal { stroke: var(--cyan); }
-.wire .wire-flow { stroke: var(--amber); stroke-width: 2.6; stroke-dasharray: 10 7; stroke-linecap: butt; filter: url(#wireGlow); }
+.wire .wire-flow { stroke: var(--wire-flow-color,var(--amber)); stroke-width: 2.6; stroke-dasharray: 10 7; stroke-linecap: butt; filter: url(#wireGlow); }
 .wire .wire-flow-highlight { stroke: var(--canvas-text); stroke-width: 1.05; stroke-dasharray: 2 15; stroke-linecap: butt; opacity: .95; }
-.wire.logic-1 .wire-flow { stroke: var(--cyan); }
-.wire.logic-0 .wire-flow { stroke: var(--blue); }
+.wire.logic-1 .wire-flow { stroke: var(--wire-flow-color,var(--cyan)); }
+.wire.logic-0 .wire-flow { stroke: var(--wire-flow-color,var(--blue)); }
 .wire.logic-0 .wire-flow-highlight { opacity: .68; }
 .wire:not(.active) .wire-signal { opacity: .62; }
 .wire-preview { fill: none; stroke: var(--cyan); stroke-width: 2; stroke-dasharray: 7 5; vector-effect: non-scaling-stroke; pointer-events: none; }
@@ -344,6 +345,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .lamp-bulb.on { fill: #f5b94233; stroke: var(--amber); filter: url(#signalGlow); }
 .symbol-title { fill: var(--canvas-text); font: 600 10px Inter, sans-serif; }
 .symbol-model { fill: #637d89; font: 500 7px "IBM Plex Mono", monospace; letter-spacing: .12em; }
+.symbol-value { fill: var(--amber); font: 700 8px "IBM Plex Mono", monospace; letter-spacing: .025em; }
+.junction-node { fill:var(--chrome-0); stroke:var(--cyan); stroke-width:1.5; vector-effect:non-scaling-stroke; }.junction-core { fill:var(--cyan); filter:url(#signalGlow); }
 .logic-value { fill: var(--cyan); font: 600 30px "IBM Plex Mono", monospace; }
 .generic-label, .chip-name { fill: var(--canvas-text); font: 600 10px Inter, sans-serif; }
 .chip-body { fill: var(--component-fill); }
@@ -461,6 +464,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .pin-kind { width: 6px; height: 6px; background: var(--blue); }.pin-kind.output { background: var(--cyan); }.pin-kind.vcc,.pin-kind.power { background: var(--amber); }.pin-kind.gnd { background: #7a8b94; }
 .deep-zoom-note { margin: 10px; padding: 9px; display: flex; gap: 8px; border: 1px solid #1b695f; background: #0a2826; color: var(--cyan); }
 .deep-zoom-note > div { display: flex; flex-direction: column; gap: 3px; }.deep-zoom-note strong { font-size: 9px; }.deep-zoom-note span { color: #78a9a2; font-size: 8px; line-height: 1.35; }
+.instrument-binding { padding:8px 10px 10px; display:grid; gap:7px; }.instrument-binding label { display:grid; gap:4px; color:var(--muted); font-size:8px; }.instrument-binding select { width:100%; min-width:0; height:28px; padding:0 6px; color:var(--text-soft); background:var(--chrome-0); border:1px solid var(--line-strong); font-size:8px; }.instrument-binding p { margin:0; color:var(--faint); font-size:7px; line-height:1.45; }
 .module-actions { padding: 8px 10px; display: grid; gap: 5px; border-top: 1px solid #1a2c35; }
 .module-actions button { min-height: 29px; display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #2a414c; color: #8fa5ae; font-size: 8px; }
 .module-actions button:hover { color: var(--cyan); border-color: var(--cyan-dark); }.module-actions button.primary { color: #061511; background: var(--cyan); border-color: var(--cyan); font-weight: 700; }

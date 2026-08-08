@@ -27,6 +27,7 @@ export function pinsFor(profile: string): PinDefinition[] {
     probe2: [pin('plus', '+', 'INPUT', 'ANALOG', 0, .35), pin('minus', '−', 'INPUT', 'ANALOG', 0, .65)],
     scope: [pin('ch1', 'CH1', 'INPUT', 'ANALOG', 0, .35), pin('ch2', 'CH2', 'INPUT', 'ANALOG', 0, .65), pin('gnd', 'GND', 'GND', 'POWER', 1, .8)],
     connector2: [pin('p1', '1', 'BIDIRECTIONAL', 'MIXED', 0, .35), pin('p2', '2', 'BIDIRECTIONAL', 'MIXED', 0, .65)],
+    junction: [pin('node','●','BIDIRECTIONAL','MIXED',.5,.5)],
   };
   if (profiles[profile]) return profiles[profile];
   if (profile === 'transformer') return [pin('p1','P1','ANALOG','ANALOG',0,.3),pin('p2','P2','ANALOG','ANALOG',0,.7),pin('s1','S1','ANALOG','ANALOG',1,.3),pin('s2','S2','ANALOG','ANALOG',1,.7)];
@@ -57,6 +58,7 @@ function symbolSize(symbol:string):{width:number;height:number}{
     matrix8:{width:210,height:150},bargraph:{width:230,height:170},
   };
   if(displays[symbol])return displays[symbol];
+  if(symbol==='junction')return{width:18,height:18};
   if(['oscilloscope','analyzer','multimeter','spectrum','power_monitor','frequency_counter'].includes(symbol))return{width:210,height:120};
   return{width:160,height:80};
 }
@@ -71,6 +73,23 @@ export const EMBEDDED_CATALOG: ComponentDefinition[] = ([...(rawCatalog as RawCo
 });
 
 export const CATALOG_BY_ID = new Map(EMBEDDED_CATALOG.map(item => [item.id, item]));
+
+const VARIABLE_GATE_MODELS=new Set(['and','or','nand','nor','xor','xnor']);
+
+/** Returns the physical pins of this instance, including configurable logic-gate fan-in/fan-out. */
+export function effectiveDefinition(base:ComponentDefinition,properties:Record<string,string|number|boolean>):ComponentDefinition {
+  if(!VARIABLE_GATE_MODELS.has(base.model)&&base.model!=='not')return base;
+  const originalInputs=base.pins.filter(item=>item.kind==='INPUT');
+  const inputCount=base.model==='not'?1:clampCount(Number(properties.inputCount??(originalInputs.length||2)));
+  const outputCount=clampCount(Number(properties.outputCount??1));
+  const inputs=Array.from({length:inputCount},(_,index)=>pin(
+    index===0?(base.model==='not'?'in':'a'):index===1?'b':index===2?'c':`in${index+1}`,
+    String.fromCharCode(65+index), 'INPUT','DIGITAL',0,(index+1)/(inputCount+1)));
+  const outputs=Array.from({length:outputCount},(_,index)=>pin(index?'out'+(index+1):'out',index?`Q${index+1}`:'Q','OUTPUT','DIGITAL',1,(index+1)/(outputCount+1)));
+  return {...base,pins:[...inputs,...outputs]};
+}
+
+function clampCount(value:number){return Math.max(1,Math.min(10,Math.round(Number.isFinite(value)?value:1)));}
 
 export async function verifyCatalogDatabase(): Promise<CatalogDatabaseStatus> {
   try {

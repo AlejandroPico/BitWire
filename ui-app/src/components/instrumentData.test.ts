@@ -49,4 +49,26 @@ describe('captura individual de instrumentos',() => {
     expect(instrumentDisplayName(project,scopeB)).toBe('Osciloscopio 2');
     expect(instrumentDisplayName(project,meter)).toBe('Multímetro 1');
   });
+
+  it('mide un componente vinculado sin añadir un cable al instrumento',()=>{
+    const project=createBlankProject();
+    const resistor=createInstance('resistor',0,0,'load');
+    const scope=createInstance('oscilloscope',300,0,'scope');
+    scope.properties.linkedComponentId='load';
+    scope.properties.linkedPinId='a';
+    project.components.push(resistor,scope);
+    const samples:SimulationSnapshot[]=[1,3].map((voltage,index)=>({
+      time:index*.01,tick:index,warnings:[],wireSignals:{},componentSignals:{
+        load:{active:true,power:.03,outputs:{},inputs:{
+          a:{voltage,current:.01,logic:voltage>2.5?1:0,active:true},
+          b:{voltage:0,current:-.01,logic:0,active:true},
+        }},
+      },
+    }));
+    const capture=captureInstrument(project,scope,samples);
+    expect(project.wires).toHaveLength(0);
+    expect(capture.voltage).toBe(3);
+    expect(capture.current).toBe(.01);
+    expect(capture.pins[0].wireLabel).toContain('Vínculo interno');
+  });
 });

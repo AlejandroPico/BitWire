@@ -3,6 +3,7 @@ import type { ComponentDefinition, ComponentInstance, ComponentSignal, PinDefini
 import type { LodLevel } from '../canvas/LODManager';
 import type { InstrumentCapture } from './instrumentData';
 import { formatFrequency } from './instrumentData';
+import { formatSI, unitForProperty } from '../utils/si';
 
 interface Props {
   component: ComponentInstance;
@@ -26,6 +27,8 @@ export function CircuitSymbol({ component, definition, selected, lod, signal, in
   const active = Boolean(signal?.active);
   const gateInternal = lod >= 3 && ['and','or','not','nand','nor','xor','xnor'].includes(definition.model);
   const semiconductorInternal = lod >= 3 && ['npn','pnp','nmos','pmos','jfet_n','jfet_p','igbt_n','igbt_p','diode','zener','led'].includes(definition.symbol);
+  const valueLabel=componentValueLabel(definition,component);
+  const junction=definition.symbol==='junction';
   return <g
     className={`circuit-component ${selected ? 'selected' : ''} ${active ? 'energized' : ''} ${component.enabled ? '' : 'disabled'}`}
     transform={`translate(${component.x} ${component.y}) scale(${component.scale || 1}) rotate(${component.rotation} ${w / 2} ${h / 2})`}
@@ -39,8 +42,9 @@ export function CircuitSymbol({ component, definition, selected, lod, signal, in
       {!gateInternal && !semiconductorInternal && <g className="symbol-artwork">{symbolArtwork(definition, component, signal, instrumentCapture, instrumentLabel)}</g>}
       {gateInternal && (lod >= 4 ? <GateCmosNetwork definition={definition}/> : <GateInternalNetwork definition={definition}/>)} 
       {semiconductorInternal && <SemiconductorInternal definition={definition} lod={lod}/>} 
-      <text className="symbol-title" x={w / 2} y={h + 20} textAnchor="middle">{definition.name}</text>
-      {lod >= 2 && <text className="symbol-model" x={w / 2} y={h + 34} textAnchor="middle">{definition.family.toUpperCase()}</text>}
+      {!junction&&<text className="symbol-title" x={w / 2} y={h + 18} textAnchor="middle">{definition.name}</text>}
+      {valueLabel&&<text className="symbol-value" x={w/2} y={h+31} textAnchor="middle">{valueLabel}</text>}
+      {lod >= 3 && <text className="symbol-model" x={w / 2} y={h + (valueLabel?43:32)} textAnchor="middle">{definition.family.toUpperCase()}</text>}
       {lod >= 3 && definition.symbol === 'oscilloscope' && <OscilloscopeInternalNetwork definition={definition}/>} 
       {lod >= 3 && definition.internal && !gateInternal && definition.symbol !== 'oscilloscope' && <InternalNetwork definition={definition}/>} 
       {lod >= 4 && !gateInternal && !semiconductorInternal && definition.symbol !== 'oscilloscope' && <InlinePropertyEditor component={component} definition={definition} onProperty={onProperty}/>} 
@@ -53,7 +57,7 @@ export function CircuitSymbol({ component, definition, selected, lod, signal, in
       const labelX=x+(pin.x===0?(dense?8:10):pin.x===1?(dense?-8:-10):0);
       const labelY=vertical?y+2.5:pin.y===0?y+10:y-7;
       return <g className="pin-group" key={pin.id}>
-        {lod >= 2 && <text className={`pin-label ${dense?'dense':''}`} x={labelX} y={labelY} textAnchor={pin.x === 0 ? 'start' : pin.x === 1 ? 'end' : 'middle'}>{pin.name}</text>}
+        {lod >= 2 && !junction && <text className={`pin-label ${dense?'dense':''}`} x={labelX} y={labelY} textAnchor={pin.x === 0 ? 'start' : pin.x === 1 ? 'end' : 'middle'}>{pin.name}</text>}
         <circle className={`pin ${pin.domain.toLowerCase()} ${dense?'dense':''}`} cx={x} cy={y} r={dense?3.2:lod >= 2 ? 5 : 4}/>
         <circle className={`pin-hit ${dense?'dense':''}`} cx={x} cy={y} r={dense?6:13} onPointerDown={event => onPin(event, component, pin)}/>
       </g>;
@@ -87,10 +91,11 @@ function symbolArtwork(definition: ComponentDefinition, component: ComponentInst
   }
   if (s === 'lamp') return <><path className="lead" d={`M0 ${h/2}H43 M117 ${h/2}H${w}`}/><circle className={`lamp-bulb ${active ? 'on' : ''}`} cx="80" cy="40" r="35"/><path className="symbol-line" d="M56 16l48 48m0-48L56 64"/></>;
   if (s === 'led' || s === 'diode' || s === 'zener') return <><path className="lead" d={`M0 ${h/2}H50 M110 ${h/2}H${w}`}/><path className="symbol-body" d="M50 16v48l50-24z"/><path className="symbol-line" d={s === 'zener' ? 'M100 16v13m-6 0h12m-6 0v22m-6 0h12m-6 0v13' : 'M100 14v52'}/>{s === 'led' && <><path className="symbol-line accent" d="M105 25l18-14m-8 1 8-1-2 8M111 38l18-14m-8 1 8-1-2 8"/></>}</>;
-  if (['and','nand'].includes(s)) return <><path className="symbol-body" d="M42 8h35c53 0 53 64 0 64H42z"/><path className="lead" d={`${inputLeadPath(definition,42)} M${s==='nand'?130:118} 40H${w}`}/>{s === 'nand' && <circle className="symbol-body" cx="124" cy="40" r="6"/>}</>;
-  if (['or','nor','xor','xnor'].includes(s)) return <><path className="symbol-body" d="M39 8c22 0 63 4 84 32-21 28-62 32-84 32 18-20 18-44 0-64z"/><path className="lead" d={`${inputLeadPath(definition,45)} M${s==='nor'||s==='xnor'?134:123} 40H${w}`}/>{s.startsWith('x') && <path className="symbol-line" d="M31 8c18 20 18 44 0 64"/>}{(s === 'nor' || s === 'xnor') && <circle className="symbol-body" cx="128" cy="40" r="6"/>}</>;
-  if (s === 'not') return <><path className="symbol-body" d="M42 8v64l72-32z"/><path className="lead" d={`M0 40H42 M126 40H${w}`}/><circle className="symbol-body" cx="120" cy="40" r="6"/></>;
+  if (['and','nand'].includes(s)) return <><path className="symbol-body" d="M42 8h35c53 0 53 64 0 64H42z"/><path className="lead" d={`${inputLeadPath(definition,42)} ${outputLeadPath(definition,s==='nand'?130:118)}`}/>{s === 'nand' && <circle className="symbol-body" cx="124" cy="40" r="6"/>}</>;
+  if (['or','nor','xor','xnor'].includes(s)) return <><path className="symbol-body" d="M39 8c22 0 63 4 84 32-21 28-62 32-84 32 18-20 18-44 0-64z"/><path className="lead" d={`${inputLeadPath(definition,45)} ${outputLeadPath(definition,s==='nor'||s==='xnor'?134:123)}`}/>{s.startsWith('x') && <path className="symbol-line" d="M31 8c18 20 18 44 0 64"/>}{(s === 'nor' || s === 'xnor') && <circle className="symbol-body" cx="128" cy="40" r="6"/>}</>;
+  if (s === 'not') return <><path className="symbol-body" d="M42 8v64l72-32z"/><path className="lead" d={`M0 40H42 ${outputLeadPath(definition,126)}`}/><circle className="symbol-body" cx="120" cy="40" r="6"/></>;
   if (s === 'logic_input') return <><path className="lead" d={`M112 40H${w}`}/><rect className="symbol-body" x="26" y="11" width="86" height="58"/><text className="logic-value" x="69" y="51" textAnchor="middle">{active ? '1' : '0'}</text></>;
+  if (s === 'junction') return <><rect className="junction-node" x="3" y="3" width="12" height="12"/><circle className="junction-core" cx="9" cy="9" r="3.5"/></>;
   if (s === 'npn' || s === 'pnp') return <BjtSymbol type={s}/>;
   if (s === 'nmos' || s === 'pmos') return <MosfetSymbol type={s}/>;
   if (s === 'jfet_n' || s === 'jfet_p') return <JfetSymbol type={s}/>;
@@ -110,6 +115,14 @@ function symbolArtwork(definition: ComponentDefinition, component: ComponentInst
 
 function inputLeadPath(definition:ComponentDefinition,endX:number) {
   return definition.pins.filter(pin=>pin.x===0&&pin.kind==='INPUT').map(pin=>`M0 ${pin.y*definition.height}H${endX}`).join(' ');
+}
+
+function outputLeadPath(definition:ComponentDefinition,startX:number){return definition.pins.filter(pin=>pin.kind==='OUTPUT').map(pin=>`M${startX} ${pin.y*definition.height}H${definition.width}`).join(' ');}
+
+function componentValueLabel(definition:ComponentDefinition,component:ComponentInstance){
+  const props={...definition.defaults,...component.properties};
+  const priorities:Record<string,string[]>={resistor:['resistance'],potentiometer:['resistance'],capacitor:['capacitance'],inductor:['inductance'],source_dc:['voltage'],source_ac:['voltage','frequency'],current_source:['current'],lamp:['resistance'],motor:['coilResistance'],clock:['frequency'],diode:['forwardVoltage'],zener:['zenerVoltage','breakdownVoltage'],led:['forwardVoltage']};
+  return (priorities[definition.model]??[]).flatMap(key=>typeof props[key]==='number'?[formatSI(Number(props[key]),unitForProperty(key))]:[]).join(' · ');
 }
 
 function InstrumentSymbol({ definition, capture, label }: { definition: ComponentDefinition; capture?: InstrumentCapture; label?: string }) {

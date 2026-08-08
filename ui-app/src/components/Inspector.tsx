@@ -1,8 +1,10 @@
 import { Box, ChevronRight, CirclePower, Copy, Download, ExternalLink, Layers3, Library, Plus, RotateCw, Trash2, X } from 'lucide-react';
-import { CATALOG_BY_ID } from '../catalog/catalog';
+import { useEffect, useState } from 'react';
+import { CATALOG_BY_ID, effectiveDefinition } from '../catalog/catalog';
 import type { BitWireProject, ComponentInstance, ModuleArea, ModulePin, ModulePinSide, PinKind, PropertyValue, SignalDomain } from '../model/types';
 import { redistributeModulePins } from '../model/moduleScope';
 import { uid } from '../state/project';
+import { formatSI, parseSI, unitForProperty } from '../utils/si';
 
 interface Props {
   project: BitWireProject;
@@ -26,7 +28,8 @@ interface Props {
 export function Inspector({ project, selected, collapsed, onToggle, onProperty, onPatch, onProject, onDelete, onDuplicate, onSelectModule, selectedModule, onModule, activeModuleId, onEnterModule, onSaveModule, onExportModule }: Props) {
   if (collapsed) return <aside className="inspector-panel collapsed-panel right"><button className="icon-button vertical-label" onClick={onToggle}>INSPECTOR</button></aside>;
   const component = selected.length === 1 ? project.components.find(item => item.id === selected[0]) : undefined;
-  const definition = component ? CATALOG_BY_ID.get(component.definitionId) : undefined;
+  const baseDefinition = component ? CATALOG_BY_ID.get(component.definitionId) : undefined;
+  const definition = component&&baseDefinition?effectiveDefinition(baseDefinition,component.properties):undefined;
 
   return <aside className="inspector-panel">
     <div className="panel-heading"><div><span className="eyebrow">PROPIEDADES</span><h2>Inspector</h2></div><button className="icon-button" onClick={onToggle}><X size={17}/></button></div>
@@ -55,8 +58,9 @@ export function Inspector({ project, selected, collapsed, onToggle, onProperty, 
           <Field label="Bloqueado"><Toggle checked={Boolean(component.locked)} onChange={locked => onPatch(component.id, { locked })}/></Field>
         </InspectorSection>
         <InspectorSection title="Parámetros del modelo">
-          {Object.entries(component.properties).map(([key, value]) => <Field key={key} label={humanize(key)}>{typeof value === 'boolean' ? key === 'closed' ? <button className={`state-button ${value?'closed':'open'}`} onClick={()=>onProperty(component.id,key,!value)}>{value?'CERRADO':'ABIERTO'}</button> : <Toggle checked={value} onChange={next => onProperty(component.id, key, next)}/> : typeof value === 'number' ? <NumberInput value={value} onChange={next => onProperty(component.id, key, next)} suffix={unitFor(key)}/> : key.toLowerCase().includes('color') ? <input type="color" value={String(value)} onChange={e => onProperty(component.id, key, e.target.value)}/> : <input value={String(value)} onChange={e => onProperty(component.id, key, e.target.value)}/>}</Field>)}
+          {Object.entries(component.properties).filter(([key])=>!['linkedComponentId','linkedPinId'].includes(key)).map(([key, value]) => <Field key={key} label={humanize(key)}>{typeof value === 'boolean' ? key === 'closed' ? <button className={`state-button ${value?'closed':'open'}`} onClick={()=>onProperty(component.id,key,!value)}>{value?'CERRADO':'ABIERTO'}</button> : <Toggle checked={value} onChange={next => onProperty(component.id, key, next)}/> : typeof value === 'number' ? <NumberInput value={value} min={key==='inputCount'||key==='outputCount'?1:undefined} max={key==='inputCount'||key==='outputCount'?10:undefined} onChange={next => onProperty(component.id, key, next)} suffix={unitForProperty(key)}/> : key.toLowerCase().includes('color') ? <input type="color" value={String(value)} onChange={e => onProperty(component.id, key, e.target.value)}/> : <input value={String(value)} onChange={e => onProperty(component.id, key, e.target.value)}/>}</Field>)}
         </InspectorSection>
+        {definition.customGui&&<InstrumentBinding project={project} component={component} onProperty={onProperty}/>} 
         <InspectorSection title="Conectividad"><dl className="pin-list">{definition.pins.map(pin => <div key={pin.id}><dt><span className={`pin-kind ${pin.kind.toLowerCase()}`}/>{pin.name}</dt><dd>{pin.kind} · {pin.domain}</dd></div>)}</dl></InspectorSection>
         {definition.internal && <div className="deep-zoom-note"><Layers3 size={17}/><div><strong>Modelo jerárquico disponible</strong><span>Amplía el componente para revelar su red interna; usa este inspector para editar sus parámetros.</span></div></div>}
       </> : selected.length > 1 ? <>
@@ -79,11 +83,29 @@ export function Inspector({ project, selected, collapsed, onToggle, onProperty, 
 
 function InspectorSection({ title, children }: { title: string; children: React.ReactNode }) { return <section className="inspector-section"><h3>{title}</h3>{children}</section>; }
 function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label className="property-field"><span>{label}</span>{children}</label>; }
-function NumberInput({ value, onChange, suffix }: { value: number; onChange(value: number): void; suffix?: string }) { return <span className="number-control"><input type="number" value={Number.isFinite(value) ? value : 0} onChange={e => onChange(Number(e.target.value))}/>{suffix && <small>{suffix}</small>}</span>; }
+function NumberInput({ value, onChange, suffix, min, max }: { value: number; onChange(value: number): void; suffix?: string; min?:number; max?:number }) {
+  const engineering=Boolean(suffix&&['Ω','F','H','Hz','V','A','W','s'].includes(suffix));
+  const formatted=()=>engineering?formatSI(Number.isFinite(value)?value:0,''):String(Number.isFinite(value)?value:0);
+  const [text,setText]=useState(formatted);
+  useEffect(()=>setText(formatted()),[value,engineering]);
+  const commit=()=>{const parsed=engineering?parseSI(text):Number(text);if(parsed===undefined||!Number.isFinite(parsed)){setText(formatted());return;}const bounded=Math.max(min??-Infinity,Math.min(max??Infinity,parsed));onChange(bounded);setText(engineering?formatSI(bounded,''):String(bounded));};
+  return <span className="number-control"><input type="text" inputMode="decimal" value={text} onChange={event=>setText(event.target.value)} onBlur={commit} onKeyDown={event=>{if(event.key==='Enter'){commit();event.currentTarget.blur();}}}/>{suffix && <small>{suffix}</small>}</span>;
+}
 function Toggle({ checked, onChange }: { checked: boolean; onChange(value: boolean): void }) { return <button type="button" className={`toggle ${checked ? 'on' : ''}`} onClick={() => onChange(!checked)} aria-pressed={checked}><span/></button>; }
-function humanize(value: string) { const labels:Record<string,string>={frequency:'Frecuencia',dutyCycle:'Ciclo útil',propagationDelay:'Retardo de propagación',voltage:'Tensión',currentLimit:'Límite de corriente',resistance:'Resistencia',capacitance:'Capacidad',inductance:'Inductancia',state:'Estado lógico',closed:'Estado del contacto'}; return labels[value] ?? value.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()); }
-function unitFor(key: string) { const keyLower = key.toLowerCase(); if (keyLower.includes('voltage')) return 'V'; if (keyLower.includes('resistance')) return 'Ω'; if (keyLower.includes('capacitance')) return 'F'; if (keyLower.includes('inductance')) return 'H'; if (keyLower.includes('frequency')) return 'Hz'; if (keyLower.includes('delay')) return 'ns'; if (keyLower.includes('power')) return 'W'; return ''; }
+function humanize(value: string) { const labels:Record<string,string>={frequency:'Frecuencia',dutyCycle:'Ciclo útil',propagationDelay:'Retardo de propagación',voltage:'Tensión',currentLimit:'Límite de corriente',resistance:'Resistencia',capacitance:'Capacidad',inductance:'Inductancia',state:'Estado lógico',closed:'Estado del contacto',inputCount:'Cantidad de entradas',outputCount:'Cantidad de salidas'}; return labels[value] ?? value.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()); }
 function MouseHint() { return <svg viewBox="0 0 50 64" width="34"><rect x="9" y="2" width="32" height="58" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M25 3v20" stroke="currentColor"/><rect x="21" y="10" width="8" height="14" fill="currentColor"/></svg>; }
+
+function InstrumentBinding({project,component,onProperty}:{project:BitWireProject;component:ComponentInstance;onProperty:Props['onProperty']}){
+  const linkedId=String(component.properties.linkedComponentId??'');
+  const target=project.components.find(item=>item.id===linkedId);
+  const base=target?CATALOG_BY_ID.get(target.definitionId):undefined;
+  const definition=target&&base?effectiveDefinition(base,target.properties):undefined;
+  return <InspectorSection title="Vinculación interna de medida"><div className="instrument-binding">
+    <label><span>Origen</span><select value={linkedId} onChange={event=>{onProperty(component.id,'linkedComponentId',event.target.value);onProperty(component.id,'linkedPinId','');}}><option value="">Patillas físicas del instrumento</option>{project.components.filter(item=>item.id!==component.id&&!CATALOG_BY_ID.get(item.definitionId)?.customGui).map(item=><option key={item.id} value={item.id}>{CATALOG_BY_ID.get(item.definitionId)?.name} · {item.id}</option>)}</select></label>
+    {target&&definition&&<label><span>Terminal observado</span><select value={String(component.properties.linkedPinId??'')} onChange={event=>onProperty(component.id,'linkedPinId',event.target.value)}><option value="">Diferencial del elemento</option>{definition.pins.map(pin=><option key={pin.id} value={pin.id}>{pin.name} · {pin.kind}</option>)}</select></label>}
+    <p>La vinculación es una sonda virtual de alta impedancia: mide sin añadir cables ni alterar el circuito.</p>
+  </div></InspectorSection>;
+}
 
 function ModulePinsEditor({ module, onChange }: { module: ModuleArea; onChange(pins: ModulePin[]): void }) {
   const change = (id: string, patch: Partial<ModulePin>) => {

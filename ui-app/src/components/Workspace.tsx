@@ -3,7 +3,7 @@ import {
   Trash2, Waypoints, X,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CATALOG_BY_ID } from '../catalog/catalog';
+import { CATALOG_BY_ID, effectiveDefinition } from '../catalog/catalog';
 import { fitBounds, screenToWorld, zoomAt } from '../canvas/ViewportMatrix';
 import { lodForScale } from '../canvas/LODManager';
 import { nearestSegmentIndex, routePreview, routeWire, wireLabelPoint } from '../canvas/WireRouter';
@@ -17,6 +17,7 @@ import type {
 } from '../model/types';
 import { createInstance, uid } from '../state/project';
 import { captureInstrument, instrumentDisplayName } from './instrumentData';
+import { formatSI } from '../utils/si';
 
 type Update = (recipe: (draft: BitWireProject) => void, record?: boolean) => void;
 
@@ -102,7 +103,8 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
 
   const pinWorld = useCallback((ref: PinRef): Point | undefined => {
     const component = project.components.find(item => item.id === ref.componentId);
-    const definition = component && CATALOG_BY_ID.get(component.definitionId);
+    const baseDefinition = component && CATALOG_BY_ID.get(component.definitionId);
+    const definition = component&&baseDefinition?effectiveDefinition(baseDefinition,component.properties):undefined;
     const pin = definition?.pins.find(item => item.id === ref.pinId);
     if (!component || !definition || !pin) {
       const module = project.modules.find(item => item.id === ref.componentId);
@@ -224,7 +226,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
         }).map(component => component.id);
         if (currentInteraction.type === 'marquee') onSelected(memberIds);
         else {
-          const module: ModuleArea = { id: uid('module'), name: `Encapsulado ${project.modules.length + 1}`, ...rect, color: '#7b8cff', memberIds, enabled: true, collapsed: false, pins: [], parentModuleId: activeModuleId };
+          const module: ModuleArea = { id: uid('module'), name: `Encapsulado ${project.modules.length + 1}`, ...rect, color: randomModuleColor(project.modules.map(item=>item.color)), memberIds, enabled: true, collapsed: false, pins: [], parentModuleId: activeModuleId };
           update(draft => { draft.modules.push(module); });
           onSelectedModule(module.id); onTool('select');
         }
@@ -346,18 +348,34 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
     svgRef.current?.setPointerCapture(event.pointerId);
   };
 
+  const createJunctionOnWire=(wire:Wire,point:Point,index:number,existingControlPoint=false,connectImmediately=false)=>{
+    const junctionId=uid('junction'),junctionRef:PinRef={componentId:junctionId,pinId:'node'};
+    update(draft=>{
+      const target=draft.wires.find(item=>item.id===wire.id);if(!target)return;
+      const oldTo={...target.to},points=[...(target.controlPoints??[])];
+      const junction=createInstance('junction',point.x-9,point.y-9,junctionId,1);
+      draft.components.push(junction);if(activeModuleId)draft.modules.find(module=>module.id===activeModuleId)?.memberIds.push(junctionId);
+      target.to=junctionRef;target.controlPoints=points.slice(0,index);
+      draft.wires.push({id:uid('wire'),from:junctionRef,to:oldTo,routing:target.routing,controlPoints:points.slice(existingControlPoint?index+1:index)});
+      if(connectImmediately&&pendingPin)draft.wires.push({id:uid('wire'),from:{...pendingPin},to:junctionRef,routing:draft.settings.wireRouting});
+    });
+    setSelectedWireId(undefined);onSelected([junctionId]);onSelectedModule(undefined);
+    if(connectImmediately&&pendingPin){setPendingPin(undefined);onTool('select');}
+    else if(tool==='wire'){setPendingPin(junctionRef);}
+  };
+
   const addWireNode = (event: React.MouseEvent<SVGPathElement>,wire:Wire,from:Point,to:Point) => {
     event.stopPropagation();
     const world=screenToWorld(localPoint(event),viewport);
     const index=nearestSegmentIndex([from,...(wire.controlPoints??[]),to],world);
-    update(draft=>{const target=draft.wires.find(item=>item.id===wire.id);if(target){target.controlPoints??=[];target.controlPoints.splice(index,0,world);}});
-    setSelectedWireId(wire.id);
+    createJunctionOnWire(wire,world,index,false,Boolean(pendingPin));
   };
 
-  const onWireNodeDown = (event: React.PointerEvent<SVGRectElement>, wireId: string, index: number) => {
+  const onWireNodeDown = (event: React.PointerEvent<SVGRectElement>, wire:Wire, index: number, point:Point) => {
     event.stopPropagation();
-    setSelectedWireId(wireId);
-    setCurrentInteraction({ type: 'wire-node', wireId, index, recorded: false });
+    if(tool==='wire'){createJunctionOnWire(wire,point,index,true,Boolean(pendingPin));return;}
+    setSelectedWireId(wire.id);
+    setCurrentInteraction({ type: 'wire-node', wireId:wire.id, index, recorded: false });
     svgRef.current?.setPointerCapture(event.pointerId);
   };
 
@@ -386,7 +404,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
         <rect className="grid-plane" x={-100000} y={-100000} width={200000} height={200000} fill="url(#majorGrid)"/>
         <g className="module-layer">{renderedModules.map(module => <g key={module.id} className={`module-area ${module.collapsed ? 'chip-mode' : 'area-mode'} ${module.id === selectedModuleId ? 'selected' : ''} ${module.enabled ? '' : 'disabled'}`} onPointerDown={event => onModuleDown(event,module)} onDoubleClick={event => { event.stopPropagation(); navigateToModule(module.id); }} onContextMenu={event=>{event.preventDefault();event.stopPropagation();onSelected([]);onSelectedModule(module.id);onContextTarget({kind:'module',id:module.id,x:event.clientX,y:event.clientY});}}>
           <rect className="module-shell" x={module.x} y={module.y} width={module.width} height={module.height} style={{ stroke: module.color }}/>
-          <ModulePreview project={project} module={module} snapshot={snapshot}/>
+          <ModulePreview project={project} module={module} snapshot={snapshot} running={running} animateCurrent={project.settings.animateCurrent}/>
           <path d={`M${module.x} ${module.y + 34}h${module.width}`} style={{ stroke: module.color }}/>
           {module.collapsed && <>{Array.from({length:Math.max(2,Math.min(12,module.pins.length))},(_,index)=><path key={index} className="chip-decoration" d={`M${module.x+22+index*14} ${module.y+12}v10`} style={{stroke:module.color}}/>)}</>}
           <text x={module.x + 14} y={module.y + 23} style={{ fill: module.color }}>{module.name.toUpperCase()}</text><text className="module-state" x={module.x + module.width - 14} y={module.y + 23} textAnchor="end">{module.collapsed ? `${module.pins.length} PINES` : module.enabled ? 'ACTIVO' : 'AISLADO'}</text>
@@ -399,21 +417,25 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
           const value = formatSignal(signal, project.settings.signalView);
           const mid = wireLabelPoint(from,to,wire.routing,wire.controlPoints);
           const wirePath = routeWire(from, to, wire.routing, wire.controlPoints);
-          return <g key={wire.id} className={`wire ${signal?.active ? 'active' : ''} logic-${signal?.logic ?? 'z'} ${running ? 'running' : ''}`}>
+          const flowColor=activeModule?.color;
+          const flowDuration=currentFlowDuration(signal?.current??0);
+          const flowOffset=(signal?.current??0)>=0?-34:34;
+          return <g key={wire.id} className={`wire ${signal?.active ? 'active' : ''} logic-${signal?.logic ?? 'z'} ${running ? 'running' : ''}`} style={flowColor?{'--wire-flow-color':flowColor} as React.CSSProperties:undefined}>
             <path className="wire-hit" d={wirePath} onPointerDown={event => onWireDown(event,wire,from,to)} onDoubleClick={event => addWireNode(event,wire,from,to)} onContextMenu={event=>{event.preventDefault();event.stopPropagation();setSelectedWireId(wire.id);onContextTarget({kind:'wire',id:wire.id,x:event.clientX,y:event.clientY});}}/>
             <path className="wire-base" d={wirePath}/>
             <path className="wire-signal" d={wirePath}/>
-            {project.settings.animateCurrent && running && signal?.active && <>
-              <path className="wire-flow" d={wirePath}><animate attributeName="stroke-dashoffset" from="0" to="-34" dur="0.82s" calcMode="linear" repeatCount="indefinite"/></path>
-              <path className="wire-flow-highlight" d={wirePath}><animate attributeName="stroke-dashoffset" from="0" to="-34" dur="0.82s" calcMode="linear" repeatCount="indefinite"/></path>
+            {project.settings.animateCurrent && running && Math.abs(signal?.current??0)>1e-9 && <>
+              <path className="wire-flow" d={wirePath}><animate attributeName="stroke-dashoffset" from="0" to={String(flowOffset)} dur={`${flowDuration}s`} calcMode="linear" repeatCount="indefinite"/></path>
+              <path className="wire-flow-highlight" d={wirePath}><animate attributeName="stroke-dashoffset" from="0" to={String(flowOffset)} dur={`${flowDuration}s`} calcMode="linear" repeatCount="indefinite"/></path>
             </>}
             {project.settings.showValues && <g className="signal-label" transform={`translate(${mid.x} ${mid.y})`}><rect x="-36" y="-13" width="72" height="22"/><text textAnchor="middle" y="3">{value}</text></g>}
-            {wire.id === selectedWireId && wire.controlPoints?.map((point,index)=><rect key={index} className="wire-control-node" x={point.x-6} y={point.y-6} width="12" height="12" onPointerDown={event => onWireNodeDown(event,wire.id,index)} onDoubleClick={event => { event.stopPropagation(); patchWire(wire.id,{ controlPoints:wire.controlPoints?.filter((_,itemIndex)=>itemIndex!==index) }); }}/>) }
+            {wire.id === selectedWireId && wire.controlPoints?.map((point,index)=><rect key={index} className="wire-control-node" x={point.x-6} y={point.y-6} width="12" height="12" onPointerDown={event => onWireNodeDown(event,wire,index,point)} onDoubleClick={event => { event.stopPropagation(); patchWire(wire.id,{ controlPoints:wire.controlPoints?.filter((_,itemIndex)=>itemIndex!==index) }); }}/>) }
           </g>;
         })}{pendingStart && <path className="wire-preview" d={routePreview(pendingStart, pointerWorld)}/>}</g>
         <g className="component-layer">{visibleComponents.map(component => {
-          const definition = CATALOG_BY_ID.get(component.definitionId);
-          if (!definition) return null;
+          const baseDefinition = CATALOG_BY_ID.get(component.definitionId);
+          if (!baseDefinition) return null;
+          const definition=effectiveDefinition(baseDefinition,component.properties);
           const componentLod = lodForScale(viewport.scale * (component.scale || 1));
           const instrumentCapture = definition.customGui && project.settings.liveInstrumentScreens ? captureInstrument(project,component,samples) : undefined;
           return <CircuitSymbol key={component.id} component={component} definition={definition} selected={selected.includes(component.id)} lod={componentLod.level} signal={snapshot?.componentSignals[component.id]} instrumentCapture={instrumentCapture} instrumentLabel={definition.customGui?instrumentDisplayName(project,component):undefined} onPointerDown={onComponentDown} onDoubleClick={openComponentInspector} onContextMenu={componentContext} onPin={onPin} onQuickToggle={quickToggle} onProperty={(item,key,value) => update(draft => { const target=draft.components.find(node=>node.id===item.id); if(target) target.properties[key]=value; })}/>;
@@ -431,7 +453,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
     </nav>
     {activeModule && <ModulePortDocks module={activeModule} onPin={pin=>connectPin({componentId:activeModule.id,pinId:pin.id})}/>} 
     <div className="lod-indicator"><Scan size={15}/><div><span>LOD {lod.level}</span><strong>{lod.name}</strong></div><small>{lod.detail}</small></div>
-    {pendingPin && <div className="wire-hint"><WayPointIcon/>Selecciona otro terminal para completar el cable<button onClick={() => setPendingPin(undefined)}><X size={14}/></button></div>}
+    {pendingPin && <div className="wire-hint"><WayPointIcon/>Selecciona un terminal o un nodo del cable para completar la conexión<button onClick={() => setPendingPin(undefined)}><X size={14}/></button></div>}
     {selectedWire && <div className="wire-editor"><Route size={14}/><strong>CONEXIÓN</strong><select value={selectedWire.routing} onChange={event => patchWire(selectedWire.id,{routing:event.target.value as Wire['routing']})}><option value="orthogonal">Ortogonal</option><option value="bezier">Bézier</option><option value="straight">Recta</option></select><span>{selectedWire.controlPoints?.length ?? 0} nodos</span><button onClick={() => patchWire(selectedWire.id,{controlPoints:[]})}>Limpiar nodos</button><button className="danger" onClick={() => deleteWire(selectedWire.id)}><Trash2 size={13}/></button></div>}
     <div className="zoom-controls"><button onClick={() => setViewport(current => zoomAt(current, { x: svgRef.current!.clientWidth/2, y: svgRef.current!.clientHeight/2 }, 1.25))}><Plus size={16}/></button><span title={`${viewport.scale * 100}%`}>{formatZoom(viewport.scale)}</span><button onClick={() => setViewport(current => zoomAt(current, { x: svgRef.current!.clientWidth/2, y: svgRef.current!.clientHeight/2 }, .8))}><Minus size={16}/></button><button onClick={fitProject} title="Encajar proyecto"><Maximize size={16}/></button><button onClick={() => setViewport({ x: svgRef.current!.clientWidth/2, y: svgRef.current!.clientHeight/2, scale: 1 })} title="Centrar origen"><Crosshair size={16}/></button></div>
   </main>;
@@ -442,7 +464,9 @@ function intersects(a: {x:number;y:number;width:number;height:number}, b: {x:num
 function adaptiveGrid(base: number, scale: number) { let size = base; while (size * scale < 10) size *= 5; while (size * scale > 80) size /= 2; return size; }
 function formatZoom(scale:number) { const percent=scale*100; if(percent<10_000)return `${Math.round(percent)}%`; if(percent<1_000_000)return `${(percent/1000).toFixed(1)}k%`; return `${(percent/1_000_000).toFixed(percent<10_000_000?1:0)}M%`; }
 function isTyping(target: EventTarget | null) { return target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement; }
-function formatSignal(signal: WireSignal | undefined, view: BitWireProject['settings']['signalView']) { if (!signal || !signal.active) return '—'; if (view === 'logic') return String(signal.logic); if (view === 'current') return signal.current >= 1 ? `${signal.current.toFixed(2)} A` : `${(signal.current*1000).toFixed(1)} mA`; if (view === 'power') return `${Math.abs(signal.voltage*signal.current).toFixed(3)} W`; return `${signal.voltage.toFixed(2)} V`; }
+function formatSignal(signal: WireSignal | undefined, view: BitWireProject['settings']['signalView']) { if (!signal || (!signal.active&&!Number.isFinite(signal.voltage))) return '—'; if (view === 'logic') return String(signal.logic); if (view === 'current') return formatSI(signal.current,'A'); if (view === 'power') return formatSI(Math.abs(signal.voltage*signal.current),'W'); return formatSI(signal.voltage,'V'); }
+function currentFlowDuration(current:number){const magnitude=Math.abs(current);return Math.max(.18,Math.min(2.4,1.5/(1+Math.log10(1+magnitude*1000))));}
+function randomModuleColor(used:string[]){const palette=['#2be4c4','#f5b942','#ff6f91','#7b8cff','#b4e36b','#ff9e52','#d792ff','#48b9ff','#f06cd7','#66d19e','#e6c84f','#ef745c'];const available=palette.filter(color=>!used.some(item=>item.toLowerCase()===color.toLowerCase()));const candidates=available.length?available:palette;const random=new Uint32Array(1);crypto.getRandomValues(random);return candidates[random[0]%candidates.length];}
 function WayPointIcon() { return <svg viewBox="0 0 24 24" width="16"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="12" r="3"/><path d="M8 12h8" fill="none" stroke="currentColor" strokeWidth="2"/></svg>; }
 
 function modulePinWorld(module: ModuleArea, pin: ModulePin): Point {

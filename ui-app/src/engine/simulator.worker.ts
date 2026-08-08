@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 import type { BitWireProject } from '../model/types';
-import { evaluateCircuit } from './simulate';
+import { createSimulationState, evaluateCircuit } from './simulate';
 
 type Message =
   | { type: 'project'; project: BitWireProject }
@@ -13,12 +13,13 @@ let speed = 1;
 let tick = 0;
 let simulationTime = 0;
 let last = performance.now();
+let simulationState=createSimulationState();
 
 function emit(delta = 1 / 60) {
   if (!project) return;
   simulationTime += delta * speed;
   tick += 1;
-  self.postMessage({ type: 'snapshot', snapshot: evaluateCircuit(project, simulationTime, tick) });
+  self.postMessage({ type: 'snapshot', snapshot: evaluateCircuit(project, simulationTime, tick, simulationState) });
 }
 
 setInterval(() => {
@@ -33,6 +34,7 @@ self.onmessage = (event: MessageEvent<Message>) => {
   const message = event.data;
   if (message.type === 'project') {
     project = message.project;
+    simulationState=createSimulationState();
     emit(0);
   } else if (message.type === 'control') {
     running = message.running;
@@ -44,4 +46,3 @@ self.onmessage = (event: MessageEvent<Message>) => {
 };
 
 export {};
-

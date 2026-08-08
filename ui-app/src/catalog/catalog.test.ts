@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { EMBEDDED_CATALOG } from './catalog';
+import { CATALOG_BY_ID, EMBEDDED_CATALOG, effectiveDefinition } from './catalog';
 
 describe('expanded component catalog', () => {
-  it('contains 219 unique, connectable vector components', () => {
-    expect(EMBEDDED_CATALOG).toHaveLength(219);
-    expect(new Set(EMBEDDED_CATALOG.map(item=>item.id)).size).toBe(219);
+  it('contains 220 unique, connectable vector components', () => {
+    expect(EMBEDDED_CATALOG).toHaveLength(220);
+    expect(new Set(EMBEDDED_CATALOG.map(item=>item.id)).size).toBe(220);
     expect(EMBEDDED_CATALOG.every(item=>item.pins.length>0)).toBe(true);
   });
 
@@ -24,5 +24,20 @@ describe('expanded component catalog', () => {
       const minimum=Math.min(...left.slice(1).map((pin,index)=>(pin.y-left[index].y)*display.height));
       expect(minimum).toBeGreaterThan(12);
     }
+  });
+
+  it('materializes up to ten inputs and ten outputs on configurable gates',()=>{
+    const base=CATALOG_BY_ID.get('gate_and')!;
+    const gate=effectiveDefinition(base,{inputCount:10,outputCount:10});
+    expect(gate.pins.filter(pin=>pin.kind==='INPUT')).toHaveLength(10);
+    expect(gate.pins.filter(pin=>pin.kind==='OUTPUT')).toHaveLength(10);
+    expect(gate.pins.map(pin=>pin.id)).toContain('in10');
+    expect(gate.pins.map(pin=>pin.id)).toContain('out10');
+  });
+
+  it('includes a one-terminal junction that can become part of a net',()=>{
+    const junction=CATALOG_BY_ID.get('junction')!;
+    expect(junction.model).toBe('connector');
+    expect(junction.pins.map(pin=>pin.id)).toEqual(['node']);
   });
 });

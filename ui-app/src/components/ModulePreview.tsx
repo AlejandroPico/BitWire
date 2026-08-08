@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { CATALOG_BY_ID } from '../catalog/catalog';
+import { CATALOG_BY_ID, effectiveDefinition } from '../catalog/catalog';
 import { routeWire } from '../canvas/WireRouter';
-import { descendantModules, respectsModuleBoundaries } from '../model/moduleScope';
+import { descendantModules, respectsModuleBoundaries, wireOwnerModuleId } from '../model/moduleScope';
 import type { BitWireProject, ModuleArea, ModulePin, PinRef, Point, SimulationSnapshot } from '../model/types';
 import { CircuitSymbol } from './CircuitSymbol';
 
@@ -9,11 +9,13 @@ interface Props {
   project: BitWireProject;
   module: ModuleArea;
   snapshot?: SimulationSnapshot;
+  running:boolean;
+  animateCurrent:boolean;
 }
 
 interface Bounds { x:number; y:number; width:number; height:number }
 
-export function ModulePreview({ project, module, snapshot }: Props) {
+export function ModulePreview({ project, module, snapshot, running, animateCurrent }: Props) {
   const content = useMemo(() => {
     const descendants = descendantModules(project,module.id);
     const moduleIds = new Set([module.id,...descendants.map(item=>item.id)]);
@@ -24,7 +26,7 @@ export function ModulePreview({ project, module, snapshot }: Props) {
       && endpointIds.has(wire.from.componentId) && endpointIds.has(wire.to.componentId));
     const points:Point[]=[];
     for(const component of components){
-      const definition=CATALOG_BY_ID.get(component.definitionId);if(!definition)continue;
+      const base=CATALOG_BY_ID.get(component.definitionId);if(!base)continue;const definition=effectiveDefinition(base,component.properties);
       const scale=component.scale||1;
       points.push({x:component.x,y:component.y},{x:component.x+definition.width*scale,y:component.y+definition.height*scale});
     }
@@ -52,10 +54,12 @@ export function ModulePreview({ project, module, snapshot }: Props) {
         {content.descendants.map(child=><g className="module-preview-child" key={child.id}><rect x={child.x} y={child.y} width={child.width} height={child.height} style={{stroke:child.color}}/><text x={child.x+9} y={child.y+17} style={{fill:child.color}}>{child.name.toUpperCase()}</text></g>)}
         {content.wires.map(wire=>{
           const from=projectPinWorld(project,wire.from),to=projectPinWorld(project,wire.to);if(!from||!to)return null;
-          return <path key={wire.id} className={`module-preview-wire ${snapshot?.wireSignals[wire.id]?.active?'active':''}`} d={routeWire(from,to,wire.routing,wire.controlPoints)}/>;
+          const signal=snapshot?.wireSignals[wire.id],path=routeWire(from,to,wire.routing,wire.controlPoints),ownerId=wireOwnerModuleId(project,wire),color=project.modules.find(item=>item.id===ownerId)?.color??module.color;
+          const offset=(signal?.current??0)>=0?-34:34,duration=currentFlowDuration(signal?.current??0);
+          return <g key={wire.id} style={{'--wire-flow-color':color} as React.CSSProperties}><path className={`module-preview-wire ${signal?.active?'active':''}`} d={path}/>{animateCurrent&&running&&Math.abs(signal?.current??0)>1e-9&&<path className="module-preview-flow" d={path}><animate attributeName="stroke-dashoffset" from="0" to={String(offset)} dur={`${duration}s`} calcMode="linear" repeatCount="indefinite"/></path>}</g>;
         })}
         {content.components.map(component=>{
-          const definition=CATALOG_BY_ID.get(component.definitionId);if(!definition)return null;
+          const base=CATALOG_BY_ID.get(component.definitionId);if(!base)return null;const definition=effectiveDefinition(base,component.properties);
           return <CircuitSymbol key={component.id} component={component} definition={definition} selected={false} lod={1} signal={snapshot?.componentSignals[component.id]}
             onPointerDown={()=>{}} onDoubleClick={()=>{}} onContextMenu={()=>{}} onPin={()=>{}} onQuickToggle={()=>{}} onProperty={()=>{}}/>;
         })}
@@ -64,6 +68,8 @@ export function ModulePreview({ project, module, snapshot }: Props) {
     <path className="module-preview-frame" d={`M${body.x} ${body.y+12}v-12h12 M${body.x+body.width-12} ${body.y}h12v12 M${body.x} ${body.y+body.height-12}v12h12 M${body.x+body.width-12} ${body.y+body.height}h12v-12`}/>
   </g>;
 }
+
+function currentFlowDuration(current:number){const magnitude=Math.abs(current);return Math.max(.18,Math.min(2.4,1.5/(1+Math.log10(1+magnitude*1000))));}
 
 function boundsFor(points:Point[]):Bounds|undefined {
   if(!points.length)return undefined;
@@ -75,7 +81,7 @@ function boundsFor(points:Point[]):Bounds|undefined {
 function projectPinWorld(project:BitWireProject,ref:PinRef):Point|undefined {
   const component=project.components.find(item=>item.id===ref.componentId);
   if(component){
-    const definition=CATALOG_BY_ID.get(component.definitionId),pin=definition?.pins.find(item=>item.id===ref.pinId);
+    const baseDefinition=CATALOG_BY_ID.get(component.definitionId),definition=baseDefinition?effectiveDefinition(baseDefinition,component.properties):undefined,pin=definition?.pins.find(item=>item.id===ref.pinId);
     if(!definition||!pin)return undefined;
     const base={x:pin.x*definition.width,y:pin.y*definition.height};
     const angle=component.rotation*Math.PI/180,cx=definition.width/2,cy=definition.height/2,scale=component.scale||1;

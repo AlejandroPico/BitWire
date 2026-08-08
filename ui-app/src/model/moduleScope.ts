@@ -44,6 +44,12 @@ export function respectsModuleBoundaries(project: BitWireProject, wire: Wire): b
   return [...fromScopes].some(scope => toScopes.has(scope));
 }
 
+/** Hierarchical canvas that owns a valid wire; root wires return undefined. */
+export function wireOwnerModuleId(project:BitWireProject,wire:Wire):string|undefined {
+  const shared=[...endpointScopes(project,wire.from.componentId)].filter(scope=>endpointScopes(project,wire.to.componentId).has(scope));
+  return shared.filter(scope=>scope!==ROOT_SCOPE).map(id=>project.modules.find(module=>module.id===id)).filter((module):module is ModuleArea=>Boolean(module)).sort((a,b)=>moduleDepth(b,project.modules)-moduleDepth(a,project.modules))[0]?.id;
+}
+
 /** Returns only the objects directly editable at the requested hierarchy level. */
 export function canvasScope(project: BitWireProject, activeModuleId?: string): CanvasScope {
   const modules = project.modules.filter(module => module.parentModuleId === activeModuleId);

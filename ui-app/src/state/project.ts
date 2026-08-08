@@ -19,6 +19,11 @@ export const DEFAULT_SETTINGS: ProjectSettings = {
 export function createInstance(definitionId: string, x: number, y: number, id = uid('node'), scale = 1): ComponentInstance {
   const definition = CATALOG_BY_ID.get(definitionId);
   if (!definition) throw new Error(`Componente desconocido: ${definitionId}`);
+  const properties={ ...definition.defaults };
+  if(['and','or','nand','nor','xor','xnor'].includes(definition.model)){
+    properties.inputCount=definition.pins.filter(pin=>pin.kind==='INPUT').length||2;
+    properties.outputCount=1;
+  } else if(definition.model==='not') properties.outputCount=1;
   return {
     id,
     definitionId,
@@ -26,7 +31,7 @@ export function createInstance(definitionId: string, x: number, y: number, id = 
     y,
     rotation: 0,
     scale,
-    properties: { ...definition.defaults },
+    properties,
     enabled: true,
   };
 }

@@ -9,23 +9,25 @@ La primera versión funcional incluye un plano SVG de profundidad semántica, ca
 - Plano técnico virtualmente infinito con desplazamiento, zoom práctico hasta `1.000.000.000×`, rejilla adaptativa y encaje automático.
 - Cinco niveles de detalle: encapsulado, esquemático, funcional, dispositivo y físico.
 - Escala de inserción dependiente del zoom: una pieza conserva el tamaño visual con el que fue colocada y revela su escala relativa al alejarse.
-- Catálogo de **219 componentes** repartidos entre electricidad, semiconductores, RF, analógica, potencia, sensores, lógica, memorias, comunicaciones, audio, visualización e instrumentación.
+- Catálogo de **220 componentes** repartidos entre electricidad, semiconductores, RF, analógica, potencia, sensores, lógica, memorias, comunicaciones, audio, visualización e instrumentación.
 - Símbolos SVG nativos: no se utilizan bitmaps para los elementos del circuito.
 - Inserción mediante arrastre o doble clic, movimiento con ajuste a rejilla, selección múltiple, duplicado, giro, bloqueo y borrado seguro de conexiones.
 - Paleta vertical integrada en el lienzo para seleccionar, cablear, desplazar y crear encapsulados sin cargar la cabecera.
 - Cableado terminal a terminal con rutas ortogonales, Bézier o rectas.
-- Edición manual de cables: arrastre directo, nodos mediante doble clic, asas desplazables y cambio de ruta por conexión.
+- Edición manual de cables: arrastre directo, nodos eléctricos conectables mediante doble clic, asas desplazables y cambio de ruta por conexión.
 - Control central de simulación con jerarquía visual propia: ejecución, pausa, paso y velocidades de `0,25×` a `10×` sobre un motor aislado en `Web Worker`.
-- Propagación de fuentes CC/CA, interruptores, cargas, pasivos, entradas digitales, reloj y puertas AND, OR, NOT, NAND, NOR, XOR y XNOR.
+- Solver nodal MNA con fuentes CC/CA, fuentes de corriente, resistencias, potenciómetros, condensadores e inductores con estado transitorio, interruptores, cargas, diodos, transistores y etapas analógicas básicas.
+- Corriente calculada con signo y conservación de Kirchhoff: el sentido y la velocidad de la animación responden al resultado eléctrico, incluidos retornos a masa y medios ciclos negativos de CA.
+- Puertas AND, OR, NOT, NAND, NOR, XOR y XNOR configurables con hasta 10 entradas y 10 salidas físicas por instancia.
 - Visualización sobre el cable de tensión, corriente, potencia o estado lógico mediante menús propios de superficie completa, sin depender de pequeños selectores nativos.
 - Accionamiento directo de interruptores y entradas binarias desde el plano.
 - Banco de instrumentación multivista y persistente: osciloscopio, analizador lógico, multímetro, monitor de potencia, analizador de espectro y frecuencímetro; cualquier combinación puede mostrarse u ocultarse.
-- Captura independiente por aparato: cada osciloscopio, sonda o analizador lee únicamente las redes conectadas a sus propios terminales.
+- Captura independiente por aparato: cada osciloscopio, sonda o analizador lee únicamente sus redes o un componente vinculado mediante una sonda virtual de alta impedancia.
 - Menús contextuales propios mediante botón derecho para componentes, conexiones, lienzo y encapsulados; el menú nativo del navegador queda bloqueado dentro del laboratorio.
 - Ventanas de instrumento movibles, redimensionables, minimizables, maximizables y ordenadas por foco, con extensión a frontales profesionales de adquisición, disparo, escalas, rangos y filtros.
-- Encapsulados funcionales redimensionables y anidables sin límite práctico, con lienzo interno propio, navegación jerárquica, terminales fijos de borde, modo chip y patillas configurables.
+- Encapsulados funcionales redimensionables y anidables sin límite práctico, con color diferenciado al crearlos, lienzo interno propio, animación de corriente coloreada, navegación jerárquica, terminales fijos de borde, modo chip y patillas configurables.
 - Biblioteca local de encapsulados, importación y exportación `.bitwire-module` y reutilización entre proyectos.
-- Inspector editable con parámetros eléctricos, posición, rotación, estado y conectividad.
+- Inspector editable con parámetros eléctricos en notación SI (`15 µF`, `4,7 kΩ`), posición, rotación, estado y conectividad.
 - Interfaz de trabajo compacta con identidad integrada en el catálogo, título de proyecto centrado, inspector plegado al iniciar y barra superior separada del plano.
 - Manual interactivo con búsqueda, índice navegable y doce tutoriales desarrollados sobre edición, simulación, encapsulados, instrumentos, LOD, archivos y diagnóstico.
 - Inspector lateral mediante doble clic y parámetros editables directamente dentro del elemento al alcanzar el LOD físico.
@@ -115,7 +117,7 @@ Un archivo BitWire es JSON versionado y contiene metadatos, instancias, propieda
 
 La estructura actual deja preparadas las siguientes ampliaciones sin romper los proyectos existentes:
 
-1. Solver analógico MNA completo en Rust/WASM y modelos SPICE.
+1. Migración opcional del solver MNA a Rust/WASM y ampliación progresiva con modelos SPICE de precisión.
 2. Retardos de propagación, buses, alta impedancia y resolución de conflictos digitales.
 3. Apertura real de subgrafos anidados e importación de un proyecto como símbolo reutilizable.
 4. Autorouter Manhattan con evitación de obstáculos y edición de vértices.
