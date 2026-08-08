@@ -9,26 +9,26 @@ La primera versión funcional incluye un plano SVG de profundidad semántica, ca
 - Plano técnico virtualmente infinito con desplazamiento, zoom práctico hasta `1.000.000.000×`, rejilla adaptativa y encaje automático.
 - Cinco niveles de detalle: encapsulado, esquemático, funcional, dispositivo y físico.
 - Escala de inserción dependiente del zoom: una pieza conserva el tamaño visual con el que fue colocada y revela su escala relativa al alejarse.
-- Catálogo de **220 componentes** repartidos entre electricidad, semiconductores, RF, analógica, potencia, sensores, lógica, memorias, comunicaciones, audio, visualización e instrumentación.
+- Catálogo de **235 componentes** repartidos entre electricidad, semiconductores, RF, analógica, potencia, sensores, lógica, memorias, comunicaciones, audio, visualización e instrumentación.
 - Símbolos SVG nativos: no se utilizan bitmaps para los elementos del circuito.
 - Inserción mediante arrastre o doble clic, movimiento con ajuste a rejilla, selección múltiple, duplicado, giro, bloqueo y borrado seguro de conexiones.
 - Paleta vertical integrada en el lienzo para seleccionar, cablear, desplazar y crear encapsulados sin cargar la cabecera.
 - Cableado terminal a terminal con rutas ortogonales, Bézier o rectas.
 - Edición manual de cables: arrastre directo, nodos eléctricos conectables mediante doble clic, asas desplazables y cambio de ruta por conexión.
-- Control central de simulación con jerarquía visual propia: ejecución, pausa, paso y velocidades de `0,25×` a `10×` sobre un motor aislado en `Web Worker`.
+- Control central de simulación con ejecución, pausa y paso, más una escala temporal logarítmica manejable con ratón entre `0,0001×` y `10×` sobre un motor aislado en `Web Worker`.
 - Solver nodal MNA con fuentes CC/CA, fuentes de corriente, resistencias, potenciómetros, condensadores e inductores con estado transitorio, interruptores, cargas, diodos, transistores y etapas analógicas básicas.
 - Corriente calculada con signo y conservación de Kirchhoff: el sentido y la velocidad de la animación responden al resultado eléctrico, incluidos retornos a masa y medios ciclos negativos de CA.
 - Puertas AND, OR, NOT, NAND, NOR, XOR y XNOR configurables con hasta 10 entradas y 10 salidas físicas por instancia.
 - Visualización sobre el cable de tensión, corriente, potencia o estado lógico mediante menús propios de superficie completa, sin depender de pequeños selectores nativos.
 - Accionamiento directo de interruptores y entradas binarias desde el plano.
 - Banco de instrumentación multivista y persistente: osciloscopio, analizador lógico, multímetro, monitor de potencia, analizador de espectro y frecuencímetro; cualquier combinación puede mostrarse u ocultarse.
-- Captura independiente por aparato: cada osciloscopio, sonda o analizador lee únicamente sus redes o un componente vinculado mediante una sonda virtual de alta impedancia.
+- Captura independiente por aparato: osciloscopios, medidores, analizadores y sondas leen únicamente sus redes o un componente vinculado mediante una sonda virtual de alta impedancia.
 - Menús contextuales propios mediante botón derecho para componentes, conexiones, lienzo y encapsulados; el menú nativo del navegador queda bloqueado dentro del laboratorio.
 - Ventanas de instrumento movibles, redimensionables, minimizables, maximizables y ordenadas por foco, con extensión a frontales profesionales de adquisición, disparo, escalas, rangos y filtros.
 - Encapsulados funcionales redimensionables y anidables sin límite práctico, con color diferenciado al crearlos, lienzo interno propio, animación de corriente coloreada, navegación jerárquica, terminales fijos de borde, modo chip y patillas configurables.
 - Biblioteca local de encapsulados, importación y exportación `.bitwire-module` y reutilización entre proyectos.
-- Inspector editable con parámetros eléctricos en notación SI (`15 µF`, `4,7 kΩ`), posición, rotación, estado y conectividad.
-- Interfaz de trabajo compacta con identidad integrada en el catálogo, título de proyecto centrado, inspector plegado al iniciar y barra superior separada del plano.
+- Inspector editable con nombre propio por elemento, parámetros eléctricos en notación SI (`15 µF`, `4,7 kΩ`), posición, rotación, estado y conectividad.
+- Interfaz de trabajo compacta con contador de catálogo `visibles / total`, título de proyecto centrado, inspector abierto al iniciar y barra superior separada del plano.
 - Manual interactivo con búsqueda, índice navegable y doce tutoriales desarrollados sobre edición, simulación, encapsulados, instrumentos, LOD, archivos y diagnóstico.
 - Inspector lateral mediante doble clic y parámetros editables directamente dentro del elemento al alcanzar el LOD físico.
 - Redes internas equivalentes y CMOS para AND, OR, NOT, NAND, NOR, XOR y XNOR; estructura P–N, BJT y MOS visible mediante zoom semántico.

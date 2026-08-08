@@ -38,7 +38,7 @@ export function InstrumentWindow({ state,component,project,samples,onState,onPat
   const capture=useMemo(()=>captureInstrument(project,component,samples),[project,component,samples]);
   const operation=useRef<PointerOperation|undefined>(undefined);
   const Icon=iconFor(component.definitionId);
-  const connected=capture.pins.filter(pin=>pin.wireId).length;
+  const connected=capture.pins.filter(pin=>pin.wireId||pin.wireLabel?.startsWith('Vínculo interno')).length;
   const displayName=instrumentDisplayName(project,component);
 
   const begin=(event:React.PointerEvent,mode:'drag'|'resize')=>{
@@ -86,8 +86,8 @@ function InstrumentDisplay({component,capture}:{component:ComponentInstance;capt
   if(component.definitionId==='oscilloscope')return <ScopeDisplay capture={capture}/>;
   if(component.definitionId==='logic_analyzer')return <LogicDisplay capture={capture}/>;
   if(component.definitionId==='spectrum_analyzer')return <SpectrumDisplay capture={capture}/>;
-  if(component.definitionId==='multimeter')return <MeterDisplay capture={capture} mode={String(component.properties.mode??'voltage')}/>;
-  if(component.definitionId==='power_monitor')return <PowerDisplay capture={capture}/>;
+  if(['multimeter','ammeter','ohmmeter'].includes(component.definitionId))return <MeterDisplay capture={capture} mode={component.definitionId==='ammeter'?'current':component.definitionId==='ohmmeter'?'resistance':String(component.properties.mode??'voltage')}/>;
+  if(component.definitionId==='power_monitor'||component.definitionId==='wattmeter')return <PowerDisplay capture={capture}/>;
   if(component.definitionId==='frequency_counter')return <FrequencyDisplay capture={capture}/>;
   return <ProbeDisplay capture={capture}/>;
 }
@@ -114,7 +114,7 @@ function SpectrumDisplay({capture}:{capture:ReturnType<typeof captureInstrument>
 }
 
 function MeterDisplay({capture,mode}:{capture:ReturnType<typeof captureInstrument>;mode:string}) {
-  const reading=mode==='current'?`${(capture.current*1000).toFixed(3)} mA`:mode==='resistance'?`${Math.abs(capture.current)>1e-9?Math.abs(capture.voltage/capture.current).toFixed(2):'OL'} Ω`:mode==='frequency'?formatFrequency(capture.frequency):`${capture.voltage.toFixed(4)} V`;
+  const reading=mode==='current'?`${(capture.current*1000).toFixed(3)} mA`:mode==='resistance'?`${capture.resistance===undefined?'OL':capture.resistance.toFixed(2)} Ω`:mode==='frequency'?formatFrequency(capture.frequency):`${capture.voltage.toFixed(4)} V`;
   return <div className="professional-screen meter-screen"><header><span>TRUE RMS</span><span>AUTO RANGE</span><span>DC</span></header><strong>{reading}</strong><div className="meter-bar"><i style={{width:`${Math.min(100,Math.abs(capture.voltage)/10*100)}%`}}/></div><footer><span>MIN {capture.minimum.toFixed(3)}</span><span>AVG {capture.average.toFixed(3)}</span><span>MAX {capture.maximum.toFixed(3)}</span></footer></div>;
 }
 

@@ -1,4 +1,4 @@
-import { Box, ChevronDown, Database, FolderUp, GripVertical, Search, Trash2, X } from 'lucide-react';
+import { Box, ChevronDown, FolderUp, GripVertical, Search, Trash2, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { EMBEDDED_CATALOG, searchCatalog } from '../catalog/catalog';
 import type { CatalogDatabaseStatus, ComponentDefinition, SavedModule } from '../model/types';
@@ -19,6 +19,7 @@ export function CatalogPanel({ collapsed, database, onToggle, onAdd, modules, on
   const [open, setOpen] = useState<Set<string>>(() => new Set(['Fuentes y tierra', 'Pasivos', 'Lógica digital']));
   const categories = useMemo(() => [...new Set(EMBEDDED_CATALOG.map(item => item.category))], []);
   const items = useMemo(() => searchCatalog(query), [query]);
+  const total = database.count || EMBEDDED_CATALOG.length;
 
   if (collapsed) return (
     <aside className="catalog-panel collapsed-panel">
@@ -46,9 +47,9 @@ export function CatalogPanel({ collapsed, database, onToggle, onAdd, modules, on
       <label className="search-box">
         <Search size={15}/>
         <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Buscar resistencia, CMOS…" />
+        <span className="catalog-count" title={`${items.length} elementos visibles de ${total}`}>{items.length} / {total}</span>
         {query && <button onClick={() => setQuery('')}><X size={14}/></button>}
       </label>
-      <div className="catalog-status"><Database size={13}/><span>{database.count} símbolos · {database.source === 'sqlite' ? 'SQLite verificado' : 'catálogo integrado'}</span></div>
       <div className="catalog-scroll">
         <section className="saved-module-section">
           <div className="saved-module-heading"><span><Box size={13}/>MIS ENCAPSULADOS</span><button onClick={onImportModule} title="Importar .bitwire-module"><FolderUp size={14}/>Importar</button></div>

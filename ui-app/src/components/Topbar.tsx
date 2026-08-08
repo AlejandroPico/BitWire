@@ -43,12 +43,7 @@ const ROUTING_OPTIONS = [
   { value: 'straight' as const, label: 'Recto', detail: 'Distancia mínima', icon: <Minus size={15}/> },
 ];
 
-const SPEED_OPTIONS = [.25, .5, 1, 2, 5, 10].map(value => ({
-  value,
-  label: `${String(value).replace('.', ',')}×`,
-  detail: value < 1 ? 'Cámara lenta' : value === 1 ? 'Tiempo normal' : 'Acelerado',
-  icon: <CircleGauge size={15}/>,
-}));
+const SPEED_PRESETS=[.0001,.001,.01,.1,.25,.5,1,2,5,10];
 
 export function Topbar(props: Props) {
   return <header className="topbar">
@@ -78,7 +73,7 @@ export function Topbar(props: Props) {
         <button className="step-action" onClick={props.onStep} disabled={props.running} title="Avanzar una iteración">
           <StepForward size={16}/><span>Paso</span>
         </button>
-        <ToolbarMenu value={props.speed} options={SPEED_OPTIONS} onChange={props.onSpeed} label="Velocidad de simulación" compact/>
+        <SimulationSpeedControl value={props.speed} onChange={props.onSpeed}/>
       </nav>
     </div>
 
@@ -148,17 +143,9 @@ interface MenuOption<T extends string | number> {
   icon: ReactNode;
 }
 
-function ToolbarMenu<T extends string | number>({ value, options, onChange, label, triggerIcon, compact = false }: {
-  value: T;
-  options: MenuOption<T>[];
-  onChange(value: T): void;
-  label: string;
-  triggerIcon?: ReactNode;
-  compact?: boolean;
-}) {
+function SimulationSpeedControl({value,onChange}:{value:number;onChange(value:number):void}) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
-  const active = options.find(option => option.value === value) ?? options[0];
 
   useEffect(() => {
     if (!open) return;
@@ -169,15 +156,21 @@ function ToolbarMenu<T extends string | number>({ value, options, onChange, labe
     return () => { window.removeEventListener('pointerdown', closeOutside); window.removeEventListener('keydown', closeEscape); };
   }, [open]);
 
-  return <div className={`toolbar-menu ${compact ? 'compact' : ''}`} ref={root}>
-    <button className={open ? 'toolbar-menu-trigger active' : 'toolbar-menu-trigger'} type="button" onClick={() => setOpen(value => !value)} aria-haspopup="menu" aria-expanded={open} aria-label={`${label}: ${active.label}`} title={`${label}: ${active.label}`}>
-      {triggerIcon ?? active.icon}<span>{active.label}</span><ChevronDown size={12}/>
+  const exponent=Math.log10(Math.max(.0001,Math.min(10,value)));
+  return <div className="toolbar-menu compact speed-control" ref={root}>
+    <button className={open ? 'toolbar-menu-trigger active' : 'toolbar-menu-trigger'} type="button" onClick={() => setOpen(current => !current)} aria-haspopup="dialog" aria-expanded={open} aria-label={`Velocidad de simulación: ${formatSpeed(value)}`} title={`Velocidad de simulación: ${formatSpeed(value)}`}>
+      <CircleGauge size={15}/><span>{formatSpeed(value)}</span><ChevronDown size={12}/>
     </button>
-    {open && <menu className="toolbar-popover" aria-label={label}>
-      <header>{label.toUpperCase()}</header>
-      {options.map(option => <button key={option.value} type="button" className={option.value === value ? 'active' : ''} onClick={() => { onChange(option.value); setOpen(false); }}>
-        <span>{option.icon}</span><span><strong>{option.label}</strong><small>{option.detail}</small></span>{option.value === value && <i/>}
-      </button>)}
-    </menu>}
+    {open&&<section className="speed-popover" role="dialog" aria-label="Escala temporal">
+      <header><span>ESCALA TEMPORAL</span><strong>{formatSpeed(value)}</strong></header>
+      <label><span>ULTRALENTA</span><input type="range" min="-4" max="1" step="0.01" value={exponent} onChange={event=>onChange(10**Number(event.target.value))}/><span>10×</span></label>
+      <div>{SPEED_PRESETS.map(preset=><button key={preset} className={Math.abs(Math.log10(value)-Math.log10(preset))<.001?'active':''} onClick={()=>onChange(preset)}>{formatSpeed(preset)}</button>)}</div>
+      <footer>La escala es logarítmica: permite observar µs, transitorios LRC y conmutaciones rápidas con el ratón.</footer>
+    </section>}
   </div>;
+}
+
+function formatSpeed(value:number){
+  const digits=value<.001?4:value<.01?3:value<.1?2:value<1?2:value<10?2:0;
+  return `${value.toLocaleString('es-ES',{maximumFractionDigits:digits})}×`;
 }

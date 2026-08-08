@@ -2,10 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { CATALOG_BY_ID, EMBEDDED_CATALOG, effectiveDefinition } from './catalog';
 
 describe('expanded component catalog', () => {
-  it('contains 220 unique, connectable vector components', () => {
-    expect(EMBEDDED_CATALOG).toHaveLength(220);
-    expect(new Set(EMBEDDED_CATALOG.map(item=>item.id)).size).toBe(220);
+  it('contains 235 unique, connectable vector components', () => {
+    expect(EMBEDDED_CATALOG).toHaveLength(235);
+    expect(new Set(EMBEDDED_CATALOG.map(item=>item.id)).size).toBe(235);
     expect(EMBEDDED_CATALOG.every(item=>item.pins.length>0)).toBe(true);
+  });
+
+  it('covers the newly audited CircuitJS fundamentals with explicit models',()=>{
+    for(const id of ['rail_dc','rail_ac','square_source','sweep_source','noise_source','ammeter','ohmmeter','wattmeter','data_recorder','demux_1_2','decoder_7seg','vcvs','vccs'])expect(CATALOG_BY_ID.has(id)).toBe(true);
+    expect(CATALOG_BY_ID.get('decoder_7seg')?.pins).toHaveLength(11);
+    expect(CATALOG_BY_ID.get('vcvs')?.pins.map(pin=>pin.id)).toEqual(['ctrl_plus','ctrl_minus','out_plus','out_minus']);
   });
 
   it('provides meaningful RF, sensor and power coverage', () => {

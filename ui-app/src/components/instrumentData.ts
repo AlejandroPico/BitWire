@@ -1,7 +1,8 @@
-import { CATALOG_BY_ID, effectiveDefinition } from '../catalog/catalog';
+import { CATALOG_BY_ID, effectiveDefinition, isInstrumentDefinition } from '../catalog/catalog';
 import type {
   BitWireProject, ComponentInstance, LogicValue, SimulationSnapshot, WireSignal,
 } from '../model/types';
+import { componentDisplayName } from '../model/componentIdentity';
 
 export interface InstrumentPinCapture {
   pinId: string;
@@ -30,20 +31,16 @@ export interface InstrumentCapture {
   transitions: number;
   energy: number;
   spectrum: number[];
+  resistance?:number;
 }
 
 export function instrumentComponents(project: BitWireProject) {
-  return project.components.filter(component => CATALOG_BY_ID.get(component.definitionId)?.customGui);
+  return project.components.filter(component => isInstrumentDefinition(CATALOG_BY_ID.get(component.definitionId)));
 }
 
 /** Human-readable, deterministic identity among instruments of the same kind. */
 export function instrumentDisplayName(project: BitWireProject, component: ComponentInstance) {
-  const customName = String(component.properties.instrumentName ?? '').trim();
-  if (customName) return customName;
-  const definition = CATALOG_BY_ID.get(component.definitionId);
-  const siblings = project.components.filter(item => item.definitionId === component.definitionId);
-  const index = Math.max(0,siblings.findIndex(item => item.id === component.id)) + 1;
-  return `${definition?.name ?? 'Instrumento'} ${index}`;
+  return componentDisplayName(project,component);
 }
 
 export function captureInstrument(
@@ -72,6 +69,7 @@ export function captureInstrument(
   });
   const linkedId=String(component.properties.linkedComponentId??'');
   const linked=project.components.find(item=>item.id===linkedId);
+  let linkedResistance:number|undefined;
   const linkedBase=linked?CATALOG_BY_ID.get(linked.definitionId):undefined;
   if(linked&&linkedBase){
     const linkedDefinition=effectiveDefinition(linkedBase,linked.properties);
@@ -83,10 +81,12 @@ export function captureInstrument(
     const currents=recent.map((_,index)=>series[0]?.[index]?.current??0);
     const logic=recent.map((_,index)=>series[0]?.[index]?.logic??'Z');
     const primaryId=preferredPinId(component.definitionId);
-    pins=[{pinId:primaryId,pinName:selectedPin?`${linkedBase.name} · ${selectedPin.name}`:`${linkedBase.name} · ΔV`,wireId:undefined,wireLabel:`Vínculo interno · ${linked.id}`,values,currents,logic,last:series[0]?.at(-1)}];
+    const linkedName=componentDisplayName(project,linked);
+    if(typeof linked.properties.resistance==='number')linkedResistance=Number(linked.properties.resistance);
+    pins=[{pinId:primaryId,pinName:selectedPin?`${linkedName} · ${selectedPin.name}`:`${linkedName} · ΔV`,wireId:undefined,wireLabel:`Vínculo interno · ${linkedName}`,values,currents,logic,last:series[0]?.at(-1)}];
   }
   const primary = primaryPin(component.definitionId, pins);
-  const reference = component.definitionId === 'multimeter' ? pins.find(pin => pin.pinId === 'minus') : undefined;
+  const reference = pins.some(pin=>pin.pinId==='plus') ? pins.find(pin => pin.pinId === 'minus') : undefined;
   const values = primary?.values.map((value,index) => value - (reference?.values[index] ?? 0)) ?? [];
   const currents = primary?.currents ?? [];
   const logic = primary?.logic ?? [];
@@ -115,6 +115,7 @@ export function captureInstrument(
     transitions,
     energy: integrate(powerSeries,duration),
     spectrum: spectrumBins(values,32),
+    resistance:linkedResistance??(Math.abs(current)>1e-12?Math.abs(voltage/current):undefined),
   };
 }
 
@@ -128,6 +129,7 @@ function primaryPin(definitionId: string, pins: InstrumentPinCapture[]) {
   const preferred: Record<string,string[]> = {
     oscilloscope: ['ch1','ch2'], logic_analyzer: ['ch0'], multimeter: ['plus'],
     spectrum_analyzer: ['in'], power_monitor: ['plus','in'], frequency_counter: ['in'], probe: ['in'],
+    ammeter:['plus'],ohmmeter:['plus'],wattmeter:['plus'],data_recorder:['in'],logic_output:['in'],test_point:['in'],
   };
   for (const id of preferred[definitionId] ?? []) {
     const pin = pins.find(item => item.pinId === id);
@@ -137,7 +139,7 @@ function primaryPin(definitionId: string, pins: InstrumentPinCapture[]) {
 }
 
 function preferredPinId(definitionId:string){
-  const preferred:Record<string,string>={oscilloscope:'ch1',logic_analyzer:'ch0',multimeter:'plus',spectrum_analyzer:'in',power_monitor:'plus',frequency_counter:'in',probe:'in'};
+  const preferred:Record<string,string>={oscilloscope:'ch1',logic_analyzer:'ch0',multimeter:'plus',spectrum_analyzer:'in',power_monitor:'plus',frequency_counter:'in',probe:'in',ammeter:'plus',ohmmeter:'plus',wattmeter:'plus',data_recorder:'in',logic_output:'in',test_point:'in'};
   return preferred[definitionId]??'in';
 }
 

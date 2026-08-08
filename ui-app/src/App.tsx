@@ -10,7 +10,7 @@ import { InstrumentTray } from './components/Oscilloscope';
 import { OfflineDialog } from './components/OfflineDialog';
 import { Topbar } from './components/Topbar';
 import { Workspace } from './components/Workspace';
-import { EMBEDDED_CATALOG, verifyCatalogDatabase } from './catalog/catalog';
+import { EMBEDDED_CATALOG, isInstrumentDefinition, verifyCatalogDatabase } from './catalog/catalog';
 import type {
   BitWireProject, CatalogDatabaseStatus, ComponentDefinition, ModuleArea,
   PropertyValue, SavedModule, SimulationSnapshot, Theme, ToolMode, ViewportState,
@@ -34,7 +34,7 @@ export default function App() {
   const [snapshot, setSnapshot] = useState<SimulationSnapshot>();
   const [samples, setSamples] = useState<SimulationSnapshot[]>([]);
   const [catalogCollapsed, setCatalogCollapsed] = useState(false);
-  const [inspectorCollapsed, setInspectorCollapsed] = useState(true);
+  const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
   const [instrumentsCollapsed, setInstrumentsCollapsed] = useState(false);
   const [database, setDatabase] = useState<CatalogDatabaseStatus>({ source: 'embedded', count: EMBEDDED_CATALOG.length });
   const [viewport, setViewport] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
@@ -188,7 +188,7 @@ export default function App() {
   const openInstrumentWindow = useCallback((componentId:string) => {
     const component=project.components.find(item=>item.id===componentId);
     const definition=component&&EMBEDDED_CATALOG.find(item=>item.id===component.definitionId);
-    if(!component||!definition?.customGui)return;
+    if(!component||!isInstrumentDefinition(definition))return;
     setInstrumentWindows(current=>{
       const existing=current.find(item=>item.componentId===componentId);
       const z=++windowZ.current;
@@ -261,7 +261,7 @@ export default function App() {
       onSettings={patch => update(draft => { Object.assign(draft.settings, patch); })}
       onNew={newProject} onSave={save} onImport={() => importRef.current?.click()} onExport={() => exportProject(project)} onOffline={()=>setOfflineOpen(true)} onUndo={undo} onRedo={redo}/>
       <CatalogPanel collapsed={catalogCollapsed} database={database} onToggle={() => setCatalogCollapsed(value => !value)} onAdd={addDefinition} modules={moduleLibrary} onInsertModule={insertModule} onImportModule={()=>moduleImportRef.current?.click()} onDeleteModule={id=>setModuleLibrary(deleteSavedModule(id))}/>
-      <Workspace project={project} resolvedTheme={resolvedTheme} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} samples={samples} running={running} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>setInspectorCollapsed(false)} onContextTarget={setContextTarget}/>
+      <Workspace project={project} resolvedTheme={resolvedTheme} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} samples={samples} running={running} simulationSpeed={speed} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>setInspectorCollapsed(false)} onContextTarget={setContextTarget}/>
       <Inspector project={project} selected={selected} collapsed={inspectorCollapsed} onToggle={() => setInspectorCollapsed(value => !value)} selectedModule={selectedModule}
         onProperty={(id, key, value: PropertyValue) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) item.properties[key] = value; })}
         onPatch={(id, patch) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) Object.assign(item, patch); })}
@@ -269,7 +269,7 @@ export default function App() {
         onSelectModule={id => { setSelected([]); setSelectedModuleId(id); }} onModule={patchModule} activeModuleId={activeModuleId} onEnterModule={id=>{setActiveModuleId(id);if(id)setSelectedModuleId(id);}} onSaveModule={saveSelectedModule} onExportModule={()=>selectedModule&&exportModule(project,selectedModule)}/>
       <InstrumentTray collapsed={instrumentsCollapsed} project={project} samples={samples} onToggle={() => setInstrumentsCollapsed(value => !value)}/>
       <footer className="statusbar">
-        <div><span className={`engine-light ${running ? 'running' : ''}`}/><b>{running ? `SIMULANDO ${speed}×` : 'MOTOR EN PAUSA'}</b><span>{snapshot ? `t = ${snapshot.time.toFixed(3)} s · tick ${snapshot.tick}` : 'Inicializando motor…'}</span></div>
+        <div><span className={`engine-light ${running ? 'running' : ''}`}/><b>{running ? `SIMULANDO ${formatSpeed(speed)}` : 'MOTOR EN PAUSA'}</b><span>{snapshot ? `t = ${snapshot.time.toFixed(3)} s · tick ${snapshot.tick}` : 'Inicializando motor…'}</span></div>
         <div><span>{project.components.length} componentes</span><span>{project.wires.length} redes</span><span>{selected.length ? `${selected.length} seleccionados` : 'Sin selección'}</span></div>
         <div className="status-actions">
           <span className="theme-status">TEMA · {themeDefinition(theme).shortLabel.toUpperCase()}</span>
@@ -288,4 +288,9 @@ export default function App() {
     {aboutOpen && <AboutDialog onClose={()=>setAboutOpen(false)} onOffline={()=>setOfflineOpen(true)}/>} 
     {offlineOpen && <OfflineDialog onClose={()=>setOfflineOpen(false)}/>} 
   </div>;
+}
+
+function formatSpeed(value:number) {
+  const digits=value<.001?4:value<.01?3:value<.1?2:value<1?2:value<10?2:0;
+  return `${value.toLocaleString('es-ES',{maximumFractionDigits:digits})}×`;
 }

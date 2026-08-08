@@ -4,18 +4,20 @@ import { routeWire } from '../canvas/WireRouter';
 import { descendantModules, respectsModuleBoundaries, wireOwnerModuleId } from '../model/moduleScope';
 import type { BitWireProject, ModuleArea, ModulePin, PinRef, Point, SimulationSnapshot } from '../model/types';
 import { CircuitSymbol } from './CircuitSymbol';
+import { componentDisplayName } from '../model/componentIdentity';
 
 interface Props {
   project: BitWireProject;
   module: ModuleArea;
   snapshot?: SimulationSnapshot;
   running:boolean;
+  simulationSpeed:number;
   animateCurrent:boolean;
 }
 
 interface Bounds { x:number; y:number; width:number; height:number }
 
-export function ModulePreview({ project, module, snapshot, running, animateCurrent }: Props) {
+export function ModulePreview({ project, module, snapshot, running, simulationSpeed, animateCurrent }: Props) {
   const content = useMemo(() => {
     const descendants = descendantModules(project,module.id);
     const moduleIds = new Set([module.id,...descendants.map(item=>item.id)]);
@@ -55,12 +57,12 @@ export function ModulePreview({ project, module, snapshot, running, animateCurre
         {content.wires.map(wire=>{
           const from=projectPinWorld(project,wire.from),to=projectPinWorld(project,wire.to);if(!from||!to)return null;
           const signal=snapshot?.wireSignals[wire.id],path=routeWire(from,to,wire.routing,wire.controlPoints),ownerId=wireOwnerModuleId(project,wire),color=project.modules.find(item=>item.id===ownerId)?.color??module.color;
-          const offset=(signal?.current??0)>=0?-34:34,duration=currentFlowDuration(signal?.current??0);
+          const offset=(signal?.current??0)>=0?-34:34,duration=currentFlowDuration(signal?.current??0,simulationSpeed);
           return <g key={wire.id} style={{'--wire-flow-color':color} as React.CSSProperties}><path className={`module-preview-wire ${signal?.active?'active':''}`} d={path}/>{animateCurrent&&running&&Math.abs(signal?.current??0)>1e-9&&<path className="module-preview-flow" d={path}><animate attributeName="stroke-dashoffset" from="0" to={String(offset)} dur={`${duration}s`} calcMode="linear" repeatCount="indefinite"/></path>}</g>;
         })}
         {content.components.map(component=>{
           const base=CATALOG_BY_ID.get(component.definitionId);if(!base)return null;const definition=effectiveDefinition(base,component.properties);
-          return <CircuitSymbol key={component.id} component={component} definition={definition} selected={false} lod={1} signal={snapshot?.componentSignals[component.id]}
+          return <CircuitSymbol key={component.id} component={component} definition={definition} selected={false} lod={1} signal={snapshot?.componentSignals[component.id]} componentLabel={componentDisplayName(project,component)}
             onPointerDown={()=>{}} onDoubleClick={()=>{}} onContextMenu={()=>{}} onPin={()=>{}} onQuickToggle={()=>{}} onProperty={()=>{}}/>;
         })}
       </g>
@@ -69,7 +71,7 @@ export function ModulePreview({ project, module, snapshot, running, animateCurre
   </g>;
 }
 
-function currentFlowDuration(current:number){const magnitude=Math.abs(current);return Math.max(.18,Math.min(2.4,1.5/(1+Math.log10(1+magnitude*1000))));}
+function currentFlowDuration(current:number,speed:number){const magnitude=Math.abs(current),electrical=1.5/(1+Math.log10(1+magnitude*1000));return Math.max(.12,Math.min(12,electrical/Math.max(.01,speed)));}
 
 function boundsFor(points:Point[]):Bounds|undefined {
   if(!points.length)return undefined;

@@ -34,6 +34,8 @@ export interface PinRef { componentId: string; pinId: string }
 
 export interface ComponentInstance {
   id: string;
+  /** User-facing identity used by the inspector, instruments and canvas labels. */
+  name?: string;
   definitionId: string;
   x: number;
   y: number;

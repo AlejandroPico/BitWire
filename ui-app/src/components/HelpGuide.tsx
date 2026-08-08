@@ -68,7 +68,7 @@ const GUIDE: GuideSection[] = [
       { title: 'Elementos complejos', text: 'Pantallas, osciloscopios, memorias y procesadores son macromodelos. Su comportamiento y profundidad visual se ampliarán progresivamente.' },
       { title: 'Displays LED', text: 'A–G controlan individualmente los siete segmentos; D1–D4 seleccionan el dígito multiplexado; la matriz cruza R0–R7 con C0–C7 y la barra responde a sus diez entradas.' },
     ],
-    note: 'El catálogo SQLite y el catálogo integrado contienen las mismas definiciones; el indicador superior informa de la fuente cargada.',
+    note: 'El contador junto a la búsqueda indica cuántos elementos coinciden de todos los disponibles. El catálogo integrado y su base local contienen las mismas definiciones.',
   },
   {
     id: 'inspector', group: 'EDICIÓN', title: 'Selección, valores e inspector', icon: Wrench,
@@ -81,11 +81,12 @@ const GUIDE: GuideSection[] = [
     ],
     details: [
       { title: 'Edición interna', text: 'Cuando el nivel de detalle es suficiente, determinados valores aparecen dentro del propio símbolo y pueden cambiarse sin abrir el panel.' },
+      { title: 'Nombre propio', text: 'Cada componente puede recibir un nombre o etiqueta desde el inspector. Ese nombre aparece en el plano, los menús y los selectores de vinculación de instrumentos.' },
       { title: 'Bloqueo y estado', text: 'Desactivar un elemento lo mantiene en el plano, pero lo excluye de la simulación. El inspector refleja su estado actual.' },
       { title: 'Selección múltiple', text: 'Mayús permite acumular elementos. Las operaciones colectivas deben realizarse con cuidado porque afectan a todas las piezas seleccionadas.' },
       { title: 'Deshacer y rehacer', text: 'Ctrl+Z y Ctrl+Y recuperan cambios de estructura y propiedades. La simulación se recalcula con la versión restaurada.' },
     ],
-    note: 'El inspector comienza plegado para reservar espacio al plano y se abre automáticamente cuando una acción necesita mostrar propiedades.',
+    note: 'El inspector comienza abierto para que el nombre, los parámetros y las conexiones del elemento seleccionado estén siempre disponibles.',
   },
   {
     id: 'cables', group: 'EDICIÓN', title: 'Cableado, nodos y rutas', icon: Cable,
@@ -113,7 +114,7 @@ const GUIDE: GuideSection[] = [
     steps: [
       'Abre el engranaje superior derecho y selecciona la magnitud visible: Tensión, Corriente, Lógica 0/1 o Potencia.',
       'Usa el bloque central destacado: Ejecutar inicia la simulación continua y Paso avanza una iteración estando en pausa.',
-      'Ajusta la velocidad entre 0,25× y 10× según necesites observar transitorios o estados estables.',
+      'Abre la escala temporal y mueve su deslizador logarítmico entre 0,0001× y 10×; también puedes usar sus diez valores predefinidos.',
       'Lee las etiquetas sobre cada red y consulta los instrumentos para estudiar su evolución temporal.',
     ],
     details: [
@@ -123,6 +124,7 @@ const GUIDE: GuideSection[] = [
       { title: 'Lógica', text: 'Los estados digitales pueden ser 0, 1, flotante Z o indeterminado. Una entrada sin referencia no siempre equivale a cero.' },
       { title: 'Animación de corriente', text: 'Está activada por defecto. Puede ocultarse desde Configuración sin detener el motor ni alterar el cálculo eléctrico.' },
       { title: 'Cálculo analógico', text: 'El motor construye la red nodal, estampa fuentes y elementos y resuelve el sistema lineal en cada paso. Condensadores e inductores conservan estado entre iteraciones.' },
+      { title: 'Transitorios LRC', text: 'Cambiar un interruptor no reinicia el estado reactivo: la energía almacenada en condensadores y bobinas puede invertir el sentido de la corriente y decae según las pérdidas del circuito.' },
       { title: 'Unidades SI', text: 'El inspector acepta 15uF, 4,7 kΩ o 2Meg y muestra automáticamente µ, n, k o M para evitar cadenas de ceros.' },
     ],
     note: 'Los colores ayudan a distinguir estados, pero el valor numérico o lógico de la etiqueta es la referencia principal.',
@@ -154,7 +156,7 @@ const GUIDE: GuideSection[] = [
     summary: 'Combina vistas generales y abre el frontal independiente de cada instrumento conectado al circuito.',
     steps: [
       'Abre Vistas en la cabecera del banco inferior.',
-      'Activa simultáneamente osciloscopio, analizador lógico, multímetro, potencia, espectro o frecuencímetro.',
+      'Activa simultáneamente osciloscopio, analizador lógico, multímetro, potencia, espectro, frecuencímetro o cualquiera de las sondas y medidores disponibles.',
       'Pulsa con el botón derecho sobre un instrumento del plano y elige Abrir interfaz del instrumento.',
       'Arrastra la barra de título, redimensiona desde la esquina y usa la flecha para desplegar los controles profesionales.',
       'Desactiva cualquier vista para retirarla sin detener el motor ni perder muestras.',
@@ -162,7 +164,8 @@ const GUIDE: GuideSection[] = [
     ],
     details: [
       { title: 'Medida por instancia', text: 'Cada aparato resuelve exclusivamente los cables unidos a sus patillas. Dos osciloscopios conectados a redes distintas conservan gráficas e historiales diferentes.' },
-      { title: 'Sonda virtual', text: 'En Vinculación interna de medida puedes asociar un instrumento a un componente o a una patilla. La medida es de alta impedancia y no añade cables ni altera el circuito.' },
+      { title: 'Sonda virtual', text: 'En Vinculación interna de medida puedes asociar cualquier instrumento o sonda a un componente o a una patilla. La medida es de alta impedancia y no añade cables ni altera el circuito.' },
+      { title: 'Identificación', text: 'Renombra resistencias, nodos, fuentes o cualquier otro elemento desde el inspector. Los desplegables muestran esos nombres en lugar de identificadores técnicos.' },
       { title: 'Osciloscopio profesional', text: 'La vista extendida incorpora CH1/CH2, volts/div, tiempo/div, posición, acoplamiento, memoria, ancho de banda, adquisición y disparo.' },
       { title: 'Analizador lógico', text: 'Muestra estados binarios y transiciones. Es la vista adecuada para relojes, puertas, buses y secuencias.' },
       { title: 'Medidas eléctricas', text: 'Multímetro y monitor de potencia resumen los valores instantáneos y el consumo agregado de las redes activas.' },

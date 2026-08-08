@@ -9,21 +9,23 @@ import { formatSI } from '../utils/si';
 
 const EPSILON_CURRENT=1e-9;
 const LOGIC_MODELS=new Set(['and','or','not','nand','nor','xor','xnor']);
+const RAIL_MODELS=new Set(['rail_dc','rail_ac','rail_square','rail_sweep','rail_noise']);
 const SUPPORTED_MODELS=new Set([
   'source_dc','source_ac','current_source','ground','resistor','potentiometer','capacitor','inductor',
   'switch','analog_switch','fuse','connector','lamp','motor','speaker','buzzer','diode','zener','led',
   'nmos','pmos','bjt_npn','bjt_pnp','opamp','comparator','logic_input','clock','mux','instrument','probe',
-  'seven_segment','display',...LOGIC_MODELS,
+  'seven_segment','seven_segment_decoder','display','demux','vcvs','vccs',...RAIL_MODELS,...LOGIC_MODELS,
 ]);
 
 export interface SimulationState {
   lastTime:number;
+  lastDt:number;
   capacitors:Record<string,number>;
   inductors:Record<string,number>;
 }
 
 export function createSimulationState():SimulationState {
-  return {lastTime:0,capacitors:{},inductors:{}};
+  return {lastTime:0,lastDt:1/60,capacitors:{},inductors:{}};
 }
 
 const cloneSignal=(signal:Partial<WireSignal>={}):WireSignal=>({...EMPTY_SIGNAL,...signal});
@@ -52,7 +54,8 @@ interface SolveResult { voltages:Map<string,number>; sourceCurrents:Map<string,n
 
 export function evaluateCircuit(project:BitWireProject,time=0,tick=0,state?:SimulationState):SimulationSnapshot {
   const runtime=state??createSimulationState();
-  const dt=Math.max(1e-6,time>runtime.lastTime?time-runtime.lastTime:1/60);
+  const elapsed=time-runtime.lastTime;
+  const dt=Math.max(1e-9,elapsed>0?elapsed:runtime.lastDt);
   const network=buildNetwork(project);
   const digital=resolveDigital(project,network,time);
   const solved=solveElectrical(project,network,digital,time,dt,runtime);
@@ -87,7 +90,7 @@ export function evaluateCircuit(project:BitWireProject,time=0,tick=0,state?:Simu
     const definition=CATALOG_BY_ID.get(project.components.find(item=>item.id===branch.componentId)?.definitionId??'');
     if(definition?.model==='inductor')runtime.inductors[branch.componentId]=branch.current;
   }
-  runtime.lastTime=time;
+  runtime.lastTime=time;if(elapsed>0)runtime.lastDt=dt;
 
   const warnings=[
     ...network.invalidWires.map(wire=>`Cable ${wire.label??wire.id} aislado: atraviesa un encapsulado sin patilla`),
@@ -133,6 +136,7 @@ function buildNetwork(project:BitWireProject):NetworkContext {
     const source=project.components.find(component=>['source_dc','source_ac'].includes(CATALOG_BY_ID.get(component.definitionId)?.model??''));
     if(source)referenceRoot=union.find(keyOf(source.id,'neg'));
   }
+  if(!referenceRoot&&project.components.some(component=>RAIL_MODELS.has(CATALOG_BY_ID.get(component.definitionId)?.model??''))){union.add('__reference__:gnd');referenceRoot=union.find('__reference__:gnd');}
   referenceRoot??=union.find(union.values()[0]??'__reference__:gnd');
   for(const root of groundRoots)union.union(referenceRoot,root);
   referenceRoot=union.find(referenceRoot);
@@ -166,8 +170,20 @@ function resolveDigital(project:BitWireProject,network:NetworkContext,time:numbe
       if(!component.enabled)continue;
       const base=CATALOG_BY_ID.get(component.definitionId);if(!base)continue;
       const definition=effectiveDefinition(base,component.properties);
-      if(!LOGIC_MODELS.has(definition.model)&&definition.model!=='mux')continue;
+      if(!LOGIC_MODELS.has(definition.model)&&!['mux','demux','seven_segment_decoder'].includes(definition.model))continue;
       const inputs=definition.pins.filter(pin=>pin.kind==='INPUT').map(pin=>drivers.get(network.union.find(keyOf(component.id,pin.id)))?.logic??'X');
+      if(definition.model==='demux'){
+        const data=inputs[0]??'X',select=inputs[1]??'X';
+        const values:Record<string,LogicValue>={a:select==='X'||select==='Z'?'X':select===0?data:0,b:select==='X'||select==='Z'?'X':select===1?data:0};
+        for(const pin of definition.pins.filter(pin=>pin.kind==='OUTPUT')){const root=network.union.find(keyOf(component.id,pin.id)),previous=drivers.get(root),result=values[pin.id]??'X';if(previous?.logic!==result)changed=true;drive(root,result,result===1?Number(component.properties.voltageHigh??5):0,keyOf(component.id,pin.id));}
+        continue;
+      }
+      if(definition.model==='seven_segment_decoder'){
+        const unknown=inputs.some(value=>value==='X'||value==='Z'),digit=unknown?-1:(inputs as Array<0|1>).reduce<number>((sum,value,index)=>sum+(value<<index),0);
+        const lit=new Set((['abcdef','bc','abdeg','abcdg','bcfg','acdfg','acdefg','abc','abcdefg','abcdfg'][digit]??''));
+        for(const pin of definition.pins.filter(pin=>pin.kind==='OUTPUT')){const root=network.union.find(keyOf(component.id,pin.id)),previous=drivers.get(root),result:LogicValue=unknown?'X':lit.has(pin.id)?1:0;if(previous?.logic!==result)changed=true;drive(root,result,result===1?Number(component.properties.voltageHigh??5):0,keyOf(component.id,pin.id));}
+        continue;
+      }
       let result:LogicValue;
       if(definition.model==='mux')result=inputs[2]===1?inputs[1]??'X':inputs[2]===0?inputs[0]??'X':'X';
       else result=gateResult(definition.model,inputs);
@@ -186,7 +202,7 @@ function resolveDigital(project:BitWireProject,network:NetworkContext,time:numbe
 function solveElectrical(project:BitWireProject,network:NetworkContext,digital:Map<string,DigitalDriver>,time:number,dt:number,state:SimulationState):SolveResult {
   const nodeRoots=network.roots.filter(root=>root!==network.referenceRoot);
   const nodeIndex=new Map(nodeRoots.map((root,index)=>[root,index]));
-  const sources=project.components.filter(component=>component.enabled&&['source_dc','source_ac'].includes(CATALOG_BY_ID.get(component.definitionId)?.model??''));
+  const sources=project.components.filter(component=>component.enabled&&['source_dc','source_ac','vcvs'].includes(CATALOG_BY_ID.get(component.definitionId)?.model??''));
   const sourceIndex=new Map(sources.map((component,index)=>[component.id,nodeRoots.length+index]));
   const size=nodeRoots.length+sources.length;
   let guess=new Map<string,number>(network.roots.map(root=>[root,0]));
@@ -201,6 +217,7 @@ function solveElectrical(project:BitWireProject,network:NetworkContext,digital:M
     const stampG=(a:string,b:string,g:number)=>{const ia=idx(a),ib=idx(b);if(ia!==undefined)matrix[ia][ia]+=g;if(ib!==undefined)matrix[ib][ib]+=g;if(ia!==undefined&&ib!==undefined){matrix[ia][ib]-=g;matrix[ib][ia]-=g;}};
     const stampI=(a:string,b:string,current:number)=>{const ia=idx(a),ib=idx(b);if(ia!==undefined)rhs[ia]-=current;if(ib!==undefined)rhs[ib]+=current;};
     const stampAffine=(a:string,b:string,g:number,offset:number)=>{stampG(a,b,g);const history=g*offset;const ia=idx(a),ib=idx(b);if(ia!==undefined)rhs[ia]+=history;if(ib!==undefined)rhs[ib]-=history;};
+    const stampVCCS=(outPlus:string,outMinus:string,controlPlus:string,controlMinus:string,g:number)=>{const op=idx(outPlus),om=idx(outMinus),cp=idx(controlPlus),cm=idx(controlMinus);if(op!==undefined&&cp!==undefined)matrix[op][cp]+=g;if(op!==undefined&&cm!==undefined)matrix[op][cm]-=g;if(om!==undefined&&cp!==undefined)matrix[om][cp]-=g;if(om!==undefined&&cm!==undefined)matrix[om][cm]+=g;};
     const stampNorton=(out:string,target:number,resistance=.05)=>{const g=1/Math.max(1e-9,resistance);stampG(out,network.referenceRoot,g);stampI(network.referenceRoot,out,target*g);};
     const voltage=(root:string)=>guess.get(root)??0;
     for(let index=0;index<nodeRoots.length;index++)matrix[index][index]+=1e-12;
@@ -211,6 +228,7 @@ function solveElectrical(project:BitWireProject,network:NetworkContext,digital:M
       const definition=effectiveDefinition(base,component.properties),props={...definition.defaults,...component.properties},pins=definition.pins;
       const a=pins[0]?rootFor(component.id,pins[0].id):network.referenceRoot,b=pins[1]?rootFor(component.id,pins[1].id):network.referenceRoot;
       const model=definition.model;
+      if(RAIL_MODELS.has(model)){const out=rootFor(component.id,'out');stampNorton(out,railVoltage(model,props,time),Math.max(.001,Number(props.internalResistance??.05)));}
       if(model==='resistor')stampG(a,b,1/resistanceFor(props,1000));
       else if(model==='potentiometer'){
         const ra=rootFor(component.id,'a'),rw=rootFor(component.id,'w'),rb=rootFor(component.id,'b'),position=Math.max(.001,Math.min(.999,Number(props.position??50)/100)),total=resistanceFor(props,10000);
@@ -241,15 +259,19 @@ function solveElectrical(project:BitWireProject,network:NetworkContext,digital:M
         const plus=rootFor(component.id,'plus'),minus=rootFor(component.id,'minus'),out=rootFor(component.id,'out');
         const supply=Number(props.supply??props.highVoltage??12),gain=model==='comparator'?1e6:Number(props.gain??100000);
         const target=Math.max(model==='comparator'?0:-supply,Math.min(supply,(voltage(plus)-voltage(minus))*gain));stampNorton(out,target,.05);
+      } else if(model==='vccs'){
+        stampVCCS(rootFor(component.id,'out_plus'),rootFor(component.id,'out_minus'),rootFor(component.id,'ctrl_plus'),rootFor(component.id,'ctrl_minus'),Number(props.transconductance??.001));
       }
     }
     for(const driver of digital.values())if(driver.logic===0||driver.logic===1)stampNorton(network.union.find(driver.endpoint),driver.voltage,.05);
     for(const source of sources){
       const definition=CATALOG_BY_ID.get(source.definitionId)!,props={...definition.defaults,...source.properties};
-      const pos=rootFor(source.id,'pos'),neg=rootFor(source.id,'neg'),row=sourceIndex.get(source.id)!;
-      const voltageSource=definition.model==='source_ac'?Number(props.voltage??12)*Math.sin(time*Math.PI*2*Number(props.frequency??50)):Number(props.voltage??5);
+      const controlled=definition.model==='vcvs';
+      const pos=rootFor(source.id,controlled?'out_plus':'pos'),neg=rootFor(source.id,controlled?'out_minus':'neg'),row=sourceIndex.get(source.id)!;
+      const voltageSource=definition.model==='source_ac'?Number(props.voltage??12)*Math.sin(time*Math.PI*2*Number(props.frequency??50)):controlled?0:Number(props.voltage??5);
       const ip=idx(pos),ineg=idx(neg);
       if(ip!==undefined){matrix[ip][row]+=1;matrix[row][ip]+=1;}if(ineg!==undefined){matrix[ineg][row]-=1;matrix[row][ineg]-=1;}rhs[row]+=voltageSource;
+      if(controlled){const gain=Number(props.gain??1),cp=idx(rootFor(source.id,'ctrl_plus')),cm=idx(rootFor(source.id,'ctrl_minus'));if(cp!==undefined)matrix[row][cp]-=gain;if(cm!==undefined)matrix[row][cm]+=gain;}
     }
     try{solution=gaussianSolve(matrix,rhs);}catch(error){warnings.push(`Matriz eléctrica singular: ${error instanceof Error?error.message:String(error)}`);solution=Array.from({length:size},()=>0);break;}
     const next=new Map<string,number>([[network.referenceRoot,0]]);
@@ -274,6 +296,9 @@ function calculateBranches(project:BitWireProject,network:NetworkContext,digital
   for(const component of project.components){
     if(!component.enabled)continue;const base=CATALOG_BY_ID.get(component.definitionId);if(!base)continue;
     const definition=effectiveDefinition(base,component.properties),props={...definition.defaults,...component.properties},pins=definition.pins,model=definition.model;
+    if(RAIL_MODELS.has(model)){const target=railVoltage(model,props,time),resistance=Math.max(.001,Number(props.internalResistance??.05)),actual=v(component.id,'out');branches.push({componentId:component.id,a:keyOf(component.id,'out'),b:'__reference__:gnd',current:(actual-target)/resistance});continue;}
+    if(model==='vcvs'){add(component.id,'out_plus','out_minus',solved.sourceCurrents.get(component.id)??0);continue;}
+    if(model==='vccs'){add(component.id,'out_plus','out_minus',Number(props.transconductance??.001)*(v(component.id,'ctrl_plus')-v(component.id,'ctrl_minus')));continue;}
     const a=pins[0]?.id,b=pins[1]?.id;if(!a||!b)continue;const difference=v(component.id,a)-v(component.id,b);
     if(model==='resistor')add(component.id,a,b,difference/resistanceFor(props,1000));
     else if(model==='potentiometer'){
@@ -355,6 +380,14 @@ function gateResult(model:string,inputs:LogicValue[]):LogicValue {
 
 function resistanceFor(props:Record<string,unknown>,fallback:number){
   return Math.max(1e-9,Number(props.resistance??props.coilResistance??props.impedance??props.darkResistance??fallback));
+}
+function railVoltage(model:string,props:Record<string,unknown>,time:number){
+  const amplitude=Number(props.voltage??5),frequency=Math.max(.000001,Number(props.frequency??50));
+  if(model==='rail_ac')return amplitude*Math.sin(2*Math.PI*frequency*time);
+  if(model==='rail_square'){const duty=Math.max(0,Math.min(100,Number(props.dutyCycle??50)))/100;return Number(props.offsetVoltage??0)+((time*frequency)%1<duty?amplitude:0);}
+  if(model==='rail_sweep'){const duration=Math.max(1e-9,Number(props.sweepTime??1)),local=((time%duration)+duration)%duration,start=Number(props.startFrequency??10),stop=Number(props.stopFrequency??10000),slope=(stop-start)/duration;return amplitude*Math.sin(2*Math.PI*(start*local+.5*slope*local*local));}
+  if(model==='rail_noise'){const sample=Math.floor(time*Math.max(1000,Number(props.sampleRate??20000)))+Number(props.seed??1),raw=Math.sin(sample*12.9898)*43758.5453;return amplitude*((raw-Math.floor(raw))*2-1);}
+  return amplitude;
 }
 function diodeLinearization(model:string,props:Record<string,unknown>,voltage:number){
   const forward=Math.max(.01,Number(props.forwardVoltage??(model==='led'?2:.7))),zener=Number(props.zenerVoltage??props.breakdownVoltage??Number.POSITIVE_INFINITY);

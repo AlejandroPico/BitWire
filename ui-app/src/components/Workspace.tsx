@@ -3,13 +3,14 @@ import {
   Trash2, Waypoints, X,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CATALOG_BY_ID, effectiveDefinition } from '../catalog/catalog';
+import { CATALOG_BY_ID, effectiveDefinition, isInstrumentDefinition } from '../catalog/catalog';
 import { fitBounds, screenToWorld, zoomAt } from '../canvas/ViewportMatrix';
 import { lodForScale } from '../canvas/LODManager';
 import { nearestSegmentIndex, routePreview, routeWire, wireLabelPoint } from '../canvas/WireRouter';
 import { CircuitSymbol } from './CircuitSymbol';
 import type { ContextTarget } from './ContextMenu';
 import { ModulePreview } from './ModulePreview';
+import { componentDisplayName } from '../model/componentIdentity';
 import { canvasScope } from '../model/moduleScope';
 import type {
   BitWireProject, ComponentInstance, ModuleArea, PinDefinition, PinRef, Point,
@@ -34,6 +35,7 @@ interface Props {
   snapshot?: SimulationSnapshot;
   samples: SimulationSnapshot[];
   running: boolean;
+  simulationSpeed:number;
   onViewport(viewport: ViewportState): void;
   activeModuleId?: string;
   onActiveModule(id?: string): void;
@@ -51,7 +53,7 @@ type Interaction =
   | { type: 'marquee' | 'module'; start: Point; current: Point }
   | null;
 
-export function Workspace({ project, resolvedTheme, update, selected, onSelected, selectedModuleId, onSelectedModule, tool, onTool, snapshot, samples, running, onViewport, activeModuleId, onActiveModule, onOpenInspector, onContextTarget }: Props) {
+export function Workspace({ project, resolvedTheme, update, selected, onSelected, selectedModuleId, onSelectedModule, tool, onTool, snapshot, samples, running, simulationSpeed, onViewport, activeModuleId, onActiveModule, onOpenInspector, onContextTarget }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [viewport, setViewportState] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
   const [interaction, setInteraction] = useState<Interaction>(null);
@@ -404,7 +406,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
         <rect className="grid-plane" x={-100000} y={-100000} width={200000} height={200000} fill="url(#majorGrid)"/>
         <g className="module-layer">{renderedModules.map(module => <g key={module.id} className={`module-area ${module.collapsed ? 'chip-mode' : 'area-mode'} ${module.id === selectedModuleId ? 'selected' : ''} ${module.enabled ? '' : 'disabled'}`} onPointerDown={event => onModuleDown(event,module)} onDoubleClick={event => { event.stopPropagation(); navigateToModule(module.id); }} onContextMenu={event=>{event.preventDefault();event.stopPropagation();onSelected([]);onSelectedModule(module.id);onContextTarget({kind:'module',id:module.id,x:event.clientX,y:event.clientY});}}>
           <rect className="module-shell" x={module.x} y={module.y} width={module.width} height={module.height} style={{ stroke: module.color }}/>
-          <ModulePreview project={project} module={module} snapshot={snapshot} running={running} animateCurrent={project.settings.animateCurrent}/>
+          <ModulePreview project={project} module={module} snapshot={snapshot} running={running} simulationSpeed={simulationSpeed} animateCurrent={project.settings.animateCurrent}/>
           <path d={`M${module.x} ${module.y + 34}h${module.width}`} style={{ stroke: module.color }}/>
           {module.collapsed && <>{Array.from({length:Math.max(2,Math.min(12,module.pins.length))},(_,index)=><path key={index} className="chip-decoration" d={`M${module.x+22+index*14} ${module.y+12}v10`} style={{stroke:module.color}}/>)}</>}
           <text x={module.x + 14} y={module.y + 23} style={{ fill: module.color }}>{module.name.toUpperCase()}</text><text className="module-state" x={module.x + module.width - 14} y={module.y + 23} textAnchor="end">{module.collapsed ? `${module.pins.length} PINES` : module.enabled ? 'ACTIVO' : 'AISLADO'}</text>
@@ -418,7 +420,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
           const mid = wireLabelPoint(from,to,wire.routing,wire.controlPoints);
           const wirePath = routeWire(from, to, wire.routing, wire.controlPoints);
           const flowColor=activeModule?.color;
-          const flowDuration=currentFlowDuration(signal?.current??0);
+          const flowDuration=currentFlowDuration(signal?.current??0,simulationSpeed);
           const flowOffset=(signal?.current??0)>=0?-34:34;
           return <g key={wire.id} className={`wire ${signal?.active ? 'active' : ''} logic-${signal?.logic ?? 'z'} ${running ? 'running' : ''}`} style={flowColor?{'--wire-flow-color':flowColor} as React.CSSProperties:undefined}>
             <path className="wire-hit" d={wirePath} onPointerDown={event => onWireDown(event,wire,from,to)} onDoubleClick={event => addWireNode(event,wire,from,to)} onContextMenu={event=>{event.preventDefault();event.stopPropagation();setSelectedWireId(wire.id);onContextTarget({kind:'wire',id:wire.id,x:event.clientX,y:event.clientY});}}/>
@@ -437,8 +439,8 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
           if (!baseDefinition) return null;
           const definition=effectiveDefinition(baseDefinition,component.properties);
           const componentLod = lodForScale(viewport.scale * (component.scale || 1));
-          const instrumentCapture = definition.customGui && project.settings.liveInstrumentScreens ? captureInstrument(project,component,samples) : undefined;
-          return <CircuitSymbol key={component.id} component={component} definition={definition} selected={selected.includes(component.id)} lod={componentLod.level} signal={snapshot?.componentSignals[component.id]} instrumentCapture={instrumentCapture} instrumentLabel={definition.customGui?instrumentDisplayName(project,component):undefined} onPointerDown={onComponentDown} onDoubleClick={openComponentInspector} onContextMenu={componentContext} onPin={onPin} onQuickToggle={quickToggle} onProperty={(item,key,value) => update(draft => { const target=draft.components.find(node=>node.id===item.id); if(target) target.properties[key]=value; })}/>;
+          const instrument=isInstrumentDefinition(definition),instrumentCapture = instrument&&project.settings.liveInstrumentScreens ? captureInstrument(project,component,samples) : undefined;
+          return <CircuitSymbol key={component.id} component={component} definition={definition} selected={selected.includes(component.id)} lod={componentLod.level} signal={snapshot?.componentSignals[component.id]} componentLabel={componentDisplayName(project,component)} instrumentCapture={instrumentCapture} instrumentLabel={instrument?instrumentDisplayName(project,component):undefined} onPointerDown={onComponentDown} onDoubleClick={openComponentInspector} onContextMenu={componentContext} onPin={onPin} onQuickToggle={quickToggle} onProperty={(item,key,value) => update(draft => { const target=draft.components.find(node=>node.id===item.id); if(target) target.properties[key]=value; })}/>;
         })}</g>
         {marquee && <rect className={interaction?.type === 'module' ? 'module-marquee' : 'selection-marquee'} x={marquee.x} y={marquee.y} width={marquee.width} height={marquee.height}/>} 
       </g>
@@ -465,7 +467,7 @@ function adaptiveGrid(base: number, scale: number) { let size = base; while (siz
 function formatZoom(scale:number) { const percent=scale*100; if(percent<10_000)return `${Math.round(percent)}%`; if(percent<1_000_000)return `${(percent/1000).toFixed(1)}k%`; return `${(percent/1_000_000).toFixed(percent<10_000_000?1:0)}M%`; }
 function isTyping(target: EventTarget | null) { return target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement; }
 function formatSignal(signal: WireSignal | undefined, view: BitWireProject['settings']['signalView']) { if (!signal || (!signal.active&&!Number.isFinite(signal.voltage))) return '—'; if (view === 'logic') return String(signal.logic); if (view === 'current') return formatSI(signal.current,'A'); if (view === 'power') return formatSI(Math.abs(signal.voltage*signal.current),'W'); return formatSI(signal.voltage,'V'); }
-function currentFlowDuration(current:number){const magnitude=Math.abs(current);return Math.max(.18,Math.min(2.4,1.5/(1+Math.log10(1+magnitude*1000))));}
+function currentFlowDuration(current:number,speed:number){const magnitude=Math.abs(current),electrical=1.5/(1+Math.log10(1+magnitude*1000));return Math.max(.12,Math.min(12,electrical/Math.max(.01,speed)));}
 function randomModuleColor(used:string[]){const palette=['#2be4c4','#f5b942','#ff6f91','#7b8cff','#b4e36b','#ff9e52','#d792ff','#48b9ff','#f06cd7','#66d19e','#e6c84f','#ef745c'];const available=palette.filter(color=>!used.some(item=>item.toLowerCase()===color.toLowerCase()));const candidates=available.length?available:palette;const random=new Uint32Array(1);crypto.getRandomValues(random);return candidates[random[0]%candidates.length];}
 function WayPointIcon() { return <svg viewBox="0 0 24 24" width="16"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="12" r="3"/><path d="M8 12h8" fill="none" stroke="currentColor" strokeWidth="2"/></svg>; }
 

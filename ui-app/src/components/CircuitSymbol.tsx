@@ -13,6 +13,7 @@ interface Props {
   signal?: ComponentSignal;
   instrumentCapture?: InstrumentCapture;
   instrumentLabel?: string;
+  componentLabel?: string;
   onPointerDown(event: ReactPointerEvent<SVGGElement>, component: ComponentInstance): void;
   onDoubleClick(component: ComponentInstance): void;
   onContextMenu(event: ReactMouseEvent<SVGGElement>, component: ComponentInstance): void;
@@ -21,7 +22,7 @@ interface Props {
   onProperty(component: ComponentInstance, key: string, value: PropertyValue): void;
 }
 
-export function CircuitSymbol({ component, definition, selected, lod, signal, instrumentCapture, instrumentLabel, onPointerDown, onDoubleClick, onContextMenu, onPin, onQuickToggle, onProperty }: Props) {
+export function CircuitSymbol({ component, definition, selected, lod, signal, instrumentCapture, instrumentLabel, componentLabel, onPointerDown, onDoubleClick, onContextMenu, onPin, onQuickToggle, onProperty }: Props) {
   const w = definition.width;
   const h = definition.height;
   const active = Boolean(signal?.active);
@@ -42,7 +43,7 @@ export function CircuitSymbol({ component, definition, selected, lod, signal, in
       {!gateInternal && !semiconductorInternal && <g className="symbol-artwork">{symbolArtwork(definition, component, signal, instrumentCapture, instrumentLabel)}</g>}
       {gateInternal && (lod >= 4 ? <GateCmosNetwork definition={definition}/> : <GateInternalNetwork definition={definition}/>)} 
       {semiconductorInternal && <SemiconductorInternal definition={definition} lod={lod}/>} 
-      {!junction&&<text className="symbol-title" x={w / 2} y={h + 18} textAnchor="middle">{definition.name}</text>}
+      {!junction&&<text className="symbol-title" x={w / 2} y={h + 18} textAnchor="middle">{componentLabel??definition.name}</text>}
       {valueLabel&&<text className="symbol-value" x={w/2} y={h+31} textAnchor="middle">{valueLabel}</text>}
       {lod >= 3 && <text className="symbol-model" x={w / 2} y={h + (valueLabel?43:32)} textAnchor="middle">{definition.family.toUpperCase()}</text>}
       {lod >= 3 && definition.symbol === 'oscilloscope' && <OscilloscopeInternalNetwork definition={definition}/>} 
@@ -101,7 +102,7 @@ function symbolArtwork(definition: ComponentDefinition, component: ComponentInst
   if (s === 'jfet_n' || s === 'jfet_p') return <JfetSymbol type={s}/>;
   if (s === 'igbt_n' || s === 'igbt_p') return <IgbtSymbol type={s}/>;
   if (s === 'opamp' || s === 'comparator') return <><path className="symbol-body" d="M35 8v64l88-32z"/><path className="lead" d={`M0 28H35 M0 52H35 M123 40H${w}`}/><text className="op-sign" x="45" y="31">+</text><text className="op-sign" x="45" y="57">−</text></>;
-  if (['oscilloscope','analyzer','multimeter','spectrum','power_monitor','frequency_counter'].includes(s)) return <InstrumentSymbol definition={definition} capture={instrumentCapture} label={instrumentLabel}/>;
+  if (['oscilloscope','analyzer','multimeter','spectrum','power_monitor','frequency_counter','probe'].includes(s)) return <InstrumentSymbol definition={definition} capture={instrumentCapture} label={instrumentLabel}/>;
   if (s === 'display7') return <SevenSegmentDisplay width={w} height={h} inputs={signal?.inputs} common={String(component.properties.common??'cathode')}/>;
   if (s === 'display4') return <FourDigitDisplay width={w} height={h} inputs={signal?.inputs} common={String(component.properties.common??'cathode')}/>;
   if (s === 'lcd16x2') return <LcdDisplay width={w} height={h} text={String(component.properties.text??'BITWIRE READY')}/>;
@@ -138,8 +139,8 @@ function LiveInstrumentScreen({ type, capture, screen }: { type:string; capture:
   const primary = capture.pins.find(pin=>pin.wireId&&pin.pinId!=='gnd') ?? capture.pins[0];
   const values = primary?.values ?? [];
   const trace = compactTrace(values,screen.x+4,screen.y+4,screen.width-8,screen.height-8);
-  if (type==='multimeter') return <><text className="instrument-live-value" x={screen.x+screen.width/2} y={screen.y+screen.height/2+5} textAnchor="middle">{capture.voltage.toFixed(3)} V</text><text className="instrument-live-caption" x={screen.x+5} y={screen.y+9}>DC · AUTO</text></>;
-  if (type==='power_monitor') return <><rect className="instrument-live-meter" x={screen.x+5} y={screen.y+screen.height-13} width={(screen.width-10)*Math.min(1,Math.abs(capture.power)/Math.max(.001,Math.abs(capture.power)+.02))} height="6"/><text className="instrument-live-value" x={screen.x+screen.width/2} y={screen.y+screen.height/2} textAnchor="middle">{capture.power.toFixed(3)} W</text></>;
+  if (['multimeter','ammeter','ohmmeter'].includes(type)) {const value=type==='ammeter'?`${capture.current.toFixed(4)} A`:type==='ohmmeter'?capture.resistance===undefined?'— Ω':`${capture.resistance.toFixed(2)} Ω`:`${capture.voltage.toFixed(3)} V`;return <><text className="instrument-live-value" x={screen.x+screen.width/2} y={screen.y+screen.height/2+5} textAnchor="middle">{value}</text><text className="instrument-live-caption" x={screen.x+5} y={screen.y+9}>AUTO · VÍNCULO</text></>;}
+  if (type==='power_monitor'||type==='wattmeter') return <><rect className="instrument-live-meter" x={screen.x+5} y={screen.y+screen.height-13} width={(screen.width-10)*Math.min(1,Math.abs(capture.power)/Math.max(.001,Math.abs(capture.power)+.02))} height="6"/><text className="instrument-live-value" x={screen.x+screen.width/2} y={screen.y+screen.height/2} textAnchor="middle">{capture.power.toFixed(3)} W</text></>;
   if (type==='frequency_counter') return <><text className="instrument-live-value" x={screen.x+screen.width/2} y={screen.y+screen.height/2+4} textAnchor="middle">{formatFrequency(capture.frequency)}</text><text className="instrument-live-caption" x={screen.x+5} y={screen.y+9}>{capture.transitions} FLANCOS</text></>;
   if (type==='spectrum_analyzer') return <>{capture.spectrum.slice(0,16).map((value,index)=><rect key={index} className="instrument-live-bar" x={screen.x+4+index*(screen.width-8)/16} y={screen.y+screen.height-5-value*(screen.height-12)} width={Math.max(1,(screen.width-8)/16-1)} height={value*(screen.height-12)}/>)}</>;
   if (type==='logic_analyzer') return <polyline className="instrument-live-logic" points={compactLogic(primary?.logic ?? [],screen.x+4,screen.y+5,screen.width-8,screen.height-10)}/>;

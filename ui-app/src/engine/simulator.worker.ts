@@ -33,8 +33,9 @@ setInterval(() => {
 self.onmessage = (event: MessageEvent<Message>) => {
   const message = event.data;
   if (message.type === 'project') {
+    const changedProject=project?.id!==message.project.id;
     project = message.project;
-    simulationState=createSimulationState();
+    if(changedProject){simulationState=createSimulationState();simulationTime=0;tick=0;}
     emit(0);
   } else if (message.type === 'control') {
     running = message.running;

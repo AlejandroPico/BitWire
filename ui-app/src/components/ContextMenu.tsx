@@ -3,8 +3,9 @@ import {
   Play, RotateCw, Save, Trash2, Unlock, Waypoints, Wrench,
 } from 'lucide-react';
 import { useEffect } from 'react';
-import { CATALOG_BY_ID } from '../catalog/catalog';
+import { CATALOG_BY_ID, isInstrumentDefinition } from '../catalog/catalog';
 import type { BitWireProject } from '../model/types';
+import { componentDisplayName } from '../model/componentIdentity';
 
 export type ContextTarget =
   | { kind:'component'; id:string; x:number; y:number }
@@ -38,8 +39,8 @@ export function ContextMenu({target,project,onAction,onClose}:Props) {
     const definition=component&&CATALOG_BY_ID.get(component.definitionId);
     if(!component||!definition)return null;
     return <menu className="object-context-menu" style={position} onPointerDown={event=>event.stopPropagation()}>
-      <header><span>{glyph(definition.symbol)}</span><div><strong>{definition.name}</strong><small>{component.id}</small></div></header>
-      {definition.customGui&&<button className="context-primary" onClick={()=>run('instrument')}><Activity size={15}/><span><strong>Abrir interfaz del instrumento</strong><small>Lectura independiente y controles profesionales</small></span></button>}
+      <header><span>{glyph(definition.symbol)}</span><div><strong>{componentDisplayName(project,component)}</strong><small>{definition.name}</small></div></header>
+      {isInstrumentDefinition(definition)&&<button className="context-primary" onClick={()=>run('instrument')}><Activity size={15}/><span><strong>Abrir interfaz del instrumento</strong><small>Lectura independiente y controles profesionales</small></span></button>}
       <button onClick={()=>run('inspect')}><Inspect size={14}/><span>Mostrar en el inspector</span><kbd>doble clic</kbd></button>
       <button onClick={()=>run('duplicate')}><Copy size={14}/><span>Duplicar componente</span></button>
       <button onClick={()=>run('rotate')}><RotateCw size={14}/><span>Girar 90°</span></button>

@@ -28,6 +28,9 @@ export function pinsFor(profile: string): PinDefinition[] {
     scope: [pin('ch1', 'CH1', 'INPUT', 'ANALOG', 0, .35), pin('ch2', 'CH2', 'INPUT', 'ANALOG', 0, .65), pin('gnd', 'GND', 'GND', 'POWER', 1, .8)],
     connector2: [pin('p1', '1', 'BIDIRECTIONAL', 'MIXED', 0, .35), pin('p2', '2', 'BIDIRECTIONAL', 'MIXED', 0, .65)],
     junction: [pin('node','●','BIDIRECTIONAL','MIXED',.5,.5)],
+    rail: [pin('out','OUT','OUTPUT','ANALOG',1,.5)],
+    demux: [pin('in','IN','INPUT','DIGITAL',0,.35),pin('sel','S','INPUT','DIGITAL',0,.7),pin('a','A','OUTPUT','DIGITAL',1,.3),pin('b','B','OUTPUT','DIGITAL',1,.7)],
+    controlled4: [pin('ctrl_plus','C+','INPUT','ANALOG',0,.3),pin('ctrl_minus','C−','INPUT','ANALOG',0,.7),pin('out_plus','O+','OUTPUT','ANALOG',1,.3),pin('out_minus','O−','OUTPUT','ANALOG',1,.7)],
   };
   if (profiles[profile]) return profiles[profile];
   if (profile === 'transformer') return [pin('p1','P1','ANALOG','ANALOG',0,.3),pin('p2','P2','ANALOG','ANALOG',0,.7),pin('s1','S1','ANALOG','ANALOG',1,.3),pin('s2','S2','ANALOG','ANALOG',1,.7)];
@@ -49,6 +52,7 @@ export function pinsFor(profile: string): PinDefinition[] {
   if (profile === 'fulladder') return [pin('a','A','INPUT','DIGITAL',0,.25),pin('b','B','INPUT','DIGITAL',0,.5),pin('cin','CIN','INPUT','DIGITAL',0,.75),pin('sum','Σ','OUTPUT','DIGITAL',1,.35),pin('cout','COUT','OUTPUT','DIGITAL',1,.68)];
   if (profile === 'gate3') return [pin('a','A','INPUT','DIGITAL',0,.22),pin('b','B','INPUT','DIGITAL',0,.5),pin('c','C','INPUT','DIGITAL',0,.78),pin('out','Q','OUTPUT','DIGITAL',1,.5)];
   if (profile === 'bus8') return Array.from({length:8},(_,i)=>pin(`d${i}`,`D${i}`,'BIDIRECTIONAL','DIGITAL',i<4?0:1,((i%4)+1)/5));
+  if (profile === 'decoder7') return Array.from({length:4},(_,i)=>pin(`d${i}`,`D${i}`,'INPUT','DIGITAL',0,(i+1)/5)).concat([...'abcdefg'].map((name,i)=>pin(name,name.toUpperCase(),'OUTPUT','DIGITAL',1,(i+1)/8)));
   return profiles.analog2;
 }
 
@@ -73,6 +77,10 @@ export const EMBEDDED_CATALOG: ComponentDefinition[] = ([...(rawCatalog as RawCo
 });
 
 export const CATALOG_BY_ID = new Map(EMBEDDED_CATALOG.map(item => [item.id, item]));
+
+export function isInstrumentDefinition(definition:ComponentDefinition|undefined) {
+  return Boolean(definition&&(definition.customGui||definition.model==='instrument'||definition.model==='probe'));
+}
 
 const VARIABLE_GATE_MODELS=new Set(['and','or','nand','nor','xor','xnor']);
 

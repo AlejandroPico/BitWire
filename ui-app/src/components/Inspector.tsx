@@ -1,8 +1,9 @@
 import { Box, ChevronRight, CirclePower, Copy, Download, ExternalLink, Layers3, Library, Plus, RotateCw, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { CATALOG_BY_ID, effectiveDefinition } from '../catalog/catalog';
+import { CATALOG_BY_ID, effectiveDefinition, isInstrumentDefinition } from '../catalog/catalog';
 import type { BitWireProject, ComponentInstance, ModuleArea, ModulePin, ModulePinSide, PinKind, PropertyValue, SignalDomain } from '../model/types';
 import { redistributeModulePins } from '../model/moduleScope';
+import { componentDisplayName } from '../model/componentIdentity';
 import { uid } from '../state/project';
 import { formatSI, parseSI, unitForProperty } from '../utils/si';
 
@@ -48,8 +49,9 @@ export function Inspector({ project, selected, collapsed, onToggle, onProperty, 
           <ModulePinsEditor module={selectedModule} onChange={pins => onModule({ pins })}/>
         </InspectorSection>
       </> : component && definition ? <>
-        <div className="selection-identity"><span className="identity-icon">{definition.symbol === 'chip' ? 'IC' : '◇'}</span><div><strong>{definition.name}</strong><small>{definition.category} / {definition.family}</small></div></div>
+        <div className="selection-identity"><span className="identity-icon">{definition.symbol === 'chip' ? 'IC' : '◇'}</span><div><strong>{componentDisplayName(project,component)}</strong><small>{definition.name} · {definition.category} / {definition.family}</small></div></div>
         <p className="component-description">{definition.description}</p>
+        <Field label="Nombre / etiqueta"><input value={component.name??''} placeholder={componentDisplayName(project,component)} onChange={event=>onPatch(component.id,{name:event.target.value})}/></Field>
         <div className="quick-actions"><button onClick={() => onPatch(component.id, { enabled: !component.enabled })}><CirclePower size={15}/>{component.enabled ? 'Desactivar' : 'Activar'}</button><button onClick={onDuplicate}><Copy size={15}/>Duplicar</button><button onClick={() => onPatch(component.id, { rotation: (component.rotation + 90) % 360 })}><RotateCw size={15}/>Girar</button><button className="danger" onClick={onDelete}><Trash2 size={15}/></button></div>
         <InspectorSection title="Transformación">
           <div className="field-grid"><Field label="X"><NumberInput value={component.x} onChange={x => onPatch(component.id, { x })}/></Field><Field label="Y"><NumberInput value={component.y} onChange={y => onPatch(component.id, { y })}/></Field></div>
@@ -60,7 +62,7 @@ export function Inspector({ project, selected, collapsed, onToggle, onProperty, 
         <InspectorSection title="Parámetros del modelo">
           {Object.entries(component.properties).filter(([key])=>!['linkedComponentId','linkedPinId'].includes(key)).map(([key, value]) => <Field key={key} label={humanize(key)}>{typeof value === 'boolean' ? key === 'closed' ? <button className={`state-button ${value?'closed':'open'}`} onClick={()=>onProperty(component.id,key,!value)}>{value?'CERRADO':'ABIERTO'}</button> : <Toggle checked={value} onChange={next => onProperty(component.id, key, next)}/> : typeof value === 'number' ? <NumberInput value={value} min={key==='inputCount'||key==='outputCount'?1:undefined} max={key==='inputCount'||key==='outputCount'?10:undefined} onChange={next => onProperty(component.id, key, next)} suffix={unitForProperty(key)}/> : key.toLowerCase().includes('color') ? <input type="color" value={String(value)} onChange={e => onProperty(component.id, key, e.target.value)}/> : <input value={String(value)} onChange={e => onProperty(component.id, key, e.target.value)}/>}</Field>)}
         </InspectorSection>
-        {definition.customGui&&<InstrumentBinding project={project} component={component} onProperty={onProperty}/>} 
+        {isInstrumentDefinition(definition)&&<InstrumentBinding project={project} component={component} onProperty={onProperty}/>}
         <InspectorSection title="Conectividad"><dl className="pin-list">{definition.pins.map(pin => <div key={pin.id}><dt><span className={`pin-kind ${pin.kind.toLowerCase()}`}/>{pin.name}</dt><dd>{pin.kind} · {pin.domain}</dd></div>)}</dl></InspectorSection>
         {definition.internal && <div className="deep-zoom-note"><Layers3 size={17}/><div><strong>Modelo jerárquico disponible</strong><span>Amplía el componente para revelar su red interna; usa este inspector para editar sus parámetros.</span></div></div>}
       </> : selected.length > 1 ? <>
@@ -101,7 +103,7 @@ function InstrumentBinding({project,component,onProperty}:{project:BitWireProjec
   const base=target?CATALOG_BY_ID.get(target.definitionId):undefined;
   const definition=target&&base?effectiveDefinition(base,target.properties):undefined;
   return <InspectorSection title="Vinculación interna de medida"><div className="instrument-binding">
-    <label><span>Origen</span><select value={linkedId} onChange={event=>{onProperty(component.id,'linkedComponentId',event.target.value);onProperty(component.id,'linkedPinId','');}}><option value="">Patillas físicas del instrumento</option>{project.components.filter(item=>item.id!==component.id&&!CATALOG_BY_ID.get(item.definitionId)?.customGui).map(item=><option key={item.id} value={item.id}>{CATALOG_BY_ID.get(item.definitionId)?.name} · {item.id}</option>)}</select></label>
+    <label><span>Origen</span><select value={linkedId} onChange={event=>{onProperty(component.id,'linkedComponentId',event.target.value);onProperty(component.id,'linkedPinId','');}}><option value="">Patillas físicas del instrumento</option>{project.components.filter(item=>item.id!==component.id&&!isInstrumentDefinition(CATALOG_BY_ID.get(item.definitionId))).map(item=><option key={item.id} value={item.id}>{componentDisplayName(project,item)} · {CATALOG_BY_ID.get(item.definitionId)?.name}</option>)}</select></label>
     {target&&definition&&<label><span>Terminal observado</span><select value={String(component.properties.linkedPinId??'')} onChange={event=>onProperty(component.id,'linkedPinId',event.target.value)}><option value="">Diferencial del elemento</option>{definition.pins.map(pin=><option key={pin.id} value={pin.id}>{pin.name} · {pin.kind}</option>)}</select></label>}
     <p>La vinculación es una sonda virtual de alta impedancia: mide sin añadir cables ni alterar el circuito.</p>
   </div></InspectorSection>;

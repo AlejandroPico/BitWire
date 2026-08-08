@@ -48,6 +48,14 @@ describe('captura individual de instrumentos',() => {
     expect(instrumentDisplayName(project,scopeA)).toBe('Osciloscopio 1');
     expect(instrumentDisplayName(project,scopeB)).toBe('Osciloscopio 2');
     expect(instrumentDisplayName(project,meter)).toBe('Multímetro 1');
+    scopeB.name='Osciloscopio de salida';
+    expect(instrumentDisplayName(project,scopeB)).toBe('Osciloscopio de salida');
+  });
+
+  it('incluye todas las sondas como instrumentos vinculables',()=>{
+    const project=createBlankProject();
+    project.components.push(createInstance('probe',0,0,'probe'),createInstance('test_point',0,0,'test'));
+    expect(instrumentComponents(project).map(item=>item.id)).toEqual(['probe','test']);
   });
 
   it('mide un componente vinculado sin añadir un cable al instrumento',()=>{

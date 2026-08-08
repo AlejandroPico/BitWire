@@ -30,6 +30,9 @@ def pins_for(profile: str) -> list[dict]:
         "scope": [pin("ch1", "CH1", "INPUT", "ANALOG", 0, .35), pin("ch2", "CH2", "INPUT", "ANALOG", 0, .65), pin("gnd", "GND", "GND", "POWER", 1, .8)],
         "connector2": [pin("p1", "1", "BIDIRECTIONAL", "MIXED", 0, .35), pin("p2", "2", "BIDIRECTIONAL", "MIXED", 0, .65)],
         "junction": [pin("node", "●", "BIDIRECTIONAL", "MIXED", .5, .5)],
+        "rail": [pin("out", "OUT", "OUTPUT", "ANALOG", 1, .5)],
+        "demux": [pin("in","IN","INPUT","DIGITAL",0,.35),pin("sel","S","INPUT","DIGITAL",0,.7),pin("a","A","OUTPUT","DIGITAL",1,.3),pin("b","B","OUTPUT","DIGITAL",1,.7)],
+        "controlled4": [pin("ctrl_plus","C+","INPUT","ANALOG",0,.3),pin("ctrl_minus","C−","INPUT","ANALOG",0,.7),pin("out_plus","O+","OUTPUT","ANALOG",1,.3),pin("out_minus","O−","OUTPUT","ANALOG",1,.7)],
     }
     if profile in profiles:
         return profiles[profile]
@@ -71,6 +74,8 @@ def pins_for(profile: str) -> list[dict]:
         return [pin("a","A","INPUT","DIGITAL",0,.22),pin("b","B","INPUT","DIGITAL",0,.5),pin("c","C","INPUT","DIGITAL",0,.78),pin("out","Q","OUTPUT","DIGITAL",1,.5)]
     if profile == "bus8":
         return [pin(f"d{i}",f"D{i}","BIDIRECTIONAL","DIGITAL",0 if i < 4 else 1,((i%4)+1)/5) for i in range(8)]
+    if profile == "decoder7":
+        return [pin(f"d{i}",f"D{i}","INPUT","DIGITAL",0,(i+1)/5) for i in range(4)] + [pin(name,name.upper(),"OUTPUT","DIGITAL",1,(i+1)/8) for i,name in enumerate("abcdefg")]
     return profiles["analog2"]
 
 

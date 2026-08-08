@@ -125,6 +125,7 @@ export function duplicateComponents(
   const copies = sources.map(component => ({
     ...structuredClone(component),
     id: idMap.get(component.id)!,
+    name: component.name ? `${component.name} · copia` : undefined,
     x: component.x + 40,
     y: component.y + 40,
   }));

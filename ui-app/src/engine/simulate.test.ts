@@ -198,4 +198,102 @@ describe('BitWire simulation core', () => {
     expect(warnings).toContain('potencia nominal');
     expect(warnings).toContain('límite');
   });
+
+  it('preserves and reverses the current of an isolated damped RLC tank after opening its supply switch',()=>{
+    const project=createBlankProject('RLC transient');
+    const source=createInstance('dc_source',0,0,'source');source.properties.voltage=5;
+    const charge=createInstance('resistor',0,0,'charge');charge.properties.resistance=10;
+    const toggle=createInstance('switch_spst',0,0,'switch');toggle.properties.closed=true;
+    const capacitor=createInstance('capacitor',0,0,'capacitor');capacitor.properties.capacitance=10e-6;
+    const damping=createInstance('resistor',0,0,'damping');damping.properties.resistance=1;
+    const inductor=createInstance('inductor',0,0,'inductor');inductor.properties.inductance=.01;inductor.properties.seriesResistance=0;
+    project.components.push(source,charge,toggle,capacitor,damping,inductor);
+    project.wires.push(
+      {id:'source_feed',from:{componentId:'source',pinId:'pos'},to:{componentId:'charge',pinId:'a'},routing:'straight'},
+      {id:'switch_feed',from:{componentId:'charge',pinId:'b'},to:{componentId:'switch',pinId:'a'},routing:'straight'},
+      {id:'tank_top',from:{componentId:'switch',pinId:'b'},to:{componentId:'capacitor',pinId:'a'},routing:'straight'},
+      {id:'tank_resistor',from:{componentId:'capacitor',pinId:'a'},to:{componentId:'damping',pinId:'a'},routing:'straight'},
+      {id:'tank_coil',from:{componentId:'damping',pinId:'b'},to:{componentId:'inductor',pinId:'a'},routing:'straight'},
+      {id:'tank_bottom',from:{componentId:'inductor',pinId:'b'},to:{componentId:'capacitor',pinId:'b'},routing:'straight'},
+      {id:'return',from:{componentId:'capacitor',pinId:'b'},to:{componentId:'source',pinId:'neg'},routing:'straight'},
+    );
+    const state=createSimulationState();let time=0,snapshot=evaluateCircuit(project,time,0,state);
+    for(let tick=1;tick<=800;tick++){time+=10e-6;snapshot=evaluateCircuit(project,time,tick,state);}
+    expect(Math.abs(snapshot.wireSignals.tank_coil.current)).toBeGreaterThan(.1);
+    toggle.properties.closed=false;
+    const post:number[]=[];
+    for(let tick=801;tick<=2000;tick++){time+=10e-6;snapshot=evaluateCircuit(project,time,tick,state);post.push(snapshot.wireSignals.tank_coil.current);}
+    expect(Math.abs(post[0])).toBeGreaterThan(.05);
+    expect(post.some(value=>value>1e-3)).toBe(true);
+    expect(post.some(value=>value< -1e-3)).toBe(true);
+    expect(Math.abs(post.at(-1)!)).toBeLessThan(Math.max(...post.map(Math.abs)));
+  });
+
+  it('solves one-terminal rails against the physical ground reference',()=>{
+    const project=createBlankProject('DC rail');
+    const rail=createInstance('rail_dc',0,0,'rail');rail.properties.voltage=5;
+    const resistor=createInstance('resistor',0,0,'load');resistor.properties.resistance=100;
+    const ground=createInstance('ground',0,0,'ground');
+    project.components.push(rail,resistor,ground);
+    project.wires.push(
+      {id:'feed',from:{componentId:'rail',pinId:'out'},to:{componentId:'load',pinId:'a'},routing:'straight'},
+      {id:'return',from:{componentId:'load',pinId:'b'},to:{componentId:'ground',pinId:'gnd'},routing:'straight'},
+    );
+    const snapshot=evaluateCircuit(project);
+    expect(snapshot.wireSignals.feed.voltage).toBeCloseTo(4.9975,3);
+    expect(Math.abs(snapshot.wireSignals.feed.current)).toBeCloseTo(.049975,4);
+  });
+
+  it('stamps voltage- and current-controlled sources into the nodal matrix',()=>{
+    const project=createBlankProject('Controlled sources');
+    const control=createInstance('dc_source',0,0,'control');control.properties.voltage=2;
+    const vcvs=createInstance('vcvs',0,0,'vcvs');vcvs.properties.gain=3;
+    const vccs=createInstance('vccs',0,0,'vccs');vccs.properties.transconductance=.001;
+    const loadV=createInstance('resistor',0,0,'load_v');loadV.properties.resistance=100;
+    const loadI=createInstance('resistor',0,0,'load_i');loadI.properties.resistance=1000;
+    const ground=createInstance('ground',0,0,'ground');
+    project.components.push(control,vcvs,vccs,loadV,loadI,ground);
+    project.wires.push(
+      {id:'control_ground',from:{componentId:'control',pinId:'neg'},to:{componentId:'ground',pinId:'gnd'},routing:'straight'},
+      {id:'vcvs_cp',from:{componentId:'control',pinId:'pos'},to:{componentId:'vcvs',pinId:'ctrl_plus'},routing:'straight'},
+      {id:'vcvs_cm',from:{componentId:'vcvs',pinId:'ctrl_minus'},to:{componentId:'ground',pinId:'gnd'},routing:'straight'},
+      {id:'vcvs_output',from:{componentId:'vcvs',pinId:'out_plus'},to:{componentId:'load_v',pinId:'a'},routing:'straight'},
+      {id:'vcvs_return',from:{componentId:'vcvs',pinId:'out_minus'},to:{componentId:'ground',pinId:'gnd'},routing:'straight'},
+      {id:'load_v_return',from:{componentId:'load_v',pinId:'b'},to:{componentId:'ground',pinId:'gnd'},routing:'straight'},
+      {id:'vccs_cp',from:{componentId:'control',pinId:'pos'},to:{componentId:'vccs',pinId:'ctrl_plus'},routing:'straight'},
+      {id:'vccs_cm',from:{componentId:'vccs',pinId:'ctrl_minus'},to:{componentId:'ground',pinId:'gnd'},routing:'straight'},
+      {id:'vccs_output',from:{componentId:'vccs',pinId:'out_plus'},to:{componentId:'load_i',pinId:'a'},routing:'straight'},
+      {id:'vccs_return',from:{componentId:'vccs',pinId:'out_minus'},to:{componentId:'ground',pinId:'gnd'},routing:'straight'},
+      {id:'load_i_return',from:{componentId:'load_i',pinId:'b'},to:{componentId:'ground',pinId:'gnd'},routing:'straight'},
+    );
+    const snapshot=evaluateCircuit(project);
+    expect(snapshot.wireSignals.vcvs_output.voltage).toBeCloseTo(6,6);
+    expect(snapshot.wireSignals.vccs_output.voltage).toBeCloseTo(-2,6);
+    expect(Math.abs(snapshot.wireSignals.vccs_output.current)).toBeCloseTo(.002,6);
+  });
+
+  it('evaluates a demultiplexer and a BCD seven-segment decoder',()=>{
+    const project=createBlankProject('Digital additions');
+    const data=createInstance('logic_input',0,0,'data');
+    const select=createInstance('logic_input',0,0,'select');select.properties.state=1;
+    const zero2=createInstance('logic_input',0,0,'zero2');zero2.properties.state=0;
+    const zero3=createInstance('logic_input',0,0,'zero3');zero3.properties.state=0;
+    const demux=createInstance('demux_1_2',0,0,'demux');
+    const decoder=createInstance('decoder_7seg',0,0,'decoder');
+    project.components.push(data,select,zero2,zero3,demux,decoder);
+    project.wires.push(
+      {id:'data',from:{componentId:'data',pinId:'out'},to:{componentId:'demux',pinId:'in'},routing:'straight'},
+      {id:'select',from:{componentId:'select',pinId:'out'},to:{componentId:'demux',pinId:'sel'},routing:'straight'},
+      {id:'bcd0',from:{componentId:'data',pinId:'out'},to:{componentId:'decoder',pinId:'d0'},routing:'straight'},
+      {id:'bcd1',from:{componentId:'select',pinId:'out'},to:{componentId:'decoder',pinId:'d1'},routing:'straight'},
+      {id:'bcd2',from:{componentId:'zero2',pinId:'out'},to:{componentId:'decoder',pinId:'d2'},routing:'straight'},
+      {id:'bcd3',from:{componentId:'zero3',pinId:'out'},to:{componentId:'decoder',pinId:'d3'},routing:'straight'},
+    );
+    const snapshot=evaluateCircuit(project);
+    expect(snapshot.componentSignals.demux.outputs.a.logic).toBe(0);
+    expect(snapshot.componentSignals.demux.outputs.b.logic).toBe(1);
+    // BCD 3 lights A, B, C, D and G.
+    for(const segment of ['a','b','c','d','g'])expect(snapshot.componentSignals.decoder.outputs[segment].logic).toBe(1);
+    for(const segment of ['e','f'])expect(snapshot.componentSignals.decoder.outputs[segment].logic).toBe(0);
+  });
 });
