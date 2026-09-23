@@ -3,7 +3,7 @@ import {
   Eye, FilePlus2, FolderOpen, Gauge, Grid3X3, Laptop, Minus, MonitorDot, Pause, Play, Redo2,
   Route, Save, Settings2, Spline, StepForward, Tags, Undo2, Zap,
 } from 'lucide-react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import type { ProjectSettings, Theme } from '../model/types';
 import { THEME_DEFINITIONS } from '../theme/themes';
 
@@ -29,6 +29,8 @@ interface Props {
   onRedo(): void;
   onTheme(theme: Theme): void;
   menuOpen: boolean;
+  panel: 'settings' | 'speed' | null;
+  onPanel(panel: 'settings' | 'speed' | null): void;
   onMenuToggle(): void;
   onMenuClose(): void;
   onHelp(): void;
@@ -72,7 +74,7 @@ export function Topbar(props: Props) {
     </div>
 
     <div className="topbar-right">
-      <SettingsMenu settings={props.settings} theme={props.theme} onSettings={props.onSettings} onTheme={props.onTheme}/>
+      <SettingsMenu settings={props.settings} theme={props.theme} onSettings={props.onSettings} onTheme={props.onTheme} open={props.panel === 'settings'} onOpen={open => props.onPanel(open ? 'settings' : null)}/>
     </div>
     <nav className="mobile-menu-links" aria-label="Información"><button onClick={() => { props.onMenuClose(); props.onHelp(); }}><HelpCircle size={17}/>Guía</button><button onClick={() => { props.onMenuClose(); props.onAbout(); }}><Info size={17}/>Acerca de</button></nav>
     </div>
@@ -88,31 +90,32 @@ export function Topbar(props: Props) {
         <button className="step-action" onClick={props.onStep} disabled={props.running} title="Avanzar una iteración">
           <StepForward size={16}/><span>Paso</span>
         </button>
-        <SimulationSpeedControl value={props.speed} onChange={props.onSpeed}/>
+        <SimulationSpeedControl value={props.speed} onChange={props.onSpeed} open={props.panel === 'speed'} onOpen={open => props.onPanel(open ? 'speed' : null)}/>
       </nav>
     </div>
 
   </header>;
 }
 
-function SettingsMenu({ settings, theme, onSettings, onTheme }: {
+function SettingsMenu({ settings, theme, onSettings, onTheme, open, onOpen }: {
   settings: ProjectSettings;
   theme: Theme;
   onSettings(patch: Partial<ProjectSettings>): void;
   onTheme(theme: Theme): void;
+  open: boolean;
+  onOpen(open: boolean): void;
 }) {
-  const [open,setOpen]=useState(false);
   const root=useRef<HTMLDivElement>(null);
   useEffect(()=>{
     if(!open)return;
-    const outside=(event:PointerEvent)=>{if(!root.current?.contains(event.target as Node))setOpen(false);};
-    const escape=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpen(false);};
+    const outside=(event:PointerEvent)=>{if(!root.current?.contains(event.target as Node))onOpen(false);};
+    const escape=(event:KeyboardEvent)=>{if(event.key==='Escape')onOpen(false);};
     window.addEventListener('pointerdown',outside);window.addEventListener('keydown',escape);
     return()=>{window.removeEventListener('pointerdown',outside);window.removeEventListener('keydown',escape);};
-  },[open]);
+  },[open,onOpen]);
 
   return <div className="settings-control" ref={root}>
-    <button className={open?'settings-trigger active':'settings-trigger'} type="button" onClick={()=>setOpen(value=>!value)} aria-haspopup="dialog" aria-expanded={open} aria-label="Configuración de visualización" title="Configuración de visualización">
+    <button className={open?'settings-trigger active':'settings-trigger'} type="button" onClick={()=>onOpen(!open)} aria-haspopup="dialog" aria-expanded={open} aria-label="Configuración de visualización" title="Configuración de visualización">
       <Settings2 size={18}/><span className={settings.animateCurrent?'settings-live':''}/>
     </button>
     {open&&<section className="settings-popover" role="dialog" aria-label="Configuración de BitWire">
@@ -155,22 +158,21 @@ interface MenuOption<T extends string | number> {
   icon: ReactNode;
 }
 
-function SimulationSpeedControl({value,onChange}:{value:number;onChange(value:number):void}) {
-  const [open, setOpen] = useState(false);
+function SimulationSpeedControl({value,onChange,open,onOpen}:{value:number;onChange(value:number):void;open:boolean;onOpen(open:boolean):void}) {
   const root = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    const closeOutside = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) setOpen(false); };
-    const closeEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setOpen(false); };
+    const closeOutside = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) onOpen(false); };
+    const closeEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') onOpen(false); };
     window.addEventListener('pointerdown', closeOutside);
     window.addEventListener('keydown', closeEscape);
     return () => { window.removeEventListener('pointerdown', closeOutside); window.removeEventListener('keydown', closeEscape); };
-  }, [open]);
+  }, [open,onOpen]);
 
   const exponent=Math.log10(Math.max(.0001,Math.min(10,value)));
   return <div className="toolbar-menu compact speed-control" ref={root}>
-    <button className={open ? 'toolbar-menu-trigger active' : 'toolbar-menu-trigger'} type="button" onClick={() => setOpen(current => !current)} aria-haspopup="dialog" aria-expanded={open} aria-label={`Velocidad de simulación: ${formatSpeed(value)}`} title={`Velocidad de simulación: ${formatSpeed(value)}`}>
+    <button className={open ? 'toolbar-menu-trigger active' : 'toolbar-menu-trigger'} type="button" onClick={() => onOpen(!open)} aria-haspopup="dialog" aria-expanded={open} aria-label={`Velocidad de simulación: ${formatSpeed(value)}`} title={`Velocidad de simulación: ${formatSpeed(value)}`}>
       <CircleGauge size={15}/><span>{formatSpeed(value)}</span><ChevronDown size={12}/>
     </button>
     {open&&<section className="speed-popover" role="dialog" aria-label="Escala temporal">

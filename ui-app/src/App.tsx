@@ -35,6 +35,7 @@ export default function App() {
   const [samples, setSamples] = useState<SimulationSnapshot[]>([]);
   const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 1180px)').matches);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [topbarPanel, setTopbarPanel] = useState<'settings' | 'speed' | null>(null);
   const [catalogCollapsed, setCatalogCollapsed] = useState(() => window.matchMedia('(max-width: 1180px)').matches);
   const [inspectorCollapsed, setInspectorCollapsed] = useState(() => window.matchMedia('(max-width: 1180px)').matches);
   const [instrumentsCollapsed, setInstrumentsCollapsed] = useState(() => window.matchMedia('(max-width: 1180px)').matches);
@@ -288,6 +289,7 @@ export default function App() {
     if (contextTarget) { setContextTarget(undefined); return true; }
     const foremost = [...instrumentWindows].reverse().find(item => !item.minimized);
     if (foremost) { setInstrumentWindows(current => current.filter(item => item.id !== foremost.id)); return true; }
+    if (topbarPanel) { setTopbarPanel(null); return true; }
     if (mobileMenuOpen) { setMobileMenuOpen(false); return true; }
     if (!catalogCollapsed) { setCatalogCollapsed(true); return true; }
     if (!inspectorCollapsed) { setInspectorCollapsed(true); return true; }
@@ -307,9 +309,9 @@ export default function App() {
     {compact && (!catalogCollapsed || !inspectorCollapsed || !instrumentsCollapsed) && <button className="mobile-panel-scrim" aria-label="Cerrar panel" onClick={() => { setCatalogCollapsed(true); setInspectorCollapsed(true); setInstrumentsCollapsed(true); }}/>}
     <div className={`editor-grid ${catalogCollapsed ? 'left-collapsed' : ''} ${inspectorCollapsed ? 'right-collapsed' : ''} ${instrumentsCollapsed ? 'bottom-collapsed' : ''}`}>
       <Topbar projectName={project.name} running={running} speed={speed} settings={project.settings} canUndo={canUndo} canRedo={canRedo} dirty={savedRevision !== project.updatedAt}
-      theme={theme} onTheme={changeTheme} menuOpen={mobileMenuOpen}
-      onMenuToggle={() => { setMobileMenuOpen(value => !value); setCatalogCollapsed(true); setInspectorCollapsed(true); setInstrumentsCollapsed(true); }}
-      onMenuClose={() => setMobileMenuOpen(false)} onHelp={() => setHelpOpen(true)} onAbout={() => setAboutOpen(true)}
+      theme={theme} onTheme={changeTheme} menuOpen={mobileMenuOpen} panel={topbarPanel} onPanel={setTopbarPanel}
+      onMenuToggle={() => { setMobileMenuOpen(value => !value); setTopbarPanel(null); setCatalogCollapsed(true); setInspectorCollapsed(true); setInstrumentsCollapsed(true); }}
+      onMenuClose={() => { setMobileMenuOpen(false); setTopbarPanel(null); }} onHelp={() => setHelpOpen(true)} onAbout={() => setAboutOpen(true)}
       onRun={() => setRunning(value => !value)} onStep={() => workerRef.current?.postMessage({ type: 'step' })} onSpeed={setSpeed}
       onSettings={patch => update(draft => { Object.assign(draft.settings, patch); })}
       onNew={newProject} onSave={save} onImport={() => importRef.current?.click()} onExport={() => exportProject(project)} onOffline={()=>setOfflineOpen(true)} onUndo={undo} onRedo={redo}/>
