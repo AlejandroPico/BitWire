@@ -796,3 +796,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .catalog-panel .catalog-item small,.catalog-panel .category-heading span { font-size: 11px; }
   .instrument-heading button,.floating-instrument-titlebar button { min-width: 38px; min-height: 38px; }
 }
+
+@media (max-width: 620px) {
+  .floating-instrument,.floating-instrument:not(.minimized),.floating-instrument.minimized { min-width: 0 !important; min-height: 0 !important; }
+  .floating-instrument-titlebar { grid-template-columns: 26px minmax(0,1fr) auto; gap: 4px; }
+  .floating-instrument-titlebar > .instrument-online,.floating-instrument-titlebar > .instrument-offline,.floating-instrument-titlebar small { display: none; }
+  .floating-instrument-titlebar nav button { width: 32px; min-width: 32px; }
+  .floating-instrument.expanded .professional-controls { grid-template-columns: minmax(0,1fr); }
+}
