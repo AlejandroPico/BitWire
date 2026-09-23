@@ -33,9 +33,11 @@ export default function App() {
   const [speed, setSpeed] = useState(1);
   const [snapshot, setSnapshot] = useState<SimulationSnapshot>();
   const [samples, setSamples] = useState<SimulationSnapshot[]>([]);
-  const [catalogCollapsed, setCatalogCollapsed] = useState(false);
-  const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
-  const [instrumentsCollapsed, setInstrumentsCollapsed] = useState(false);
+  const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 1180px)').matches);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [catalogCollapsed, setCatalogCollapsed] = useState(() => window.matchMedia('(max-width: 1180px)').matches);
+  const [inspectorCollapsed, setInspectorCollapsed] = useState(() => window.matchMedia('(max-width: 1180px)').matches);
+  const [instrumentsCollapsed, setInstrumentsCollapsed] = useState(() => window.matchMedia('(max-width: 1180px)').matches);
   const [database, setDatabase] = useState<CatalogDatabaseStatus>({ source: 'embedded', count: EMBEDDED_CATALOG.length });
   const [viewport, setViewport] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
   const [savedRevision, setSavedRevision] = useState(initial.updatedAt);
@@ -51,6 +53,31 @@ export default function App() {
   const importRef = useRef<HTMLInputElement>(null);
   const moduleImportRef = useRef<HTMLInputElement>(null);
   const windowZ = useRef(120);
+  const mobileBackRef = useRef<() => boolean>(() => false);
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 1180px)');
+    const sync = () => {
+      setCompact(query.matches);
+      setMobileMenuOpen(false);
+      setCatalogCollapsed(query.matches);
+      setInspectorCollapsed(query.matches);
+      setInstrumentsCollapsed(query.matches);
+    };
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    if (!compact) return;
+    window.history.pushState({ bitwireMobile: true }, '');
+    const onBack = () => {
+      if (mobileBackRef.current()) window.history.pushState({ bitwireMobile: true }, '');
+      else window.history.back();
+    };
+    window.addEventListener('popstate', onBack);
+    return () => window.removeEventListener('popstate', onBack);
+  }, [compact]);
 
   const simulationProject = useCallback((source: BitWireProject) => {
     const next = structuredClone(source);
@@ -117,11 +144,13 @@ export default function App() {
   };
 
   const addDefinition = (definition: ComponentDefinition) => {
-    const world = { x: (window.innerWidth * .5 - viewport.x) / viewport.scale, y: (window.innerHeight * .45 - viewport.y) / viewport.scale };
+    const canvas = document.querySelector('.circuit-canvas');
+    const world = { x: ((canvas?.clientWidth ?? window.innerWidth) * .5 - viewport.x) / viewport.scale, y: ((canvas?.clientHeight ?? window.innerHeight) * .5 - viewport.y) / viewport.scale };
     const instanceScale = Math.max(1e-9,Math.min(20,1/viewport.scale));
     const component = createInstance(definition.id, world.x - definition.width*instanceScale/2, world.y - definition.height*instanceScale/2, uid('node'), instanceScale);
     update(draft => { draft.components.push(component); if(activeModuleId) draft.modules.find(module=>module.id===activeModuleId)?.memberIds.push(component.id); });
     setSelected([component.id]); setSelectedModuleId(undefined);
+    if (compact) setCatalogCollapsed(true);
   };
 
   const saveSelectedModule = () => {
@@ -135,6 +164,7 @@ export default function App() {
     let insertedId='';
     update(draft=>{ const module=insertSavedModule(draft,saved,world.x-saved.width/2,world.y-saved.height/2,activeModuleId); insertedId=module.id; });
     queueMicrotask(()=>{ if(insertedId){ setSelected([]); setSelectedModuleId(insertedId); } });
+    if (compact) setCatalogCollapsed(true);
   };
 
   const doImportModule = async(file?:File) => {
@@ -251,23 +281,46 @@ export default function App() {
 
   const selectedModule = project.modules.find(module => module.id === selectedModuleId);
   const activeWarnings = snapshot?.warnings.length ?? 0;
+  mobileBackRef.current = () => {
+    if (helpOpen) { setHelpOpen(false); return true; }
+    if (aboutOpen) { setAboutOpen(false); return true; }
+    if (offlineOpen) { setOfflineOpen(false); return true; }
+    if (contextTarget) { setContextTarget(undefined); return true; }
+    const foremost = [...instrumentWindows].reverse().find(item => !item.minimized);
+    if (foremost) { setInstrumentWindows(current => current.filter(item => item.id !== foremost.id)); return true; }
+    if (mobileMenuOpen) { setMobileMenuOpen(false); return true; }
+    if (!catalogCollapsed) { setCatalogCollapsed(true); return true; }
+    if (!inspectorCollapsed) { setInspectorCollapsed(true); return true; }
+    if (!instrumentsCollapsed) { setInstrumentsCollapsed(true); return true; }
+    if (activeModuleId) { setActiveModuleId(project.modules.find(item => item.id === activeModuleId)?.parentModuleId); return true; }
+    if (selected.length || selectedModuleId) { setSelected([]); setSelectedModuleId(undefined); return true; }
+    return false;
+  };
+  const togglePanel = (panel: 'catalog' | 'inspector' | 'instruments') => {
+    if (panel === 'catalog') { setCatalogCollapsed(value => !value); if (compact) { setInspectorCollapsed(true); setInstrumentsCollapsed(true); setMobileMenuOpen(false); } }
+    if (panel === 'inspector') { setInspectorCollapsed(value => !value); if (compact) { setCatalogCollapsed(true); setInstrumentsCollapsed(true); setMobileMenuOpen(false); } }
+    if (panel === 'instruments') { setInstrumentsCollapsed(value => !value); if (compact) { setCatalogCollapsed(true); setInspectorCollapsed(true); setMobileMenuOpen(false); } }
+  };
   const resolvedTheme = resolveTheme(theme, new Date(themeClock));
 
   return <div className={`app-shell theme-${resolvedTheme}`} data-theme-mode={theme}>
+    {compact && (!catalogCollapsed || !inspectorCollapsed || !instrumentsCollapsed) && <button className="mobile-panel-scrim" aria-label="Cerrar panel" onClick={() => { setCatalogCollapsed(true); setInspectorCollapsed(true); setInstrumentsCollapsed(true); }}/>}
     <div className={`editor-grid ${catalogCollapsed ? 'left-collapsed' : ''} ${inspectorCollapsed ? 'right-collapsed' : ''} ${instrumentsCollapsed ? 'bottom-collapsed' : ''}`}>
       <Topbar projectName={project.name} running={running} speed={speed} settings={project.settings} canUndo={canUndo} canRedo={canRedo} dirty={savedRevision !== project.updatedAt}
-      theme={theme} onTheme={changeTheme}
+      theme={theme} onTheme={changeTheme} menuOpen={mobileMenuOpen}
+      onMenuToggle={() => { setMobileMenuOpen(value => !value); setCatalogCollapsed(true); setInspectorCollapsed(true); setInstrumentsCollapsed(true); }}
+      onMenuClose={() => setMobileMenuOpen(false)} onHelp={() => setHelpOpen(true)} onAbout={() => setAboutOpen(true)}
       onRun={() => setRunning(value => !value)} onStep={() => workerRef.current?.postMessage({ type: 'step' })} onSpeed={setSpeed}
       onSettings={patch => update(draft => { Object.assign(draft.settings, patch); })}
       onNew={newProject} onSave={save} onImport={() => importRef.current?.click()} onExport={() => exportProject(project)} onOffline={()=>setOfflineOpen(true)} onUndo={undo} onRedo={redo}/>
-      <CatalogPanel collapsed={catalogCollapsed} database={database} onToggle={() => setCatalogCollapsed(value => !value)} onAdd={addDefinition} modules={moduleLibrary} onInsertModule={insertModule} onImportModule={()=>moduleImportRef.current?.click()} onDeleteModule={id=>setModuleLibrary(deleteSavedModule(id))}/>
-      <Workspace project={project} resolvedTheme={resolvedTheme} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} samples={samples} running={running} simulationSpeed={speed} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>setInspectorCollapsed(false)} onContextTarget={setContextTarget}/>
-      <Inspector project={project} selected={selected} collapsed={inspectorCollapsed} onToggle={() => setInspectorCollapsed(value => !value)} selectedModule={selectedModule}
+      <CatalogPanel collapsed={catalogCollapsed} database={database} onToggle={() => togglePanel('catalog')} onAdd={addDefinition} modules={moduleLibrary} onInsertModule={insertModule} onImportModule={()=>moduleImportRef.current?.click()} onDeleteModule={id=>setModuleLibrary(deleteSavedModule(id))}/>
+      <Workspace project={project} resolvedTheme={resolvedTheme} update={update} selected={selected} onSelected={setSelected} selectedModuleId={selectedModuleId} onSelectedModule={setSelectedModuleId} tool={tool} onTool={setTool} snapshot={snapshot} samples={samples} running={running} simulationSpeed={speed} onViewport={setViewport} activeModuleId={activeModuleId} onActiveModule={id=>{setActiveModuleId(id);if(id){setSelected([]);setSelectedModuleId(id);}}} onOpenInspector={()=>{setInspectorCollapsed(false);if(compact){setCatalogCollapsed(true);setInstrumentsCollapsed(true);}}} onContextTarget={setContextTarget}/>
+      <Inspector project={project} selected={selected} collapsed={inspectorCollapsed} onToggle={() => togglePanel('inspector')} selectedModule={selectedModule}
         onProperty={(id, key, value: PropertyValue) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) item.properties[key] = value; })}
         onPatch={(id, patch) => update(draft => { const item = draft.components.find(component => component.id === id); if (item) Object.assign(item, patch); })}
         onProject={patch => update(draft => { Object.assign(draft, patch); })} onDelete={deleteSelection} onDuplicate={duplicateSelection}
         onSelectModule={id => { setSelected([]); setSelectedModuleId(id); }} onModule={patchModule} activeModuleId={activeModuleId} onEnterModule={id=>{setActiveModuleId(id);if(id)setSelectedModuleId(id);}} onSaveModule={saveSelectedModule} onExportModule={()=>selectedModule&&exportModule(project,selectedModule)}/>
-      <InstrumentTray collapsed={instrumentsCollapsed} project={project} samples={samples} onToggle={() => setInstrumentsCollapsed(value => !value)}/>
+      <InstrumentTray collapsed={instrumentsCollapsed} project={project} samples={samples} onToggle={() => togglePanel('instruments')}/>
       <footer className="statusbar">
         <div><span className={`engine-light ${running ? 'running' : ''}`}/><b>{running ? `SIMULANDO ${formatSpeed(speed)}` : 'MOTOR EN PAUSA'}</b><span>{snapshot ? `t = ${snapshot.time.toFixed(3)} s · tick ${snapshot.tick}` : 'Inicializando motor…'}</span></div>
         <div><span>{project.components.length} componentes</span><span>{project.wires.length} redes</span><span>{selected.length ? `${selected.length} seleccionados` : 'Sin selección'}</span></div>

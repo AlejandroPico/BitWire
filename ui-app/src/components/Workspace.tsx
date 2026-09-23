@@ -57,6 +57,10 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
   const svgRef = useRef<SVGSVGElement>(null);
   const [viewport, setViewportState] = useState<ViewportState>({ x: 690, y: 270, scale: .78 });
   const [interaction, setInteraction] = useState<Interaction>(null);
+  const touches = useRef(new Map<number, Point>());
+  const pinch = useRef<{ distance: number; center: Point; origin: ViewportState } | null>(null);
+  const viewportRef = useRef(viewport);
+  viewportRef.current = viewport;
   const interactionRef = useRef<Interaction>(null);
   const modulePressRef = useRef<{ id:string; at:number }|undefined>(undefined);
   const [pendingPin, setPendingPin] = useState<PinRef>();
@@ -128,6 +132,50 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
     };
   }, [project.components, project.modules, activeModuleId, viewport]);
 
+  useEffect(() => {
+    if (!window.matchMedia('(max-width: 1180px)').matches || !svgRef.current) return;
+    const canvas = svgRef.current;
+    let previous: { width: number; height: number } | undefined;
+    const observer = new ResizeObserver(entries => {
+      const rect = entries[0].contentRect;
+      if (!rect.width || !rect.height) return;
+      if (!previous) { previous = { width: rect.width, height: rect.height }; fitProject(); return; }
+      const before = previous;
+      previous = { width: rect.width, height: rect.height };
+      const origin = viewportRef.current;
+      const worldX = (before.width / 2 - origin.x) / origin.scale;
+      const worldY = (before.height / 2 - origin.y) / origin.scale;
+      setViewport({ ...origin, x: rect.width / 2 - worldX * origin.scale, y: rect.height / 2 - worldY * origin.scale });
+    });
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, []);
+
+  const onTouchDownCapture = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (event.pointerType !== 'touch') return;
+    touches.current.set(event.pointerId, localPoint(event));
+    if (touches.current.size !== 2) return;
+    const [a, b] = [...touches.current.values()];
+    pinch.current = { distance: Math.hypot(b.x - a.x, b.y - a.y), center: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, origin: viewportRef.current };
+    setCurrentInteraction(null);
+  };
+  const onTouchMoveCapture = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (event.pointerType !== 'touch' || !touches.current.has(event.pointerId)) return;
+    touches.current.set(event.pointerId, localPoint(event));
+    if (!pinch.current || touches.current.size < 2) return;
+    const [a, b] = [...touches.current.values()];
+    const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    const origin = pinch.current.origin;
+    const scale = Math.max(.03, Math.min(12, origin.scale * Math.hypot(b.x - a.x, b.y - a.y) / Math.max(1, pinch.current.distance)));
+    const worldX = (pinch.current.center.x - origin.x) / origin.scale;
+    const worldY = (pinch.current.center.y - origin.y) / origin.scale;
+    setViewport({ x: center.x - worldX * scale, y: center.y - worldY * scale, scale });
+  };
+  const onTouchEndCapture = (event: React.PointerEvent<SVGSVGElement>) => {
+    touches.current.delete(event.pointerId);
+    if (pinch.current) { pinch.current = null; setCurrentInteraction(null); }
+  };
+
   const onWheel = (event: React.WheelEvent<SVGSVGElement>) => {
     event.preventDefault();
     const point = localPoint(event);
@@ -136,12 +184,12 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
   };
 
   const onBackgroundDown = (event: React.PointerEvent<SVGSVGElement>) => {
-    if (event.button !== 0 && event.button !== 1) return;
+    if (event.button !== 0 && event.button !== 1 || pinch.current) return;
     const local = localPoint(event);
     const world = screenToWorld(local, viewport);
     svgRef.current?.setPointerCapture(event.pointerId);
     setSelectedWireId(undefined);
-    if (tool === 'pan' || event.button === 1 || spaceHeld) {
+    if (tool === 'pan' || event.button === 1 || spaceHeld || (event.pointerType === 'touch' && tool === 'select')) {
       setCurrentInteraction({ type: 'pan', start: local, origin: viewport });
     } else if (tool === 'module') {
       setCurrentInteraction({ type: 'module', start: world, current: world });
@@ -154,6 +202,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
   };
 
   const onPointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (pinch.current) return;
     const local = localPoint(event);
     const world = screenToWorld(local, viewport);
     setPointerWorld(world);
@@ -240,7 +289,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
 
   const onComponentDown = (event: React.PointerEvent<SVGGElement>, component: ComponentInstance) => {
     event.stopPropagation();
-    if (event.button === 2) return;
+    if (event.button === 2 || pinch.current) return;
     if (tool === 'pan' || event.button === 1 || spaceHeld) {
       const local = localPoint(event);
       setCurrentInteraction({ type: 'pan', start: local, origin: viewport });
@@ -320,7 +369,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
 
   const onModuleDown = (event: React.PointerEvent<SVGGElement>, module: ModuleArea) => {
     event.stopPropagation();
-    if (event.button === 2) return;
+    if (event.button === 2 || pinch.current) return;
     const now=performance.now(),previous=modulePressRef.current;
     modulePressRef.current={id:module.id,at:now};
     if(previous?.id===module.id&&now-previous.at<360){setCurrentInteraction(null);navigateToModule(module.id);return;}
@@ -393,7 +442,7 @@ export function Workspace({ project, resolvedTheme, update, selected, onSelected
   const renderedModules = childModules;
 
   return <main className={`workspace theme-${resolvedTheme} tool-${tool} ${spaceHeld ? 'space-pan' : ''} ${activeModule ? 'inside-module' : ''}`}>
-    <svg ref={svgRef} className="circuit-canvas" onWheel={onWheel} onPointerDown={onBackgroundDown} onPointerMove={onPointerMove} onPointerUp={finishInteraction} onPointerCancel={finishInteraction} onContextMenu={event=>{event.preventDefault();if(event.target===event.currentTarget||((event.target as Element).classList?.contains('grid-plane')))onContextTarget({kind:'canvas',x:event.clientX,y:event.clientY});}}
+    <svg ref={svgRef} className="circuit-canvas" onWheel={onWheel} onPointerDownCapture={onTouchDownCapture} onPointerMoveCapture={onTouchMoveCapture} onPointerUpCapture={onTouchEndCapture} onPointerCancelCapture={onTouchEndCapture} onPointerDown={onBackgroundDown} onPointerMove={onPointerMove} onPointerUp={finishInteraction} onPointerCancel={finishInteraction} onContextMenu={event=>{event.preventDefault();if(event.target===event.currentTarget||((event.target as Element).classList?.contains('grid-plane')))onContextTarget({kind:'canvas',x:event.clientX,y:event.clientY});}}
       onDragOver={event => { if (event.dataTransfer.types.includes('application/x-bitwire-component')) { event.preventDefault(); event.dataTransfer.dropEffect = 'copy'; } }}
       onDrop={event => { event.preventDefault(); const id = event.dataTransfer.getData('application/x-bitwire-component'); addAt(id, screenToWorld(localPoint(event), viewport)); }}>
       <defs>

@@ -1,4 +1,4 @@
-import { Box, ChevronDown, FolderUp, GripVertical, Search, Trash2, X } from 'lucide-react';
+import { Box, ChevronDown, ChevronRight, FolderUp, GripVertical, Search, Trash2, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { EMBEDDED_CATALOG, searchCatalog } from '../catalog/catalog';
 import type { CatalogDatabaseStatus, ComponentDefinition, SavedModule } from '../model/types';
@@ -24,7 +24,7 @@ export function CatalogPanel({ collapsed, database, onToggle, onAdd, modules, on
   if (collapsed) return (
     <aside className="catalog-panel collapsed-panel">
       <button className="catalog-brand compact-brand" onClick={onToggle} title="Abrir catálogo"><img src={`${import.meta.env.BASE_URL}favicon.svg`} alt=""/></button>
-      <button className="icon-button vertical-label" onClick={onToggle} title="Abrir catálogo">CATÁLOGO</button>
+      <button className="icon-button vertical-label" onClick={onToggle} title="Abrir componentes" aria-label="Abrir componentes"><ChevronRight className="mobile-handle-arrow" size={16}/>COMPONENTES</button>
     </aside>
   );
 
@@ -53,7 +53,7 @@ export function CatalogPanel({ collapsed, database, onToggle, onAdd, modules, on
       <div className="catalog-scroll">
         <section className="saved-module-section">
           <div className="saved-module-heading"><span><Box size={13}/>MIS ENCAPSULADOS</span><button onClick={onImportModule} title="Importar .bitwire-module"><FolderUp size={14}/>Importar</button></div>
-          {modules.length ? <div className="saved-module-list">{modules.map(module => <div key={module.id}><button className="saved-module-card" onDoubleClick={() => onInsertModule(module)} title="Doble clic para insertar"><span style={{ borderColor: module.color }}><b>{module.pins.length}</b> PIN</span><span><strong>{module.name}</strong><small>{module.components.length} elementos · {module.width} × {module.height}</small></span></button><button className="delete-library-item" onClick={() => onDeleteModule(module.id)} title="Eliminar de la biblioteca"><Trash2 size={12}/></button></div>)}</div> : <p className="empty-library">Guarda aquí los chips que diseñes para reutilizarlos en otros proyectos.</p>}
+          {modules.length ? <div className="saved-module-list">{modules.map(module => <div key={module.id}><button className="saved-module-card" onClick={() => { if (window.matchMedia('(max-width: 1180px)').matches) onInsertModule(module); }} onDoubleClick={() => { if (!window.matchMedia('(max-width: 1180px)').matches) onInsertModule(module); }} title="Toca o haz doble clic para insertar"><span style={{ borderColor: module.color }}><b>{module.pins.length}</b> PIN</span><span><strong>{module.name}</strong><small>{module.components.length} elementos · {module.width} × {module.height}</small></span></button><button className="delete-library-item" onClick={() => onDeleteModule(module.id)} title="Eliminar de la biblioteca"><Trash2 size={12}/></button></div>)}</div> : <p className="empty-library">Guarda aquí los chips que diseñes para reutilizarlos en otros proyectos.</p>}
         </section>
         {categories.map(category => {
           const categoryItems = items.filter(item => item.category === category);
@@ -70,8 +70,9 @@ export function CatalogPanel({ collapsed, database, onToggle, onAdd, modules, on
                 className="catalog-item"
                 draggable
                 onDragStart={event => { event.dataTransfer.setData('application/x-bitwire-component', item.id); event.dataTransfer.effectAllowed = 'copy'; }}
-                onDoubleClick={() => onAdd(item)}
-                title={`${item.description}\nDoble clic o arrastra al plano`}
+                onClick={() => { if (window.matchMedia('(max-width: 1180px)').matches) onAdd(item); }}
+                onDoubleClick={() => { if (!window.matchMedia('(max-width: 1180px)').matches) onAdd(item); }}
+                title={`${item.description}\nToca, haz doble clic o arrastra al plano`}
               >
                 <GripVertical size={13}/><span className="catalog-glyph">{glyphFor(item.symbol)}</span>
                 <span><strong>{item.name}</strong><small>{item.family}</small></span>
@@ -80,7 +81,7 @@ export function CatalogPanel({ collapsed, database, onToggle, onAdd, modules, on
           </section>;
         })}
       </div>
-      <div className="panel-help">Arrastra al plano o haz doble clic para insertar.</div>
+      <div className="panel-help">Toca un componente para insertarlo y arrástralo en el lienzo.</div>
     </aside>
   );
 }

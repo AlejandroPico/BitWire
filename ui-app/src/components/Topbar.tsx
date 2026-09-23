@@ -1,5 +1,5 @@
 import {
-  Activity, Binary, Cable, Check, ChevronDown, CircleGauge, CornerDownRight, Download,
+  Activity, Binary, Cable, Check, ChevronDown, CircleGauge, CornerDownRight, Download, Info, HelpCircle, Menu, Square, X,
   Eye, FilePlus2, FolderOpen, Gauge, Grid3X3, Laptop, Minus, MonitorDot, Pause, Play, Redo2,
   Route, Save, Settings2, Spline, StepForward, Tags, Undo2, Zap,
 } from 'lucide-react';
@@ -28,6 +28,11 @@ interface Props {
   onUndo(): void;
   onRedo(): void;
   onTheme(theme: Theme): void;
+  menuOpen: boolean;
+  onMenuToggle(): void;
+  onMenuClose(): void;
+  onHelp(): void;
+  onAbout(): void;
 }
 
 const SIGNAL_OPTIONS = [
@@ -47,7 +52,12 @@ const SPEED_PRESETS=[.0001,.001,.01,.1,.25,.5,1,2,5,10];
 
 export function Topbar(props: Props) {
   return <header className="topbar">
-    <div className="topbar-left">
+    <button className="mobile-menu-toggle" type="button" aria-label={props.menuOpen ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={props.menuOpen} onClick={props.onMenuToggle}>{props.menuOpen ? <X size={22}/> : <Menu size={22}/>}</button>
+    <span className="mobile-app-brand"><img src={`${import.meta.env.BASE_URL}favicon.svg`} alt=""/>BITWIRE</span>
+    {props.menuOpen && <button className="mobile-menu-backdrop" aria-label="Cerrar menú" onClick={props.onMenuClose}/>}
+    <div className={`mobile-app-menu ${props.menuOpen ? 'open' : ''}`}>
+      <div className="mobile-menu-title"><img src={`${import.meta.env.BASE_URL}favicon.svg`} alt=""/><strong>BitWire</strong><span>{props.projectName}</span></div>
+    <div className="topbar-left" onClickCapture={event => { if ((event.target as HTMLElement).closest('button')) props.onMenuClose(); }}>
       <nav className="toolbar-group file-tools" aria-label="Archivo">
         <button onClick={props.onNew} title="Proyecto nuevo (Ctrl+N)"><FilePlus2 size={16}/><span>Nuevo</span></button>
         <button onClick={props.onImport} title="Abrir o importar .bitwire"><FolderOpen size={16}/><span>Abrir</span></button>
@@ -61,14 +71,19 @@ export function Topbar(props: Props) {
       </nav>
     </div>
 
+    <div className="topbar-right">
+      <SettingsMenu settings={props.settings} theme={props.theme} onSettings={props.onSettings} onTheme={props.onTheme}/>
+    </div>
+    <nav className="mobile-menu-links" aria-label="Información"><button onClick={() => { props.onMenuClose(); props.onHelp(); }}><HelpCircle size={17}/>Guía</button><button onClick={() => { props.onMenuClose(); props.onAbout(); }}><Info size={17}/>Acerca de</button></nav>
+    </div>
     <div className="topbar-center">
       <div className="project-title" title={props.projectName}>
         <span className={props.dirty ? 'dirty-dot' : 'saved-dot'}/><span>{props.projectName}</span>
       </div>
       <nav className="simulation-command" aria-label="Control principal de simulación">
         <span className={`simulation-state ${props.running ? 'running' : ''}`}><i/>{props.running ? 'EN MARCHA' : 'EN PAUSA'}</span>
-        <button className={props.running ? 'stop-action' : 'run-action'} onClick={props.onRun}>
-          {props.running ? <Pause size={17}/> : <Play size={17}/>}<span>{props.running ? 'Pausar' : 'Ejecutar'}</span>
+        <button className={props.running ? 'stop-action' : 'run-action'} onClick={props.onRun} aria-label={props.running ? 'Detener simulación' : 'Iniciar simulación'}>
+          {props.running ? <><Pause className="desktop-pause" size={17}/><Square className="mobile-stop" size={16}/></> : <Play size={17}/>}<span>{props.running ? 'Pausar' : 'Ejecutar'}</span>
         </button>
         <button className="step-action" onClick={props.onStep} disabled={props.running} title="Avanzar una iteración">
           <StepForward size={16}/><span>Paso</span>
@@ -77,9 +92,6 @@ export function Topbar(props: Props) {
       </nav>
     </div>
 
-    <div className="topbar-right">
-      <SettingsMenu settings={props.settings} theme={props.theme} onSettings={props.onSettings} onTheme={props.onTheme}/>
-    </div>
   </header>;
 }
 

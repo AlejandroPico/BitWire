@@ -693,3 +693,106 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .instrument-picker > div { grid-template-columns: 1fr; max-height: 230px; overflow-y: auto; }
   .guide-layout { grid-template-columns: 1fr; grid-template-rows: 128px 1fr; }.guide-index { border-right: 0; border-bottom: 1px solid var(--line); overflow-x: auto; }.guide-index-summary { display: none; }.guide-index nav { display: grid; grid-auto-flow: column; grid-auto-columns: 175px; }.guide-index nav > button { border-right: 1px solid var(--line); }.guide-content { padding: 16px 13px; }.guide-chapter-heading h3 { font-size: 17px; }
 }
+
+/* La vista compacta conserva el plano completo y muestra los controles como capas. */
+.mobile-menu-toggle,.mobile-app-brand,.mobile-menu-title,.mobile-menu-links,.mobile-menu-backdrop,.mobile-panel-scrim,.mobile-stop,.mobile-handle-arrow { display: none; }
+.mobile-app-menu { display: contents; }
+.mobile-app-menu > .topbar-left { grid-column: 1; grid-row: 1; }
+.mobile-app-menu > .topbar-right { grid-column: 3; grid-row: 1; }
+.topbar-center { grid-column: 2; grid-row: 1; }
+
+@media (max-width: 1180px) {
+  html,body,#root { height: 100%; height: 100dvh; }
+  .app-shell { height: 100%; height: 100dvh; }
+  .editor-grid,.editor-grid.left-collapsed,.editor-grid.right-collapsed,.editor-grid.left-collapsed.right-collapsed,.editor-grid.bottom-collapsed {
+    min-width: 0; min-height: 0; grid-template-columns: minmax(0,1fr) !important; grid-template-rows: 54px minmax(0,1fr) 27px !important;
+  }
+  .topbar { grid-column: 1; grid-row: 1; position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 54px; z-index: 170; }
+  .topbar-center { grid-column: auto; grid-row: auto; width: auto; height: 42px; display: flex; justify-content: center; border: 0; padding: 0; }
+  .project-title,.simulation-state { display: none; }
+  .simulation-command { justify-self: center; height: 39px; }
+  .simulation-command > button.run-action,.simulation-command > button.stop-action,.simulation-command > button.step-action { min-width: 44px; padding: 0; }
+  .simulation-command > button span { display: none; }
+  .simulation-command .step-action,.simulation-command .toolbar-menu { display: flex !important; }
+  .simulation-command .toolbar-menu { min-width: 63px; height: 38px; }
+  .simulation-command .toolbar-menu-trigger { min-height: 38px; }
+  .desktop-pause { display: none; }
+  .mobile-stop { display: block; }
+  .mobile-menu-toggle { display: grid; place-items: center; position: absolute; left: max(5px,env(safe-area-inset-left)); top: 6px; width: 42px; height: 42px; color: var(--text-strong); border: 1px solid var(--line); }
+  .mobile-app-brand { display: flex; align-items: center; gap: 6px; position: absolute; left: 54px; color: var(--cyan); font: 700 12px "IBM Plex Mono",monospace; pointer-events: none; }
+  .mobile-app-brand img { width: 25px; height: 25px; }
+  .mobile-menu-backdrop { display: block; position: fixed; inset: 54px 0 0; z-index: 1; width: 100%; background: #02070b9e; }
+  .mobile-app-menu { display: none; position: fixed; z-index: 2; top: 54px; bottom: 27px; left: 0; width: min(370px,calc(100vw - 40px)); overflow-y: auto; padding: 16px; background: var(--chrome-1); border-right: 1px solid var(--line-strong); box-shadow: 8px 0 22px var(--shadow); }
+  .mobile-app-menu.open { display: flex; flex-direction: column; gap: 18px; }
+  .mobile-menu-title { display: flex; align-items: center; gap: 9px; min-width: 0; color: var(--text-strong); font-size: 16px; }
+  .mobile-menu-title img { width: 36px; height: 36px; }
+  .mobile-menu-title span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-left: auto; color: var(--muted); font-size: 10px; }
+  .mobile-app-menu > .topbar-left { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+  .mobile-app-menu .file-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  .mobile-app-menu .file-tools button { display: flex !important; min-height: 46px; justify-content: flex-start; gap: 9px; padding: 0 10px; border: 1px solid var(--line); }
+  .mobile-app-menu .file-tools button span { display: inline !important; }
+  .mobile-app-menu .history-tools { display: flex !important; gap: 8px; }
+  .mobile-app-menu .history-tools button { min-width: 46px; min-height: 42px; border: 1px solid var(--line); }
+  .mobile-app-menu > .topbar-right { display: flex; justify-content: flex-start; }
+  .mobile-menu-links { display: flex; gap: 7px; }
+  .mobile-menu-links button { display: flex; align-items: center; gap: 9px; flex: 1; min-height: 44px; padding: 0 9px; border: 1px solid var(--line); color: var(--text); }
+  .settings-popover { max-width: min(355px,calc(100vw - 56px)); max-height: min(65dvh,520px); overflow-y: auto; }
+  .workspace { grid-column: 1; grid-row: 2; min-height: 0; }
+  .statusbar { grid-column: 1; grid-row: 3; min-width: 0; overflow: hidden; }
+  .statusbar > div:nth-child(2),.theme-status { display: none; }
+  .statusbar > div:first-child { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .status-actions { flex-shrink: 0; }
+  .status-actions button { display: none; }
+  .mobile-panel-scrim { display: block; position: fixed; inset: 54px 0 27px; z-index: 95; border: 0; background: #02070ba8; }
+  .catalog-panel,.inspector-panel,.catalog-panel:not(.collapsed-panel),.inspector-panel:not(.collapsed-panel) { display: flex !important; grid-column: auto; grid-row: auto; }
+  .catalog-panel,.inspector-panel { position: fixed; top: 54px; bottom: 27px; z-index: 112; width: min(390px,calc(100vw - 46px)); max-width: none; }
+  .catalog-panel { left: 0; }
+  .inspector-panel { right: 0; }
+  .catalog-panel.collapsed-panel,.inspector-panel.collapsed-panel { top: 48%; bottom: auto; width: 34px; height: 154px; padding: 0; border: 1px solid var(--line-strong); z-index: 90; }
+  .catalog-panel.collapsed-panel { left: 0; }
+  .inspector-panel.collapsed-panel { right: 0; }
+  .collapsed-panel .compact-brand { display: none; }
+  .collapsed-panel .vertical-label { display: flex; align-items: center; justify-content: center; gap: 7px; height: 100% !important; width: 100% !important; font-size: 9px; letter-spacing: .07em; }
+  .mobile-handle-arrow { display: block; flex: none; transform: rotate(90deg); }
+  .inspector-panel .mobile-handle-arrow { transform: rotate(-90deg); }
+  .catalog-scroll,.inspector-scroll { overscroll-behavior: contain; }
+  .catalog-items { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .catalog-item { min-height: 58px; touch-action: manipulation; }
+  .catalog-panel .panel-help { min-height: 38px; padding: 6px 9px; text-align: center; }
+  .inspector-panel input,.inspector-panel select,.inspector-panel textarea,.catalog-panel input { font-size: max(14px,1rem); }
+  .inspector-panel button,.catalog-panel button { touch-action: manipulation; }
+  .instrument-tray,.instrument-tray.collapsed { position: fixed; grid-column: auto; grid-row: auto; left: 0; right: 0; bottom: 27px; top: auto; height: min(53dvh,480px); z-index: 120; }
+  .instrument-tray.collapsed { left: 50%; right: auto; width: 160px; height: 31px; transform: translateX(-50%); border: 1px solid var(--line-strong); z-index: 90; }
+  .instrument-tray:not(.collapsed) { display: flex; flex-direction: column; }
+  .instrument-grid { overflow-y: auto; min-height: 0; }
+  .floating-instrument:not(.minimized) { position: fixed !important; top: 60px !important; left: 6px !important; right: 6px !important; bottom: 35px !important; width: auto !important; height: auto !important; max-width: none !important; max-height: none !important; z-index: 190 !important; }
+  .floating-instrument.minimized { position: fixed !important; top: auto !important; left: 8px !important; bottom: 34px !important; width: min(320px,calc(100vw - 16px)) !important; height: auto !important; }
+  .floating-instrument-body { min-height: 0; overflow-y: auto; }
+  .floating-instrument-titlebar { touch-action: manipulation; }
+  .instrument-resize-handle { display: none; }
+  .modal-backdrop { padding: max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left)); }
+  .about-dialog,.offline-dialog,.help-guide { max-width: 100%; max-height: 100%; }
+}
+@media (max-width: 620px) {
+  .mobile-app-brand { display: none; }
+  .topbar-center { margin-left: 44px; }
+  .simulation-command .toolbar-menu { min-width: 55px; }
+  .catalog-items { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .workspace-breadcrumb { max-width: calc(100% - 20px); overflow-x: auto; white-space: nowrap; }
+  .lod-indicator { display: none; }
+  .zoom-controls button { min-width: 40px; min-height: 40px; }
+  .canvas-tool-palette button { min-width: 40px; min-height: 40px; }
+}
+
+@media (max-width: 1180px) {
+  .inspector-panel .property-field { min-height: 44px; }
+  .inspector-panel .property-field > label,.inspector-panel .pin-list dt,.inspector-panel .pin-list dd,.inspector-panel .metrics-list dt,.inspector-panel .metrics-list dd,.inspector-panel .component-description,.inspector-panel .instrument-binding label,.inspector-panel .instrument-binding p,.inspector-panel .empty-inspector p { font-size: 12px; }
+  .inspector-panel .number-control,.inspector-panel .state-button,.inspector-panel .module-actions button,.inspector-panel .instrument-binding select,.inspector-panel .add-pin-row button { min-height: 40px; font-size: 12px; }
+  .inspector-panel .number-control input,.inspector-panel .pin-editor-grid input,.inspector-panel .pin-editor-grid select { font-size: 16px; }
+  .inspector-panel .toggle { min-width: 44px; min-height: 26px; }
+  .inspector-panel .toggle span { width: 19px; height: 19px; }
+  .inspector-panel .toggle.on span { transform: translateX(18px); }
+  .catalog-panel .catalog-item strong { font-size: 12px; }
+  .catalog-panel .catalog-item small,.catalog-panel .category-heading span { font-size: 11px; }
+  .instrument-heading button,.floating-instrument-titlebar button { min-width: 38px; min-height: 38px; }
+}

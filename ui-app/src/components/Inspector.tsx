@@ -27,7 +27,7 @@ interface Props {
 }
 
 export function Inspector({ project, selected, collapsed, onToggle, onProperty, onPatch, onProject, onDelete, onDuplicate, onSelectModule, selectedModule, onModule, activeModuleId, onEnterModule, onSaveModule, onExportModule }: Props) {
-  if (collapsed) return <aside className="inspector-panel collapsed-panel right"><button className="icon-button vertical-label" onClick={onToggle}>INSPECTOR</button></aside>;
+  if (collapsed) return <aside className="inspector-panel collapsed-panel right"><button className="icon-button vertical-label" onClick={onToggle} title="Abrir inspector" aria-label="Abrir inspector"><ChevronRight className="mobile-handle-arrow" size={16}/>INSPECTOR</button></aside>;
   const component = selected.length === 1 ? project.components.find(item => item.id === selected[0]) : undefined;
   const baseDefinition = component ? CATALOG_BY_ID.get(component.definitionId) : undefined;
   const definition = component&&baseDefinition?effectiveDefinition(baseDefinition,component.properties):undefined;

@@ -128,3 +128,9 @@ La estructura actual deja preparadas las siguientes ampliaciones sin romper los 
 ## Licencia
 
 MIT © 2026 Alejandro Pico.
+
+## Instalación y uso táctil
+
+Abra `https://alejandropico.github.io/BitWire/` en Chrome para Android y elija **Instalar aplicación**. La aplicación usa un manifiesto y un service worker propios del directorio `/BitWire/`; después de la primera carga completa puede abrir el editor sin conexión, aunque los datos externos o actualizaciones requieren red. En escritorio Electron no se registra el service worker.
+
+En móviles y tabletas, el lienzo ocupa el área principal. El menú de tres rayas reúne archivo, historial, apariencia y ayuda; la simulación conserva los controles de detener, ejecutar, paso y velocidad en la franja superior. Las pestañas de los bordes abren Componentes, Inspector e Instrumentos. Toque un elemento del catálogo para insertarlo en el centro del lienzo y arrástrelo para situarlo; con dos dedos puede ampliar o reducir y con uno desplazarse por el fondo. El gesto o botón Atrás cierra primero la ventana o panel abierto.
