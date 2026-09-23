@@ -804,3 +804,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .floating-instrument-titlebar nav button { width: 32px; min-width: 32px; }
   .floating-instrument.expanded .professional-controls { grid-template-columns: minmax(0,1fr); }
 }
+
+@media (max-width: 1180px) and (pointer: coarse) {
+  .pin-hit { r: 18px; }
+  .pin-hit.dense { r: 14px; }
+  .wire .wire-hit { stroke-width: 24; }
+  .module-pin-hit { r: 19px; }
+}
