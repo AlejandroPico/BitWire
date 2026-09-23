@@ -811,3 +811,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .wire .wire-hit { stroke-width: 24; }
   .module-pin-hit { r: 19px; }
 }
+
+@media (max-width: 1180px) {
+  .mobile-app-menu .settings-control { flex: 1; width: 100%; height: auto; }
+  .mobile-app-menu .settings-trigger { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--line); }
+  .mobile-app-menu .settings-popover { position: relative; top: auto; right: auto; width: 100%; max-width: 100%; max-height: none; margin-top: 8px; overflow: visible; box-shadow: none; }
+  .speed-popover { position: fixed; top: 54px !important; left: 50%; right: auto; transform: translateX(-50%); width: min(330px,calc(100vw - 16px)); max-height: 60dvh; overflow-y: auto; }
+  .speed-popover > div button { min-height: 42px; font-size: 10px; }
+}
